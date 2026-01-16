@@ -1,0 +1,16 @@
+# --- From PDF Guide ---
+node_modules/
+dist/
+build/
+coverage/
+.env
+logs/
+*.log
+.DS_Store
+Thumbs.db
+
+# --- Essential for FastAPI (Python) ---
+__pycache__/
+*.py[cod]
+venv/
+.pytest_cache/
