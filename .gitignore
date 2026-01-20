@@ -1,16 +1,15 @@
-# --- From PDF Guide ---
-node_modules/
-dist/
-build/
-coverage/
-.env
-logs/
-*.log
+# React
+client/node_modules
+client/build
+
+# Python
+server/venv
+server/__pycache__/
+server/**/*.pyc
+
+# OS files
 .DS_Store
 Thumbs.db
 
-# --- Essential for FastAPI (Python) ---
-__pycache__/
-*.py[cod]
-venv/
-.pytest_cache/
+# Env files
+.env
