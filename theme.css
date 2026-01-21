@@ -1,0 +1,19 @@
+/* TalentLink Theme CSS */
+
+/* Primary Button */
+.btn-primary {
+  width: 322px;
+  height: 39px;
+  background-color: #0104F4;
+  color: #FFFFFF;
+  border-radius: 6px;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Page styling */
+body {
+  background-color: #F5F5F5;
+  font-family: Inter, Arial, sans-serif;
+}
