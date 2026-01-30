@@ -18,7 +18,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
-    role = Column(String, default=UserRole.FREELANCER) # Storing enum as string for simplicity
+    role = Column(String, default=UserRole.FREELANCER) 
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     last_login = Column(DateTime(timezone=True), onupdate=func.now())
@@ -39,12 +39,24 @@ class FreelancerProfile(Base):
     bio = Column(Text)
     hourly_rate = Column(DECIMAL(10, 2))
     
-    # Using JSON to store lists like ["React", "Python"] compatible with SQLite & Postgres
+    # Skills & Portfolio
     skills = Column(JSON, default=list) 
     portfolio_items = Column(JSON, default=list)
     
     rating = Column(DECIMAL(3, 2), default=0.0)
     total_projects = Column(Integer, default=0)
+
+    # --- NEW FIELDS (From Figma) ---
+    phone = Column(String, nullable=True)
+    location = Column(String, nullable=True)
+    years_experience = Column(String, nullable=True) # e.g. "5-10 years"
+    availability = Column(String, nullable=True)     # e.g. "Full-time"
+    
+    # Social Links
+    linkedin = Column(String, nullable=True)
+    github = Column(String, nullable=True)
+    portfolio_website = Column(String, nullable=True) 
+    twitter = Column(String, nullable=True)
     
     # Back link to User
     user = relationship("User", back_populates="freelancer_profile")
@@ -62,6 +74,16 @@ class ClientProfile(Base):
     
     rating = Column(DECIMAL(3, 2), default=0.0)
     projects_posted = Column(Integer, default=0)
+
+    # --- NEW FIELDS (From Figma) ---
+    website = Column(String, nullable=True)
+    location_city = Column(String, nullable=True)
+    location_state = Column(String, nullable=True)
+    location_country = Column(String, nullable=True)
+    linkedin_profile = Column(String, nullable=True)
+    
+    # Privacy Settings
+    is_public = Column(Boolean, default=True)
     
     # Back link to User
     user = relationship("User", back_populates="client_profile")

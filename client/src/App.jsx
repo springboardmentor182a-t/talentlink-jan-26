@@ -1,24 +1,20 @@
 // client/src/App.jsx
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout";
 import FreelancerProfile from "./pages/FreelancerProfile";
-import ClientProfile from "./pages/ClientProfile"; // <--- Import New Page
-import './themes.css';
+import ClientProfile from "./pages/ClientProfile";
+import "./assets/theme.css"; // Ensure this matches your file location
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-50">
-        <Routes>
-          <Route path="/" element={<h1>Welcome to TalentLink</h1>} />
-          
-          {/* Freelancer Route */}
-          <Route path="/profile/freelancer" element={<FreelancerProfile />} />
-          
-          {/* Client Route (NEW) */}
-          <Route path="/profile/client" element={<ClientProfile />} />
-        </Routes>
-      </div>
-    </Router>
+    <Routes>
+      {/* All pages inside this Route will have the Sidebar */}
+      <Route element={<Layout />}>
+        <Route path="/" element={<div className="p-10 text-2xl font-bold text-gray-400">Dashboard Coming Soon...</div>} />
+        <Route path="/profile/freelancer" element={<FreelancerProfile />} />
+        <Route path="/profile/client" element={<ClientProfile />} />
+      </Route>
+    </Routes>
   );
 }
 
