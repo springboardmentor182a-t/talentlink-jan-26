@@ -1,32 +1,24 @@
-# server/src/main.py
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware # <--- NEW IMPORT
+from fastapi.middleware.cors import CORSMiddleware
 from .database.core import engine
-from .users import models, router as user_router
+from .proposals import models
+from .proposals.router import router as proposals_router
 
-# Create tables
+# This creates the database file and tables automatically
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(title="TalentLink API")
 
-# --- NEW: SECURITY PASS (CORS) ---
-# This tells the server: "Allow requests from the React app running on port 5173"
-origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-]
-
+# Security: Allows React to talk to FastAPI
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# ---------------------------------
-
-app.include_router(user_router.router)
+app.include_router(proposals_router)
 
 @app.get("/")
-def read_root():
-    return {"message": "TalentLink API is running!"}
+def root():
+    return {"message": "Success! The Backend is finally running."}

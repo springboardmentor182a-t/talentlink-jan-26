@@ -1,22 +1,33 @@
 // client/src/App.jsx
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import FreelancerProfile from "./pages/FreelancerProfile";
-import ClientProfile from "./pages/ClientProfile"; // <--- Import New Page
-import './themes.css';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Sidebar from './layout/Sidebar';
+import FreelancerDashboard from './pages/FreelancerDashboard';
+import BrowseProjects from './pages/BrowseProjects';
+import Contracts from './pages/Contracts';
+import Messages from './pages/Messages';
+import FreelancerProfile from './pages/FreelancerProfile';
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
-        <Routes>
-          <Route path="/" element={<h1>Welcome to TalentLink</h1>} />
-          
-          {/* Freelancer Route */}
-          <Route path="/profile/freelancer" element={<FreelancerProfile />} />
-          
-          {/* Client Route (NEW) */}
-          <Route path="/profile/client" element={<ClientProfile />} />
-        </Routes>
+      <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#F8F9FA' }}>
+        {/* The Sidebar is OUTSIDE Routes so it never disappears */}
+        <Sidebar /> 
+        
+        {/* The Main Content area that changes based on the URL */}
+        <div style={{ flex: 1, marginLeft: '300px', padding: '40px' }}>
+          <Routes>
+            {/* Redirect / to /dashboard automatically */}
+            <Route path="/" element={<Navigate to="/dashboard" />} />
+            
+            {/* Each route matches a part of your sidebar */}
+            <Route path="/dashboard" element={<FreelancerDashboard />} />
+            <Route path="/projects" element={<BrowseProjects />} />
+            <Route path="/contracts" element={<Contracts />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/profile/freelancer" element={<FreelancerProfile />} />
+          </Routes>
+        </div>
       </div>
     </Router>
   );
