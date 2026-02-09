@@ -16,7 +16,7 @@ export default function ClientProfile() {
       };
       
       // REMEMBER: Use a valid CLIENT User ID here (e.g., 2)
-      await createClientProfile(2, formattedData);
+      await createClientProfile(1, formattedData);
       alert("Company Profile Saved Successfully!");
     } catch (error) {
       console.error(error);
