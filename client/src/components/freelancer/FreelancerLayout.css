@@ -1,0 +1,28 @@
+.freelancer-layout {
+  display: flex;
+  height: 100vh;
+  background: #f5f7fa;
+}
+
+.freelancer-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.freelancer-content {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .freelancer-layout {
+    flex-direction: column;
+  }
+
+  .freelancer-main {
+    flex: 1;
+  }
+}

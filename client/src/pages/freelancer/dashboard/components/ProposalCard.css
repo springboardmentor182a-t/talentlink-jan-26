@@ -1,0 +1,71 @@
+.proposal-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.proposal-card:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.proposal-header {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.proposal-icon {
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  background: #e8e8ff;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.proposal-info {
+  flex: 1;
+}
+
+.proposal-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.4;
+}
+
+.proposal-client {
+  margin: 5px 0 0 0;
+  font-size: 13px;
+  color: #999;
+}
+
+.proposal-budget {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #22c55e;
+}
+
+.proposal-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #dce4ff;
+  color: #6c63ff;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
