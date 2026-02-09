@@ -2,6 +2,8 @@ import React from 'react';
 import './ProposalCard.css';
 
 const ProposalCard = ({ proposal }) => {
+  const tags = Array.isArray(proposal.tags) ? proposal.tags : [];
+
   return (
     <div className="proposal-card">
       <div className="proposal-header">
@@ -15,7 +17,7 @@ const ProposalCard = ({ proposal }) => {
       <p className="proposal-budget">${proposal.budget}</p>
       
       <div className="proposal-tags">
-        {proposal.tags.map((tag, idx) => (
+        {tags.map((tag, idx) => (
           <span key={idx} className="tag">{tag}</span>
         ))}
       </div>

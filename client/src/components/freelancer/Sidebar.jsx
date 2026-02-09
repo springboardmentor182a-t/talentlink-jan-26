@@ -1,10 +1,42 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Sidebar.css';
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState('dashboard');
+  const [userName, setUserName] = useState('Freelancer');
+
+  useEffect(() => {
+    const apiBase = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
+    const controller = new AbortController();
+
+    const fetchUser = async () => {
+      try {
+        const response = await fetch(`${apiBase}/freelancer/profile`, {
+          signal: controller.signal
+        });
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data = await response.json();
+        const name = data?.name || data?.firstName || data?.user?.name;
+        if (name) {
+          setUserName(name);
+        }
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setUserName('Freelancer');
+        }
+      }
+    };
+
+    fetchUser();
+
+    return () => controller.abort();
+  }, []);
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: '📊', path: '/freelancer/dashboard' },
@@ -54,7 +86,7 @@ const Sidebar = () => {
         <div className="user-preview">
           <div className="user-avatar">👤</div>
           <div className="user-info">
-            <p className="user-name">Nayana SP</p>
+            <p className="user-name">{userName}</p>
             <p className="user-role">Freelancer</p>
           </div>
         </div>

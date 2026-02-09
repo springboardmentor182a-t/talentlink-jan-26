@@ -97,6 +97,13 @@
   border-radius: 8px;
 }
 
+.placeholder {
+  color: #999;
+  font-size: 14px;
+  margin: 0;
+  text-align: center;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .dashboard-content {
