@@ -205,6 +205,161 @@ function FindProjects() {
 
 </div>
 
+<div style={{
+  background: "white",
+  padding: "20px",
+  marginBottom: "20px",
+  borderRadius: "10px",
+  boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
+}}>
+
+  <h3>Content Writer for Tech Blog</h3>
+
+  <p style={{ color: "gray", fontSize: "14px" }}>
+    ⏱ 1 day ago • Remote • 15 proposals
+  </p>
+
+  <p>
+    Seeking experienced tech writer to create engaging articles about software development, AI and emerging technologies.
+  </p>
+
+  <div style={{ marginTop: "10px", marginBottom: "10px" }}>
+    <span style={{ background: "#e6f0ff", padding: "5px 10px", marginRight: "8px", borderRadius: "6px" }}>Content Writing</span>
+    <span style={{ background: "#e6f0ff", padding: "5px 10px", marginRight: "8px", borderRadius: "6px" }}>Tech Knowledge</span>
+    <span style={{ background: "#e6f0ff", padding: "5px 10px", marginRight: "8px", borderRadius: "6px" }}>SEO</span>
+    <span style={{ background: "#e6f0ff", padding: "5px 10px", borderRadius: "6px" }}>Research</span>
+  </div>
+
+  <div style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: "10px"
+  }}>
+
+    <p style={{ fontSize: "14px" }}>
+      Budget: $500 - $800 &nbsp;&nbsp;
+      Duration: 1 month &nbsp;&nbsp;
+      Client: Digital Media Co.
+    </p>
+
+    <button style={{
+      padding: "10px 20px",
+      background: "#4f46e5",
+      color: "white",
+      border: "none",
+      borderRadius: "6px"
+    }}>
+      Apply Now
+    </button>
+
+  </div>
+
+</div>
+
+<div style={{
+  background: "white",
+  padding: "20px",
+  marginBottom: "20px",
+  borderRadius: "10px",
+  boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
+}}>
+
+  <h3>Social Media Marketing Campaign</h3>
+
+  <p style={{ color: "gray", fontSize: "14px" }}>
+    ⏱ 6 hours ago • Remote • 20 proposals
+  </p>
+
+  <p>
+    Looking for social media expert to manage and grow our Instagram and TikTok presence. Must have proven track record.Need a creative designer to create modern, user-friendly mobile app designs for iOS and Android.
+  </p>
+
+  <div style={{ marginTop: "10px", marginBottom: "10px" }}>
+    <span style={{ background: "#e6f0ff", padding: "5px 10px", marginRight: "8px", borderRadius: "6px" }}>Social Media</span>
+    <span style={{ background: "#e6f0ff", padding: "5px 10px", marginRight: "8px", borderRadius: "6px" }}>Content Strategy</span>
+    <span style={{ background: "#e6f0ff", padding: "5px 10px", marginRight: "8px", borderRadius: "6px" }}>Analytics</span>
+    <span style={{ background: "#e6f0ff", padding: "5px 10px", borderRadius: "6px" }}>Instagram</span>
+  </div>
+
+  <div style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: "10px"
+  }}>
+
+    <p style={{ fontSize: "14px" }}>
+      Budget: $800 - $1,500 &nbsp;&nbsp;
+      Duration: 1-2 months &nbsp;&nbsp;
+      Client: Fashion Brand Co.
+    </p>
+
+    <button style={{
+      padding: "10px 20px",
+      background: "#4f46e5",
+      color: "white",
+      border: "none",
+      borderRadius: "6px"
+    }}>
+      Apply Now
+    </button>
+
+  </div>
+
+</div>
+
+<div style={{
+  background: "white",
+  padding: "20px",
+  marginBottom: "20px",
+  borderRadius: "10px",
+  boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
+}}>
+
+  <h3>WordPress Plugin Development</h3>
+
+  <p style={{ color: "gray", fontSize: "14px" }}>
+    ⏱ 4 hours ago • Remote • 10 proposals
+  </p>
+
+  <p>
+    Need WordPress expert to develop custom plugin for e-commerce functionality. Must follow WordPress coding standards.
+  </p>
+
+  <div style={{ marginTop: "10px", marginBottom: "10px" }}>
+    <span style={{ background: "#e6f0ff", padding: "5px 10px", marginRight: "8px", borderRadius: "6px" }}>WordPress</span>
+    <span style={{ background: "#e6f0ff", padding: "5px 10px", marginRight: "8px", borderRadius: "6px" }}>PHP</span>
+    <span style={{ background: "#e6f0ff", padding: "5px 10px", marginRight: "8px", borderRadius: "6px" }}>MySQL</span>
+    <span style={{ background: "#e6f0ff", padding: "5px 10px", borderRadius: "6px" }}>JavaScript</span>
+  </div>
+
+  <div style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: "10px"
+  }}>
+
+    <p style={{ fontSize: "14px" }}>
+      Budget: $1,500 - $2,500 &nbsp;&nbsp;
+      Duration: 1 month &nbsp;&nbsp;
+      Client: Web Agency Pro
+    </p>
+
+    <button style={{
+      padding: "10px 20px",
+      background: "#4f46e5",
+      color: "white",
+      border: "none",
+      borderRadius: "6px"
+    }}>
+      Apply Now
+    </button>
+
+  </div>
+
+</div>
 
     </div>
   );
