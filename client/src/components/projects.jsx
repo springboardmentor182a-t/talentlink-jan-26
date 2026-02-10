@@ -5,11 +5,12 @@ const Projects = () => {
   // 1. Define your "States" to hold the search results and input
   const [projects, setProjects] = useState([]);
   const [minPrice, setMinPrice] = useState(0);
+  const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
   // 2. PASTE THE CODE HERE (The Logic)
   const handleSearch = async () => {
     try {
-      const res = await axios.get(`http://127.0.0.1:8000/projects/?min_budget=${minPrice}`);
+      const res = await axios.get(`${API_URL}/projects/?min_budget=${minPrice}`);
       setProjects(res.data);
     } catch (error) {
       console.error("Search failed:", error);
