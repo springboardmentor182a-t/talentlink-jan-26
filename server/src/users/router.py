@@ -11,19 +11,58 @@ router = APIRouter(prefix="/users", tags=["Users"])
 # 1. Register a New User
 @router.post("/", response_model=schemas.UserResponse)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    # Check if email already exists
     db_user = service.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     return service.create_user(db=db, user=user)
 
-# 2. Create Freelancer Profile
+# 2. Create OR Update Freelancer Profile (THE FIXED UPSERT LOGIC)
 @router.post("/{user_id}/freelancer-profile", response_model=schemas.FreelancerProfileResponse)
 def create_freelancer_profile(user_id: int, profile: schemas.FreelancerProfileCreate, db: Session = Depends(get_db)):
-    # In a real app, we would verify the currently logged-in user here
-    return service.create_freelancer_profile(db=db, user_id=user_id, profile=profile)
+    # Check if profile exists
+    db_profile = db.query(models.FreelancerProfile).filter(models.FreelancerProfile.user_id == user_id).first()
+    
+    if db_profile:
+        # UPDATE existing
+        for key, value in profile.dict().items():
+            setattr(db_profile, key, value)
+        db.commit()
+        db.refresh(db_profile)
+        return db_profile
+    else:
+        # CREATE new
+        return service.create_freelancer_profile(db=db, user_id=user_id, profile=profile)
 
-# 3. Create Client Profile
+# 3. Create OR Update Client Profile (THE FIXED UPSERT LOGIC)
 @router.post("/{user_id}/client-profile", response_model=schemas.ClientProfileResponse)
 def create_client_profile(user_id: int, profile: schemas.ClientProfileCreate, db: Session = Depends(get_db)):
-    return service.create_client_profile(db=db, user_id=user_id, profile=profile)
+    db_profile = db.query(models.ClientProfile).filter(models.ClientProfile.user_id == user_id).first()
+    
+    if db_profile:
+        # UPDATE existing
+        for key, value in profile.dict().items():
+            setattr(db_profile, key, value)
+        db.commit()
+        db.refresh(db_profile)
+        return db_profile
+    else:
+        # CREATE new
+        return service.create_client_profile(db=db, user_id=user_id, profile=profile)
+
+# 4. Get Freelancer Profile (THE MISSING FUNCTION)
+@router.get("/{user_id}/freelancer_profile", response_model=schemas.FreelancerProfileResponse)
+def get_freelancer_profile(user_id: int, db: Session = Depends(get_db)):
+    from . import models
+    profile = db.query(models.FreelancerProfile).filter(models.FreelancerProfile.user_id == user_id).first()
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    return profile
+
+# 5. Get Client Profile (THE MISSING FUNCTION)
+@router.get("/{user_id}/client_profile", response_model=schemas.ClientProfileResponse)
+def get_client_profile(user_id: int, db: Session = Depends(get_db)):
+    from . import models
+    profile = db.query(models.ClientProfile).filter(models.ClientProfile.user_id == user_id).first()
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    return profile
