@@ -1,0 +1,13 @@
+/* Sidebar Links */
+
+.sidebar a {
+  display: block;
+  color: #CBD5E1;
+  text-decoration: none;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.sidebar a:hover {
+  color: var(--text-light);
+}
