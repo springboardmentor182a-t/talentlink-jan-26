@@ -40,31 +40,36 @@ class DashboardResponse(BaseModel):
     recommended_projects: List[Project]
 
 # --- ENDPOINTS ---
+from fastapi import Depends
+from sqlalchemy.orm import Session
+from .database.core import get_db
+from .proposals import models
 
-@app.get("/dashboard/", response_model=DashboardResponse)
-async def get_dashboard():
+@app.get("/dashboard/")
+def get_dashboard(db: Session = Depends(get_db)):
+    # Pulls real data from the database
+    recommended_projects = db.query(models.Project).limit(6).all()
+    active_contract = db.query(models.Contract).filter(models.Contract.status == "Active").first()
+    
     return {
         "welcome_msg": "Welcome back, John! 👋",
         "stats": {
-            "active_projects": 3,
+            "active_projects": db.query(models.Project).count(),
             "pending_proposals": 12,
             "total_earnings": "$4.5k",
             "profile_views": 247
         },
-        "active_contract": {
-            "title": "Website Redesign",
-            "due": "5 days",
-            "progress": 75
-        },
-        "recommended_projects": [
-            { "id": 1, "title": "Mobile App Development", "client": "TechStart Inc.", "budget": "$3,000 - $6,000", "match": "95%" },
-            { "id": 2, "title": "E-Commerce Website", "client": "Shopify Experts", "budget": "$1,500 - $2,500", "match": "88%" },
-            { "id": 3, "title": "Corporate Logo Design", "client": "Bright Future Ltd.", "budget": "$500 - $1,200", "match": "92%" },
-            { "id": 4, "title": "React Frontend Fixes", "client": "WebSolutions Co.", "budget": "$40 - $60 / hr", "match": "85%" },
-            { "id": 5, "title": "Python API Optimization", "client": "DataFlow Systems", "budget": "$2,000 fixed", "match": "90%" },
-            { "id": 6, "title": "UI/UX Design for Travel App", "client": "Wanderlust Inc.", "budget": "$4,000 - $5,000", "match": "80%" }
-        ]
+        "active_contract": active_contract or {"title": "No active contracts", "progress": 0},
+        "recommended_projects": recommended_projects
     }
+
+@app.get("/projects/")
+def get_all_projects(db: Session = Depends(get_db)):
+    return db.query(models.Project).all()
+
+@app.get("/contracts/")
+def get_all_contracts(db: Session = Depends(get_db)):
+    return db.query(models.Contract).all()
 
 @app.get("/")
 async def root():
