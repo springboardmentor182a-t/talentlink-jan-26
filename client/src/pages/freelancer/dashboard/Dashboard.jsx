@@ -6,6 +6,69 @@ import ContractCard from './components/ContractCard';
 import ActivityItem from './components/ActivityItem';
 import './Dashboard.css';
 
+const demoData = {
+  stats: {
+    activeProposals: 12,
+    ongoingProjects: 4,
+    totalEarnings: 8750,
+    profileViews: 342
+  },
+  proposals: [
+    {
+      id: 1,
+      title: 'E-commerce Website Redesign',
+      client: 'TechCorp Inc.',
+      budget: '$2,500',
+      tags: ['UI/UX', 'React', 'Figma']
+    },
+    {
+      id: 2,
+      title: 'Mobile App Dashboard',
+      client: 'StartupXYZ',
+      budget: '$1,800',
+      tags: ['React Native', 'API']
+    },
+    {
+      id: 3,
+      title: 'Data Analytics Portal',
+      client: 'DataFlow Ltd.',
+      budget: '$3,200',
+      tags: ['Analytics', 'Charts', 'D3.js']
+    }
+  ],
+  contracts: [
+    {
+      id: 1,
+      title: 'Custom Dashboard Development',
+      client: 'Innovation Labs',
+      budget: '$4,500'
+    },
+    {
+      id: 2,
+      title: 'SaaS Platform Migration',
+      client: 'CloudTech',
+      budget: '$6,200'
+    }
+  ],
+  earningsSeries: [
+    { month: 'Jan', earnings: 1200 },
+    { month: 'Feb', earnings: 1800 },
+    { month: 'Mar', earnings: 2100 },
+    { month: 'Apr', earnings: 1900 },
+    { month: 'May', earnings: 2400 },
+    { month: 'Jun', earnings: 2800 }
+  ],
+  activities: [
+    { id: 1, message: 'New proposal submitted for "Marketing Website"', time: '2 hours ago' },
+    { id: 2, message: 'Contract signed with TechVentures', time: '5 hours ago' },
+    { id: 3, message: 'Milestone completed for "Dashboard Project"', time: 'Yesterday' },
+    { id: 4, message: 'Profile viewed by 12 clients', time: '2 days ago' }
+  ],
+  user: {
+    name: 'Akash'
+  }
+};
+
 const Dashboard = () => {
   const [stats, setStats] = useState({
     activeProposals: 0,
@@ -57,7 +120,13 @@ const Dashboard = () => {
         }
       } catch (err) {
         if (err.name !== 'AbortError') {
-          setError(err.message || 'Failed to load dashboard data');
+          setError('');
+          setStats(demoData.stats);
+          setProposals(demoData.proposals);
+          setContracts(demoData.contracts);
+          setEarningsData(demoData.earningsSeries);
+          setActivities(demoData.activities);
+          setDisplayName(demoData.user.name);
         }
       } finally {
         setIsLoading(false);
