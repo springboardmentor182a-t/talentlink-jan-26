@@ -1,7 +1,8 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 
+// Dashboard
 import Sidebar from "./layout/Sidebar";
 import ClientDashboard from "./pages/ClientDashboard";
 
@@ -36,7 +37,7 @@ const DashboardLayout = ({ children }) => {
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <BrowserRouter>
         <Routes>
           {/* Public / Auth routes */}
           <Route path="/" element={<ChooseRole />} />
@@ -58,7 +59,7 @@ function App() {
           {/* Fallback */}
           <Route path="*" element={<div style={{ padding: "24px" }}>Page not found</div>} />
         </Routes>
-      </Router>
+      </BrowserRouter>
     </AuthProvider>
   );
 }
