@@ -1,24 +1,37 @@
-import logo from './logo.svg';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Sidebar from './layout/Sidebar';
+import ClientDashboard from './pages/ClientDashboard';
 import './App.css';
+
+// Layout wrapper to include Sidebar and main content area
+const Layout = ({ children }) => {
+  return (
+    <div style={{ display: 'flex' }}>
+      <Sidebar />
+      <main style={{
+        flex: 1,
+        marginLeft: '250px',
+        minHeight: '100vh',
+        backgroundColor: 'var(--background)'
+      }}>
+        {children}
+      </main>
+    </div>
+  );
+};
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<ClientDashboard />} />
+          <Route path="*" element={<div style={{ padding: '24px' }}>Page not found</div>} />
+        </Routes>
+      </Layout>
+    </Router>
   );
 }
 
