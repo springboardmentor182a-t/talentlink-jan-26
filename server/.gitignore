@@ -1,9 +1,0 @@
-pycache/
-*.pyc
-*.pyo
-*.pyd
-.env
-venv/
-.env.local
-.DS_Store
-.pytest_cache/
