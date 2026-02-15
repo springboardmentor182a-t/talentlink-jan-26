@@ -1,24 +1,24 @@
-# server/src/database/core.py
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import os
+from dotenv import load_dotenv
 
-# --- CONFIGURATION ---
+load_dotenv()
 
-# Later, for production, we change this string to connect to PostgreSQL.
-SQLALCHEMY_DATABASE_URL = "sqlite:///./talentlink.db"
-# SQLALCHEMY_DATABASE_URL = "postgresql://user:password@localhost/dbname"
+# Simple relative path - will look in parent directory when run from server/
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///../talentlink.db")
 
-# --- SETUP ---
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, 
-    connect_args={"check_same_thread": False} # Needed only for SQLite
+    DATABASE_URL,
+    connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
 )
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
-# Dependency to get the DB session in other files
+
 def get_db():
     db = SessionLocal()
     try:

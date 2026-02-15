@@ -1,27 +1,41 @@
 // client/src/App.jsx
-import { Routes, Route } from "react-router-dom";
-import Layout from "./components/Layout";
-import FreelancerProfile from "./pages/FreelancerProfile"; // The Edit Page
-import ClientProfile from "./pages/ClientProfile";         // The Edit Page
-import FreelancerView from "./pages/FreelancerView";       // The NEW View Page
-import ClientView from "./pages/ClientView";               // The NEW View Page
-import "./assets/theme.css"; 
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+// ── Existing profile pages (other module — do not touch) ──────────────────
+import FreelancerProfile from './pages/FreelancerProfile';
+import ClientProfile from './pages/ClientProfile';
+
+// ── New auth pages ─────────────────────────────────────────────────────────
+import RoleSelection    from './pages/RoleSelection';
+import Login            from './pages/Login';
+import SignupFreelancer from './pages/SignupFreelancer';
+import SignupClient     from './pages/SignupClient';
+import ForgotPassword   from './pages/ForgotPassword';
+import ResetPassword    from './pages/ResetPassword';
+import Dashboard        from './pages/Dashboard';
 
 function App() {
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<div className="p-10 text-2xl font-bold text-gray-400">Dashboard</div>} />
-        
-        {/* FREELANCER ROUTES */}
-        <Route path="/profile/freelancer" element={<FreelancerView />} />         {/* VIEW */}
-        <Route path="/profile/freelancer/edit" element={<FreelancerProfile />} /> {/* EDIT */}
+    <Router>
+      <Routes>
+        {/* ── Auth flow ──────────────────────────────────────────────── */}
+        <Route path="/"                    element={<RoleSelection />} />
+        <Route path="/login"               element={<Login />} />
+        <Route path="/signup/freelancer"   element={<SignupFreelancer />} />
+        <Route path="/signup/client"       element={<SignupClient />} />
+        <Route path="/forgot-password"     element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/dashboard"           element={<Dashboard />} />
 
-        {/* CLIENT ROUTES */}
-        <Route path="/profile/client" element={<ClientView />} />                 {/* VIEW */}
-        <Route path="/profile/client/edit" element={<ClientProfile />} />         {/* EDIT */}
-      </Route>
-    </Routes>
+        {/* ── Existing profile pages (other module) ──────────────────── */}
+        <Route path="/profile/freelancer"  element={<FreelancerProfile />} />
+        <Route path="/profile/client"      element={<ClientProfile />} />
+
+        {/* ── TEMPORARY: Dashboard routes for testing (will be replaced during merge) ── */}
+        <Route path="/freelancer/dashboard" element={<Dashboard />} />
+        <Route path="/client/dashboard"     element={<Dashboard />} />
+      </Routes>
+    </Router>
   );
 }
 
