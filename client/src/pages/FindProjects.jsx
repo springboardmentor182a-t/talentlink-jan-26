@@ -1,34 +1,31 @@
+import { useEffect, useState } from "react";
 import ProjectCard from "../components/ProjectCard";
 import ProjectFilters from "../components/ProjectFilters";
 import "./findProjects.css";
 
 const FindProjects = () => {
-  const projects = [
-  {
-    id: 1,
-    title: "React Dashboard Development",
-    description: "Build a responsive dashboard using React and REST APIs.",
-    budget: "₹15,000 – ₹25,000",
-    duration: "2 weeks",
-    skills: ["React", "API", "CSS"],
-  },
-  {
-    id: 2,
-    title: "Django REST API for Freelance Platform",
-    description: "Create secure REST APIs using Django and JWT.",
-    budget: "₹20,000 – ₹30,000",
-    duration: "3 weeks",
-    skills: ["Django", "JWT", "PostgreSQL"],
-  },
-  {
-    id: 3,
-    title: "UI Design for Startup Website",
-    description: "Design clean UI screens using Figma.",
-    budget: "₹8,000 – ₹12,000",
-    duration: "1 week",
-    skills: ["Figma", "UI/UX"],
-  },
-];
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/projects/")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch projects");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setProjects(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching projects:", err);
+        setError("Unable to load projects.");
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <div className="find-projects-container">
@@ -42,14 +39,24 @@ const FindProjects = () => {
       {/* Filters */}
       <ProjectFilters />
 
+      {/* Loading */}
+      {loading && <p>Loading projects...</p>}
+
+      {/* Error */}
+      {error && <p className="error-text">{error}</p>}
+
       {/* Project List */}
-      <div className="projects-list">
-  {projects.map((project) => (
-    <ProjectCard key={project.id} project={project} />
-  ))}
-</div>
-
-
+      {!loading && !error && (
+        <div className="projects-list">
+          {projects.length === 0 ? (
+            <p>No projects available.</p>
+          ) : (
+            projects.map((project) => (
+              <ProjectCard key={project.id} project={project} />
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 };
