@@ -14,9 +14,12 @@ const ClientLogin = () => {
     const res = await api.post("/auth/login", {
       email,
       password,
-      role: "client",
     });
-    login(res.data);
+    login({
+      token: res.data.access_token,
+      role: "client",
+      user: { email },
+    });
   };
 
   return (
