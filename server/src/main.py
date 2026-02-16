@@ -1,7 +1,27 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from src.projects.controller import router as projects_router
+from src.client_dashboard.controller import router as client_dashboard_router
+from src.database.core import engine, Base
 
-app = FastAPI()
+# Create tables if they don't exist (useful for dev)
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="TalentLink API", version="1.0.0")
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include Routers
+app.include_router(projects_router)
+app.include_router(client_dashboard_router)
 
 @app.get("/")
 def home():
-    return {"message": "Backend working ✅"}
+    return {"message": "Backend working ✅", "status": "online"}
