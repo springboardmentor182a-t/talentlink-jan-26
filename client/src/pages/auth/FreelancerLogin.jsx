@@ -17,8 +17,8 @@ const FreelancerLogin = () => {
   const handleSubmit = async () => {
     try {
       const res = await api.post("/auth/login/", {
-        username: username,
-        password: password,
+        username,
+        password,
       });
 
       login({
@@ -38,7 +38,9 @@ const FreelancerLogin = () => {
       title="Freelancer Login"
       subtitle="Find projects and work with clients"
     >
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && (
+        <p style={{ color: "red", textAlign: "center" }}>{error}</p>
+      )}
 
       <InputField
         label="Username / Email"
@@ -57,6 +59,10 @@ const FreelancerLogin = () => {
       <div onClick={handleSubmit}>
         <AuthButton text="Login as Freelancer" />
       </div>
+
+      <p style={{ marginTop: "12px", textAlign: "center" }}>
+        <Link to="/forgot-password">Forgot Password?</Link>
+      </p>
 
       <p style={{ marginTop: "12px", textAlign: "center" }}>
         Don’t have an account?{" "}
