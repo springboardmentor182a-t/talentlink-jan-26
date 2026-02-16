@@ -1,24 +1,33 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import ChooseRole from "./pages/auth/ChooseRole";
-import ClientLogin from "./pages/auth/ClientLogin";
-import ClientSignup from "./pages/auth/ClientSignup";
-import FreelancerLogin from "./pages/auth/FreelancerLogin";
-import FreelancerSignup from "./pages/auth/FreelancerSignup";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import Login from './pages/login';
+import Signup from './pages/signup';
+import Chat from './pages/chat';
+import './App.css';
+
+function Home() {
+  return (
+    <div className="App">
+      <header className="App-header">
+        <h1>Welcome to TalentLink</h1>
+        <nav>
+          <Link to="/login" className="App-link">Login</Link> | <Link to="/signup" className="App-link">Signup</Link>
+        </nav>
+      </header>
+    </div>
+  );
+}
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<ChooseRole />} />
-          <Route path="/client/login" element={<ClientLogin />} />
-          <Route path="/client/signup" element={<ClientSignup />} />
-          <Route path="/freelancer/login" element={<FreelancerLogin />} />
-          <Route path="/freelancer/signup" element={<FreelancerSignup />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/chat" element={<Chat />} />
+      </Routes>
+    </Router>
   );
 }
 

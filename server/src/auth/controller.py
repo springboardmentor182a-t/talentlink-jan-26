@@ -1,39 +1,25 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, HTTPException, status
+from pydantic import BaseModel
 
-from src.database.core import SessionLocal
-from src.auth.models import RegisterRequest, LoginRequest, TokenResponse
-from src.auth.service import register_user, authenticate_user, create_token
+router = APIRouter()
 
-router = APIRouter(prefix="/auth", tags=["Authentication"])
+class UserLogin(BaseModel):
+    email: str
+    password: str
 
+class UserSignup(BaseModel):
+    email: str
+    password: str
+    username: str
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+@router.post("/login")
+def login(user: UserLogin):
+    # TODO: Implement actual login logic with database and JWT
+    if user.email == "test@test.com" and user.password == "password":
+        return {"access_token": "fake-jwt-token", "token_type": "bearer"}
+    raise HTTPException(status_code=401, detail="Invalid credentials")
 
-
-@router.post("/register")
-def register(data: RegisterRequest, db: Session = Depends(get_db)):
-    user = register_user(db, data.name, data.email, data.password, data.role)
-    if not user:
-        raise HTTPException(status_code=400, detail="User already exists")
-
-    return {"message": "Registration successful"}
-
-
-@router.post("/login", response_model=TokenResponse)
-def login(data: LoginRequest, db: Session = Depends(get_db)):
-    user = authenticate_user(db, data.email, data.password)
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-
-    token = create_token({
-        "sub": user.email,
-        "role": user.role
-    })
-
-    return {"access_token": token}
+@router.post("/signup")
+def signup(user: UserSignup):
+    # TODO: Implement actual signup logic
+    return {"message": "User created successfully", "user": user.username}
