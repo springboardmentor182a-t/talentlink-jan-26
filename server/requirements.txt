@@ -1,0 +1,11 @@
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+sqlalchemy==2.0.36
+pydantic[email]==2.9.2
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-dotenv==1.0.1
+python-multipart==0.0.12
+
+# Production only — uncomment when DATABASE_URL=postgresql://...
+# psycopg2-binary==2.9.9
