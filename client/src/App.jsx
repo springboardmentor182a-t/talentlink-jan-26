@@ -13,6 +13,7 @@ import SignupClient     from './pages/SignupClient';
 import ForgotPassword   from './pages/ForgotPassword';
 import ResetPassword    from './pages/ResetPassword';
 import Dashboard        from './pages/Dashboard';
+import Messages         from './pages/Messages';
 
 function App() {
   return (
@@ -34,6 +35,9 @@ function App() {
         {/* ── TEMPORARY: Dashboard routes for testing (will be replaced during merge) ── */}
         <Route path="/freelancer/dashboard" element={<Dashboard />} />
         <Route path="/client/dashboard"     element={<Dashboard />} />
+
+        {/* ── Messaging module ────────────────────────────────────────── */}
+        <Route path="/messages"             element={<Messages />} />
       </Routes>
     </Router>
   );
