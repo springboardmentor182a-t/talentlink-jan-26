@@ -1,5 +1,4 @@
-# server/src/users/models.py
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Enum, Text, DECIMAL, JSON, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Enum, Text, DECIMAL, JSON, DateTime, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import enum
@@ -60,6 +59,7 @@ class FreelancerProfile(Base):
     
     # Back link to User
     user = relationship("User", back_populates="freelancer_profile")
+    proposals = relationship("Proposal", back_populates="freelancer")
 
 # 4. The Client Profile Table
 class ClientProfile(Base):
@@ -72,18 +72,44 @@ class ClientProfile(Base):
     industry = Column(String)
     company_description = Column(Text)
     
+    # --- ADDED THIS LINE TO FIX YOUR ERROR ---
+    company_bio = Column(Text)
+    
     rating = Column(DECIMAL(3, 2), default=0.0)
     projects_posted = Column(Integer, default=0)
 
     # --- NEW FIELDS (From Figma) ---
-    website = Column(String, nullable=True)
+    website_url = Column(String, nullable=True)
     location_city = Column(String, nullable=True)
     location_state = Column(String, nullable=True)
     location_country = Column(String, nullable=True)
     linkedin_profile = Column(String, nullable=True)
+    location = Column(String, nullable=True)
+    contact_phone = Column(String, nullable=True)
+    contact_title = Column(String, nullable=True)
     
     # Privacy Settings
     is_public = Column(Boolean, default=True)
     
     # Back link to User
     user = relationship("User", back_populates="client_profile")
+
+# 5. The Proposal Table
+class Proposal(Base):
+    __tablename__ = "proposals"
+    id = Column(Integer, primary_key=True, index=True)
+    
+    # LINK TO TEAMMATE'S PROJECT
+    project_id = Column(Integer, index=True) 
+
+    # LINK TO YOUR FREELANCER
+    freelancer_id = Column(Integer, ForeignKey("profiles_freelancer.id"))
+    
+    cover_letter = Column(String)
+    bid_amount = Column(Float)
+    estimated_days = Column(Integer)
+    status = Column(String, default="pending") # pending, accepted, rejected
+    created_at = Column(String)
+
+    # Relationship to Freelancer
+    freelancer = relationship("FreelancerProfile", back_populates="proposals")

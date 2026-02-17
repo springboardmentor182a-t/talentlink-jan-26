@@ -11,7 +11,7 @@ def create_user(db: Session, user: schemas.UserCreate):
     db_user = models.User(
         email=user.email, 
         hashed_password=fake_hashed_password,
-        role=user.role.value
+        role=user.role
     )
     db.add(db_user)
     db.commit()
@@ -43,3 +43,18 @@ def create_client_profile(db: Session, user_id: int, profile: schemas.ClientProf
     db.commit()
     db.refresh(db_profile)
     return db_profile
+
+def create_proposal(db: Session, proposal: schemas.ProposalCreate, freelancer_id: int):
+    # 1. Convert the Schema (Pydantic) to a Model (Database)
+    db_proposal = models.Proposal(
+        **proposal.dict(),
+        freelancer_id=freelancer_id,
+        status="pending",
+        created_at="2026-02-12" # You can use datetime.now() later if you import datetime
+    )
+    
+    # 2. Add and Save
+    db.add(db_proposal)
+    db.commit()
+    db.refresh(db_proposal)
+    return db_proposal

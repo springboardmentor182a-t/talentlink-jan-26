@@ -54,3 +54,28 @@ export const getClientProfile = async (userId) => {
     throw error;
   }
 };
+
+// 4. Create a Proposal (Apply for a Job)
+export const createProposal = async (userId, proposalData) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/users/${userId}/proposals`,
+      proposalData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("API Error:", error);
+    throw error;
+  }
+};
+
+// 5. Get My Proposals (Freelancer Contracts Page)
+export const getMyProposals = async (userId) => {
+  try {
+    const response = await axios.get(`${API_URL}/users/${userId}/proposals`);
+    return response.data;
+  } catch (error) {
+    console.error("API Error fetching proposals:", error);
+    throw error;
+  }
+};

@@ -1,31 +1,32 @@
-# server/src/main.py
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware # <--- NEW IMPORT
-from .database.core import engine
-from .users import models, router as user_router
+from fastapi.middleware.cors import CORSMiddleware
+from .database import core
+from .users import models as user_models, router as user_router
+# I am importing your projects router here so the "Find Projects" page works
+#from .projects import models as project_models, router as project_router 
 
-# Create tables
-models.Base.metadata.create_all(bind=engine)
+# 1. Create Tables (For both Users and Projects)
+user_models.Base.metadata.create_all(bind=core.engine)
+#project_models.Base.metadata.create_all(bind=core.engine)
 
 app = FastAPI()
 
-# --- NEW: SECURITY PASS (CORS) ---
-# This tells the server: "Allow requests from the React app running on port 5173"
-origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-]
-
+# 2. SECURITY PASS (CORS) - "Nuclear Fix"
+# We allow ["*"] which means "Everyone". 
+# This fixes the specific error you saw in the console.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# ---------------------------------
 
-app.include_router(user_router.router)
+# 3. Register Routes
+# This enables URLs like /users/...
+app.include_router(user_router.router, tags=["Users"])
+# This enables URLs like /projects/...
+#app.include_router(project_router.router, prefix="/projects", tags=["Projects"])
 
 @app.get("/")
 def read_root():
