@@ -10,9 +10,6 @@ function Home() {
     <div className="App">
       <header className="App-header">
         <h1>Welcome to TalentLink</h1>
-        <nav>
-          <Link to="/login" className="App-link">Login</Link> | <Link to="/signup" className="App-link">Signup</Link>
-        </nav>
       </header>
     </div>
   );
@@ -23,8 +20,6 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
         <Route path="/chat" element={<Chat />} />
       </Routes>
     </Router>
