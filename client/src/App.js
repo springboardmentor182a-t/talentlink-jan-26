@@ -1,21 +1,19 @@
-import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 
-// Dashboard
-import Sidebar from "./layout/Sidebar";
-import ClientDashboard from "./pages/ClientDashboard";
-
-// Auth pages
 import ChooseRole from "./pages/auth/ChooseRole";
 import ClientLogin from "./pages/auth/ClientLogin";
 import ClientSignup from "./pages/auth/ClientSignup";
 import FreelancerLogin from "./pages/auth/FreelancerLogin";
 import FreelancerSignup from "./pages/auth/FreelancerSignup";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+
+import Sidebar from "./layout/Sidebar";
+import ClientDashboard from "./pages/ClientDashboard";
 
 import "./App.css";
 
-// Dashboard layout with sidebar
+// Dashboard layout (NO router, NO provider here)
 const DashboardLayout = ({ children }) => {
   return (
     <div style={{ display: "flex" }}>
@@ -45,6 +43,7 @@ function App() {
           <Route path="/client/signup" element={<ClientSignup />} />
           <Route path="/freelancer/login" element={<FreelancerLogin />} />
           <Route path="/freelancer/signup" element={<FreelancerSignup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
           {/* Client dashboard */}
           <Route
@@ -57,7 +56,10 @@ function App() {
           />
 
           {/* Fallback */}
-          <Route path="*" element={<div style={{ padding: "24px" }}>Page not found</div>} />
+          <Route
+            path="*"
+            element={<div style={{ padding: "24px" }}>Page not found</div>}
+          />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
