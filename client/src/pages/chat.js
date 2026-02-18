@@ -7,14 +7,27 @@ function Chat() {
     const [selectedUser, setSelectedUser] = useState(null);
     const navigate = useNavigate();
 
-    // Mock current user (In real app, get from Auth context)
+    // TODO: replace with actual auth context once login is implemented
     const currentUserId = 1;
 
-    // Mock list of users to chat with
-    const users = [
-        { id: 2, name: 'Freelancer Bob', role: 'freelancer' },
-        { id: 3, name: 'Client Alice', role: 'client' },
-    ];
+    // list of other users will come from the backend database
+    const [users, setUsers] = useState([]);
+
+    useEffect(() => {
+        // load all users when component is mounted
+        const loadUsers = async () => {
+            try {
+                const res = await fetch('http://localhost:8000/users');
+                if (res.ok) {
+                    const data = await res.json();
+                    setUsers(data.filter(u => u.id !== currentUserId));
+                }
+            } catch (err) {
+                console.error('Error fetching users', err);
+            }
+        };
+        loadUsers();
+    }, []);
 
     useEffect(() => {
         if (selectedUser) {
@@ -78,7 +91,7 @@ function Chat() {
                                 background: selectedUser?.id === user.id ? '#f0f0f0' : 'transparent'
                             }}
                         >
-                            {user.name} ({user.role})
+                            {user.email} ({user.role})
                         </li>
                     ))}
                 </ul>
@@ -89,7 +102,7 @@ function Chat() {
                 {selectedUser ? (
                     <>
                         <div style={{ padding: '10px', borderBottom: '1px solid #ccc' }}>
-                            <h3>Chat with {selectedUser.name}</h3>
+                            <h3>Chat with {selectedUser.email}</h3>
                         </div>
 
                         <div style={{ flex: 1, padding: '20px', overflowY: 'auto' }}>
