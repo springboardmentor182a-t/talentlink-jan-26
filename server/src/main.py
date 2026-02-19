@@ -1,5 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware # <--- NEW IMPORT
+from .database.core import engine
+from .users import models, router as user_router
+from .projects import router as project_router
+
 
 from src.database.core import engine, Base
 
@@ -36,6 +41,9 @@ app.middleware("http")(error_handler_middleware)
 app.include_router(auth_router,  prefix="/api/auth",  tags=["Authentication"])
 app.include_router(users_router, prefix="/api/users", tags=["Users"])
 app.include_router(todos_router, prefix="/api/todos", tags=["Todos"])
+app.include_router(user_router.router)
+app.include_router(project_router.router)
+>>>>>>> daec8aa (Add Find Projects API (FastAPI))
 
 
 @app.get("/")
