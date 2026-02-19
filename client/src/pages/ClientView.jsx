@@ -11,10 +11,17 @@ export default function ClientView() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // IMPORTANT: Use the User ID you saved your Client Profile with.
-        // If you used User 1 for Freelancer, maybe you used User 2 for Client?
-        // For now, let's try 1. If it fails, try 2.
-        const data = await getClientProfile(1);
+        // 1. Get the real user ID from local storage
+        const storedUser = localStorage.getItem("user");
+        if (!storedUser) {
+          setLoading(false);
+          return;
+        }
+        const user = JSON.parse(storedUser);
+        const userId = user.id;
+
+        // 2. Fetch the client profile using dynamic ID
+        const data = await getClientProfile(userId);
         setProfile(data);
       } catch (error) {
         console.error("Failed to fetch client profile", error);
@@ -75,7 +82,7 @@ export default function ClientView() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-bold text-gray-900 mb-4">About the Company</h2>
               <p className="text-gray-600 leading-relaxed whitespace-pre-line">
-                {profile.company_bio || "No description added yet."}
+                {profile.company_description || profile.company_bio || "No description added yet."}
               </p>
             </div>
 
@@ -117,8 +124,8 @@ export default function ClientView() {
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Website</p>
-                    <a href={profile.website_url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-orange-600 hover:underline break-all">
-                      {profile.website_url || "N/A"}
+                    <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-orange-600 hover:underline break-all">
+                      {profile.website || "N/A"}
                     </a>
                   </div>
                 </div>

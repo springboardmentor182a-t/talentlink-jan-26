@@ -41,16 +41,24 @@ const SignupFreelancerForm = () => {
         role: 'freelancer',
       });
     
-      // NEW: Redirect based on role from response
-      if (data.user) {
+      // FIX 1: Check the data object directly instead of looking for data.user
+     if (data && data.user) {
         redirectToDashboard(data.user, navigate);
       }
     } catch (err) {
-      setError(err.response?.data?.detail || 'Registration failed. Please try again.');
+      const errorDetail = err.response?.data?.detail;
+      
+      // FIX 2: Safely handle FastAPI's array of errors so React doesn't crash
+      if (Array.isArray(errorDetail)) {
+        setError(`Validation Error: ${errorDetail[0].msg}`);
+      } else {
+        setError(errorDetail || 'Registration failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
   };
+  
 
   return (
     <form onSubmit={handleSubmit} className="auth-form">

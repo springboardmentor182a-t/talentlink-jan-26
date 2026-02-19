@@ -8,14 +8,26 @@ export default function FreelancerProfile() {
 
   const onSubmit = async (data) => {
     try {
+      // 1. Get the dynamically logged-in user from local storage
+      const storedUser = localStorage.getItem("user");
+      if (!storedUser) {
+        console.error("No user logged in!");
+        alert("You must be logged in to save your profile.");
+        return;
+      }
+      const user = JSON.parse(storedUser);
+      const userId = user.id; 
+
+      // 2. Format the data for the backend
       const formattedData = {
         ...data,
         skills: data.skills.split(",").map(skill => skill.trim()),
         hourly_rate: parseFloat(data.hourly_rate),
         // Ensure empty strings are sent as null if needed, or keep as strings
       };
-      // REMEMBER: Use a fresh User ID here (e.g., 4 or 5) since we reset the database!
-      await createFreelancerProfile(1, formattedData);
+      
+      // 3. Send to API using the real user ID
+      await createFreelancerProfile(userId, formattedData);
       alert("Profile Saved Successfully!");
     } catch (error) {
       console.error(error);
