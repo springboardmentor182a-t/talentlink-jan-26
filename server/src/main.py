@@ -1,20 +1,56 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
+from sqlalchemy.orm import Session
 
-app = FastAPI(title="TalentLink API", version="0.1.0")
+# --- DB & Core Imports (From main-group-D) ---
+from src.database.core import engine, Base, get_db
+import src.entities.user  # noqa: F401 - registers User table
+import src.entities.todo  # noqa: F401 - registers Todo table
+import src.users.models   # noqa: F401 - registers FreelancerProfile, ClientProfile tables
 
-# --- SECURITY: The "Universal Pass" for your Frontend ---
+# --- Middlewares & Routers (From main-group-D) ---
+from src.rate_limiter import rate_limit_middleware
+from src.exceptions import error_handler_middleware
+from src.auth.controller import router as auth_router
+from src.users.router import router as users_router
+from src.todos.controller import router as todos_router
+
+# --- Your Imports ---
+from .proposals import models
+
+# Create all database tables on startup
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="TalentLink API", version="1.0.0")
+
+# --- SECURITY: CORS (From main-group-D) ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",  # Vite dev server
+        "http://localhost:3000",  # fallback / CRA
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# --- MODELS: This creates the structure seen in your screenshot ---
+# --- Middlewares (From main-group-D) ---
+app.middleware("http")(rate_limit_middleware)
+app.middleware("http")(error_handler_middleware)
+
+# --- Routers (From main-group-D) ---
+app.include_router(auth_router, prefix="/api/auth", tags=["Authentication"])
+app.include_router(users_router, prefix="/api/users", tags=["Users"])
+app.include_router(todos_router, prefix="/api/todos", tags=["Todos"])
+
+
+# ==========================================================
+# --- MODELS: Dashboard & Proposals (From your branch) ---
+# ==========================================================
+
 class StatData(BaseModel):
     active_projects: int
     pending_proposals: int
@@ -39,11 +75,15 @@ class DashboardResponse(BaseModel):
     active_contract: Contract
     recommended_projects: List[Project]
 
-# --- ENDPOINTS ---
-from fastapi import Depends
-from sqlalchemy.orm import Session
-from .database.core import get_db
-from .proposals import models
+class Proposal(BaseModel):
+    project_id: int
+    cover_letter: str
+    bid_amount: float
+
+
+# ==========================================================
+# --- ENDPOINTS: Dashboard (From your branch) ---
+# ==========================================================
 
 @app.get("/dashboard/")
 def get_dashboard(db: Session = Depends(get_db)):
@@ -71,19 +111,12 @@ def get_all_projects(db: Session = Depends(get_db)):
 def get_all_contracts(db: Session = Depends(get_db)):
     return db.query(models.Contract).all()
 
-@app.get("/")
-async def root():
-    return {"status": "TalentLink API is Live", "docs": "/docs"}
-
-class Proposal(BaseModel):
-    project_id: int
-    cover_letter: str
-    bid_amount: float
-
-# 2. Create the "Gate" to receive the /proposals/ data
 @app.post("/proposals/")
 async def create_proposal(proposal: Proposal):
     print(f"Proposal received for Project ID: {proposal.project_id}")
     return {"status": "success", "message": "Proposal saved!"}
 
-    
+# --- ROOT ENDPOINT (Combined) ---
+@app.get("/")
+async def root():
+    return {"message": "TalentLink API is Live", "version": "1.0.0", "docs": "/docs"}
