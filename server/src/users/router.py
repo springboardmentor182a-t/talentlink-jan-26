@@ -43,20 +43,14 @@ def create_freelancer_profile(
 
 
 @router.post("/{user_id}/client-profile", response_model=schemas.ClientProfileResponse)
-def create_client_profile(user_id: int, profile: schemas.ClientProfileCreate, db: Session = Depends(get_db)):
-    from . import models
-    db_profile = db.query(models.ClientProfile).filter(models.ClientProfile.user_id == user_id).first()
-    
-    if db_profile:
-        # UPDATE existing
-        for key, value in profile.dict().items():
-            setattr(db_profile, key, value)
-        db.commit()
-        db.refresh(db_profile)
-        return db_profile
-    else:
-        # CREATE new
-        return service.create_client_profile(db=db, user_id=user_id, profile=profile)
+def create_client_profile(
+    user_id: int, 
+    profile: schemas.ClientProfileCreate, 
+    db: Session = Depends(get_db)
+):
+    """Create or update a client profile dynamically using the UserService"""
+    return service.UserService.create_client_profile(db=db, user_id=user_id, profile=profile)
+
 
 # 4. Get Freelancer Profile (THE MISSING FUNCTION)
 @router.get("/{user_id}/freelancer_profile", response_model=schemas.FreelancerProfileResponse)
@@ -67,6 +61,7 @@ def get_freelancer_profile(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Profile not found")
     return profile
 
+
 # 5. Get Client Profile (THE MISSING FUNCTION)
 @router.get("/{user_id}/client_profile", response_model=schemas.ClientProfileResponse)
 def get_client_profile(user_id: int, db: Session = Depends(get_db)):
@@ -75,7 +70,6 @@ def get_client_profile(user_id: int, db: Session = Depends(get_db)):
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
     return profile
-
 
 
 # 6. Create a Proposal (Submit Application)
@@ -90,6 +84,7 @@ def create_proposal(user_id: int, proposal: schemas.ProposalCreate, db: Session 
     
     # 2. Create proposal linked to that freelancer
     return service.create_proposal(db=db, proposal=proposal, freelancer_id=freelancer.id)
+
 
 # 7. Get My Proposals (View Application History)
 @router.get("/{user_id}/proposals", response_model=List[schemas.ProposalResponse])

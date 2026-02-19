@@ -74,6 +74,7 @@ class ClientProfile(Base):
     user = relationship("User", back_populates="client_profile")
 
 # 5. The Proposal Table
+# 5. The Proposal Table
 class Proposal(Base):
     __tablename__ = "proposals"
     id = Column(Integer, primary_key=True, index=True)
@@ -88,12 +89,12 @@ class Proposal(Base):
     bid_amount = Column(Float)
     estimated_days = Column(Integer)
     status = Column(String, default="pending") # pending, accepted, rejected
-    created_at = Column(String)
-
+    
     # Relationship to Freelancer
     freelancer = relationship("FreelancerProfile", back_populates="proposals")
 
     rating = Column(DECIMAL(3, 2), default=0.0)
     projects_posted = Column(Integer, default=0)
 
+    # Let the database handle the date automatically!
     created_at = Column(DateTime(timezone=True), server_default=func.now())

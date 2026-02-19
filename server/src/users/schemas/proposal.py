@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 
 # 1. Base Schema (Shared properties)
 class ProposalBase(BaseModel):
@@ -17,7 +18,7 @@ class ProposalResponse(ProposalBase):
     project_id: int
     freelancer_id: int
     status: str
-    created_at: Optional[str] = None
+    created_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
