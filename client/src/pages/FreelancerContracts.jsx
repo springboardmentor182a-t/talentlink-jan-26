@@ -14,7 +14,16 @@ export default function FreelancerContracts() {
   useEffect(() => {
     const fetchProposals = async () => {
       try {
-        const userId = 1; // Hardcoded for now
+        // 1. Get the real user ID from local storage
+        const storedUser = localStorage.getItem("user");
+        if (!storedUser) {
+          setLoading(false);
+          return;
+        }
+        const user = JSON.parse(storedUser);
+        const userId = user.id;
+
+        // 2. Fetch proposals using the dynamic ID
         const data = await getMyProposals(userId);
         setProposals(data);
       } catch (err) {

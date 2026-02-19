@@ -24,10 +24,18 @@ export default function SubmitProposal() {
     setError("");
 
     try {
-      // HARDCODED USER ID: 1 (Replace with real logic later)
-      const userId = 1; 
+      // 1. Get the dynamically logged-in user from local storage
+      const storedUser = localStorage.getItem("user");
+      if (!storedUser) {
+        setError("You must be logged in to submit a proposal.");
+        setLoading(false);
+        return;
+      }
+      
+      const user = JSON.parse(storedUser);
+      const userId = user.id; 
 
-      // Prepare data for backend
+      // 2. Prepare data for backend
       const payload = {
         project_id: parseInt(projectId) || 1, // Fallback to 1 if testing without URL
         cover_letter: formData.cover_letter,
@@ -35,11 +43,18 @@ export default function SubmitProposal() {
         estimated_days: parseInt(formData.estimated_days)
       };
 
+      // 3. Send to API
       await createProposal(userId, payload);
       alert("Proposal submitted successfully!");
-      navigate("/dashboard"); // Go back to dashboard after success
+      navigate("/freelancer/dashboard"); // Route back to the freelancer dashboard
+      
     } catch (err) {
-      setError("Failed to submit proposal. Please try again.");
+      const errorDetail = err.response?.data?.detail;
+      if (Array.isArray(errorDetail)) {
+        setError(`Validation Error: ${errorDetail[0].msg}`);
+      } else {
+        setError(errorDetail || "Failed to submit proposal. Please try again.");
+      }
       console.error(err);
     } finally {
       setLoading(false);

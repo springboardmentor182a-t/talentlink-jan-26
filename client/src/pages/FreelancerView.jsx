@@ -11,8 +11,17 @@ export default function FreelancerView() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // Fetching User ID 1 (The one we are editing)
-        const data = await getFreelancerProfile(1);
+        // 1. Get the real user ID from local storage
+        const storedUser = localStorage.getItem("user");
+        if (!storedUser) {
+          setLoading(false);
+          return;
+        }
+        const user = JSON.parse(storedUser);
+        const userId = user.id;
+
+        // 2. Fetch the profile using the dynamic ID
+        const data = await getFreelancerProfile(userId);
         setProfile(data);
       } catch (error) {
         console.error("Failed to fetch profile", error);
@@ -20,6 +29,7 @@ export default function FreelancerView() {
         setLoading(false);
       }
     };
+    
     fetchProfile();
   }, []);
 

@@ -10,13 +10,23 @@ export default function ClientProfile() {
 
   const onSubmit = async (data) => {
     try {
+      // 1. Get the real user ID from local storage
+      const storedUser = localStorage.getItem("user");
+      if (!storedUser) {
+        alert("You must be logged in to save your company profile.");
+        return;
+      }
+      const user = JSON.parse(storedUser);
+      const userId = user.id;
+
+      // 2. Format the data
       const formattedData = {
         ...data,
         is_public: isPublic
       };
       
-      // REMEMBER: Use a valid CLIENT User ID here (e.g., 2)
-      await createClientProfile(1, formattedData);
+      // 3. Save to database using dynamic userId
+      await createClientProfile(userId, formattedData);
       alert("Company Profile Saved Successfully!");
     } catch (error) {
       console.error(error);
