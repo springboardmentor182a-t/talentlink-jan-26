@@ -14,6 +14,7 @@ import ForgotPassword   from './pages/ForgotPassword';
 import ResetPassword    from './pages/ResetPassword';
 import Dashboard        from './pages/Dashboard';
 import Messages         from './pages/Messages';
+import PageContainer    from './layout/PageContainer';
 
 function App() {
   return (
@@ -37,7 +38,7 @@ function App() {
         <Route path="/client/dashboard"     element={<Dashboard />} />
 
         {/* ── Messaging module ────────────────────────────────────────── */}
-        <Route path="/messages"             element={<Messages />} />
+        <Route path="/messages" element={<PageContainer><Messages /></PageContainer>} />
       </Routes>
     </Router>
   );

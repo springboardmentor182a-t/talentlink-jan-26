@@ -1,45 +1,62 @@
-import React from 'react';
-
-const COLORS = [
-  '#f97316', '#3b82f6', '#10b981',
-  '#8b5cf6', '#ec4899', '#14b8a6',
+const AVATAR_COLORS = [
+  '#f97316', '#0ea5e9', '#10b981', '#8b5cf6',
+  '#f43f5e', '#f59e0b', '#06b6d4', '#84cc16',
 ];
 
-const getColor = (name = '') => COLORS[name.charCodeAt(0) % COLORS.length];
+function getColor(name = '') {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+}
 
-const UserAvatar = ({ username = '', size = 40, online = false }) => {
-  const initials = username.slice(0, 2).toUpperCase();
-  const bg       = getColor(username);
+function getInitials(name = '') {
+  return name
+    .split(' ')
+    .map(w => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+}
+
+const UserAvatar = ({ username = '', size = 38, showOnline = false, isOnline = false }) => {
+  const bg = getColor(username);
+  const initials = getInitials(username);
 
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }}>
-      <div style={{
-        width:           size,
-        height:          size,
-        borderRadius:    '50%',
-        background:      bg,
-        color:           '#fff',
-        display:         'flex',
-        alignItems:      'center',
-        justifyContent:  'center',
-        fontWeight:      700,
-        fontSize:        size * 0.36,
-        fontFamily:      'var(--font-text)',
-        flexShrink:      0,
-      }}>
+    <div style={{ position: 'relative', display: 'inline-flex', flexShrink: 0 }}>
+      <div
+        style={{
+          width: size,
+          height: size,
+          borderRadius: '50%',
+          background: bg,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#fff',
+          fontSize: size * 0.36,
+          fontWeight: 600,
+          fontFamily: 'Poppins, sans-serif',
+          letterSpacing: '0.03em',
+          flexShrink: 0,
+          userSelect: 'none',
+        }}
+      >
         {initials}
       </div>
-      {online && (
-        <span style={{
-          position:   'absolute',
-          bottom:     1,
-          right:      1,
-          width:      10,
-          height:     10,
-          borderRadius: '50%',
-          background: '#22c55e',
-          border:     '2px solid #fff',
-        }} />
+      {showOnline && (
+        <span
+          style={{
+            position: 'absolute',
+            bottom: 1,
+            right: 1,
+            width: size * 0.28,
+            height: size * 0.28,
+            borderRadius: '50%',
+            background: isOnline ? '#22c55e' : '#9ca3af',
+            border: '2px solid #fff',
+          }}
+        />
       )}
     </div>
   );
