@@ -35,7 +35,7 @@ export default function App() {
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/freelancer/dashboard" element={<Dashboard />} />
-          <Route path="/client/dashboard" element={<Dashboard />} />
+          <Route path="/client/dashboard" element={<ClientView />} />
 
           {/* Your Profile Pages */}
           <Route path="/profile/freelancer" element={<FreelancerView />} />

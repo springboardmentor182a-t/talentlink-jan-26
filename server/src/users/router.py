@@ -1,10 +1,11 @@
 # server/src/users/router.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from typing import List
 
 from src.database.core import get_db
 from src.users import schemas, service
-from typing import List
+from src.users.schemas.client import ClientDashboardResponse
 
 router = APIRouter()
 
@@ -52,7 +53,7 @@ def create_client_profile(
     return service.UserService.create_client_profile(db=db, user_id=user_id, profile=profile)
 
 
-# 4. Get Freelancer Profile (THE MISSING FUNCTION)
+# 4. Get Freelancer Profile
 @router.get("/{user_id}/freelancer_profile", response_model=schemas.FreelancerProfileResponse)
 def get_freelancer_profile(user_id: int, db: Session = Depends(get_db)):
     from . import models
@@ -62,7 +63,7 @@ def get_freelancer_profile(user_id: int, db: Session = Depends(get_db)):
     return profile
 
 
-# 5. Get Client Profile (THE MISSING FUNCTION)
+# 5. Get Client Profile
 @router.get("/{user_id}/client_profile", response_model=schemas.ClientProfileResponse)
 def get_client_profile(user_id: int, db: Session = Depends(get_db)):
     from . import models
@@ -94,3 +95,66 @@ def get_my_proposals(user_id: int, db: Session = Depends(get_db)):
     if not freelancer:
         return [] # Return empty list if no profile
     return freelancer.proposals
+
+
+# 8. Get Client Dashboard Aggregate Data
+@router.get("/{user_id}/client-dashboard", response_model=ClientDashboardResponse)
+def get_client_dashboard(user_id: int, db: Session = Depends(get_db)):
+    # TEMPORARILY DISABLED FOR UI TESTING
+    # from . import models
+    # client_profile = db.query(models.ClientProfile).filter(models.ClientProfile.user_id == user_id).first()
+    # if not client_profile:
+    #     raise HTTPException(status_code=403, detail="Access denied. Client profile required.")
+
+    # TODO: Replace this dictionary with actual SQLAlchemy queries once Project/Contract models are built.
+    return {
+        "stats": {
+            "active_projects": 3, 
+            "pending_proposals": 12,
+            "total_spent": 4500.00, 
+            "completed_projects": 8
+        },
+        "active_projects": [
+            {
+                "id": 1,
+                "title": "E-Commerce Website Redesign",
+                "posted_time": "2 days ago",
+                "proposals_count": 8,
+                "budget": "$2,000 - $5,000",
+                "duration": "2-3 months",
+                "status": "Active"
+            },
+            {
+                "id": 2,
+                "title": "Mobile App Development",
+                "posted_time": "5 days ago",
+                "proposals_count": 15,
+                "budget": "$5,000 - $10,000",
+                "duration": "3-4 months",
+                "status": "Active"
+            },
+            {
+                "id": 3,
+                "title": "Logo & Brand Identity",
+                "posted_time": "1 week ago",
+                "proposals_count": 23,
+                "budget": "$500 - $1,500",
+                "duration": "2-4 weeks",
+                "status": "Active"
+            }
+        ],
+        "recent_activity": [
+            {
+                "id": 1,
+                "type": "proposal",
+                "text": "New proposal received from John Doe",
+                "time": "2 hours ago"
+            },
+            {
+                "id": 2,
+                "type": "contract",
+                "text": "Contract signed with Emily Chen",
+                "time": "5 hours ago"
+            }
+        ]
+    }

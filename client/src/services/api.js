@@ -74,3 +74,14 @@ export const getMyProposals = async (userId) => {
     throw error;
   }
 };
+
+// 7. Get Client Dashboard Data
+export const getClientDashboardData = async (userId) => {
+  try {
+    const response = await axios.get(`users/${userId}/client-dashboard`);
+    return response.data;
+  } catch (error) {
+    console.error("API Error fetching dashboard data:", error);
+    throw error;
+  }
+};
