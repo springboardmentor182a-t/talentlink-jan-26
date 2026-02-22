@@ -1,74 +1,123 @@
 import { useState, useContext } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import AuthCard from "../../components/auth/AuthCard";
-import InputField from "../../components/auth/InputField";
-import AuthButton from "../../components/auth/AuthButton";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
 
 const FreelancerLogin = () => {
-  const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
     try {
-      const res = await api.post("/auth/login/", {
-        username,
+      const res = await api.post("/auth/login", {
+        email,
         password,
-      });
-
-      login({
-        token: res.data.access,
         role: "freelancer",
-        user: { username },
       });
 
+      login(res.data);
       navigate("/freelancer/dashboard");
     } catch (err) {
-      setError("Invalid credentials");
+      setError(err.response?.data?.detail || "Invalid email or password");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <AuthCard
-      title="Freelancer Login"
-      subtitle="Find projects and work with clients"
-    >
-      {error && (
-        <p style={{ color: "red", textAlign: "center" }}>{error}</p>
-      )}
+    <div className="page-container">
+      <button
+        onClick={() => navigate("/")}
+        style={{
+          position: "absolute",
+          top: "1.5rem",
+          left: "1.5rem",
+          background: "none",
+          border: "none",
+          color: "#1f63ff",
+          fontSize: "1.1rem",
+          cursor: "pointer",
+          padding: "0.5rem",
+          fontWeight: "500",
+        }}
+      >
+        ← Back
+      </button>
+      <div className="card card-centered">
+        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+          <div className="role-icon" style={{ marginLeft: "auto", marginRight: "auto", marginBottom: "1.5rem" }}>💼</div>
+          <h2 style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>Freelancer Login</h2>
+          <p style={{ color: "#717182", fontSize: "0.95rem" }}>
+            Access your dashboard to browse projects and manage proposals
+          </p>
+        </div>
 
-      <InputField
-        label="Username / Email"
-        type="text"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
+        {error && <div className="alert alert-error">{error}</div>}
 
-      <InputField
-        label="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              placeholder="freelancer@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-      <div onClick={handleSubmit}>
-        <AuthButton text="Login as Freelancer" />
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <button type="submit" className="btn btn-secondary" disabled={loading}>
+            {loading ? "Signing in..." : "Sign In"}
+          </button>
+        </form>
+
+        <div className="divider">OR CONTINUE WITH</div>
+
+        <div className="social-buttons">
+          <button type="button" className="btn-social">
+            <span>G</span>
+            <span>Google</span>
+          </button>
+          <button type="button" className="btn-social">
+            <span>⚙</span>
+            <span>GitHub</span>
+          </button>
+        </div>
+
+        <div style={{ marginTop: "1.5rem", textAlign: "center" }}>
+          <Link to="/forgot-password" className="link small-text">
+            Forgot Password?
+          </Link>
+        </div>
+
+        <div style={{ marginTop: "1.5rem", textAlign: "center" }}>
+          <span style={{ color: "#717182" }}>Don't have an account? </span>
+          <Link to="/freelancer/signup" className="link">
+            Sign up
+          </Link>
+        </div>
       </div>
-
-      <p style={{ marginTop: "12px", textAlign: "center" }}>
-        <Link to="/forgot-password">Forgot Password?</Link>
-      </p>
-
-      <p style={{ marginTop: "12px", textAlign: "center" }}>
-        Don’t have an account?{" "}
-        <Link to="/freelancer/signup">Sign up</Link>
-      </p>
-    </AuthCard>
+    </div>
   );
 };
 

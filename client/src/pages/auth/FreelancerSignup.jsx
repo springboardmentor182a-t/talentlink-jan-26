@@ -1,70 +1,108 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import AuthCard from "../../components/auth/AuthCard";
-import InputField from "../../components/auth/InputField";
-import AuthButton from "../../components/auth/AuthButton";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 
 const FreelancerSignup = () => {
-  const navigate = useNavigate();
-
-  const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
     try {
-      await api.post("/auth/register/", {
-        username: username,
-        email: email,
-        password: password,
+      await api.post("/auth/register", {
+        name,
+        email,
+        password,
         role: "freelancer",
       });
-
       navigate("/freelancer/login");
     } catch (err) {
-      setError("Registration failed");
+      setError(err.response?.data?.detail || "Error creating account");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <AuthCard
-      title="Create Freelancer Account"
-      subtitle="Join TalentLink and start freelancing"
-    >
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <div className="page-container">
+      <div className="card card-centered">
+        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+          <div className="role-icon" style={{ marginLeft: "auto", marginRight: "auto", marginBottom: "1.5rem" }}>💼</div>
+          <h2 style={{ fontSize: "1.75rem", marginBottom: "0.5rem" }}>Create Freelancer Account</h2>
+          <p style={{ color: "#717182", fontSize: "0.95rem" }}>
+            Sign up to start finding projects and building your portfolio
+          </p>
+        </div>
 
-      <InputField
-        label="Username"
-        type="text"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
+        {error && <div className="alert alert-error">{error}</div>}
 
-      <InputField
-        label="Email"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Full Name</label>
+            <input
+              type="text"
+              placeholder="John Doe"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
 
-      <InputField
-        label="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              placeholder="freelancer@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-      <div onClick={handleSubmit}>
-        <AuthButton text="Create Freelancer Account" />
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <button type="submit" className="btn btn-secondary" disabled={loading}>
+            {loading ? "Creating Account..." : "Create Account"}
+          </button>
+        </form>
+
+        <div className="divider">OR CONTINUE WITH</div>
+
+        <div className="social-buttons">
+          <button type="button" className="btn-social">
+            <span>G</span>
+            <span>Google</span>
+          </button>
+          <button type="button" className="btn-social">
+            <span>⚙</span>
+            <span>GitHub</span>
+          </button>
+        </div>
+
+        <div style={{ marginTop: "1.5rem", textAlign: "center" }}>
+          <span style={{ color: "#717182" }}>Already have an account? </span>
+          <Link to="/freelancer/login" className="link">
+            Sign in
+          </Link>
+        </div>
       </div>
-
-      <p style={{ marginTop: "12px", textAlign: "center" }}>
-        Already have an account?{" "}
-        <Link to="/freelancer/login">Login</Link>
-      </p>
-    </AuthCard>
+    </div>
   );
 };
 
