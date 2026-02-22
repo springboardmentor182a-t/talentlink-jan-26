@@ -17,7 +17,15 @@ def read_dashboard(db: Session = Depends(get_db)):
     # client_id = current_user.id
     # ---------------------------------------------------------
     
-    # FOR NOW: We assume we are User #1 (Test Mode)
-    client_id = 1 
+    from src.projects.models import User
+    # FOR NOW: Ensure a default client exists so the app doesn't crash on an empty DB
+    default_client = db.query(User).filter(User.id == 1).first()
+    if not default_client:
+        default_client = User(id=1, username="nayana", full_name="Nayana", role="Client")
+        db.add(default_client)
+        db.commit()
+        db.refresh(default_client)
+
+    client_id = default_client.id
     
     return service.get_dashboard_data(db, client_id)

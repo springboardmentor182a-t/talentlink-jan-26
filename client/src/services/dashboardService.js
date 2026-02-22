@@ -1,6 +1,6 @@
 // client/src/services/dashboardService.js
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 
 // --- 1. Fetch Dashboard Stats (GET) ---
 export const fetchDashboardData = async () => {

@@ -1,7 +1,7 @@
 import React from "react";
 import { Bell, Search, User } from "lucide-react";
 
-const Navbar = () => {
+const Navbar = ({ profile }) => {
   return (
     <div className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-8">
       {/* Search Bar */}
@@ -26,8 +26,12 @@ const Navbar = () => {
 
         <div className="flex items-center gap-3 pl-6 border-l border-gray-200">
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-semibold text-gray-700">Client User</p>
-            <p className="text-xs text-gray-500">Premium Account</p>
+            <p className="text-sm font-semibold text-gray-700">
+              {profile?.full_name || "Client User"}
+            </p>
+            <p className="text-xs text-gray-500">
+              {profile?.account_type || "Premium Account"}
+            </p>
           </div>
           <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 border-2 border-white shadow-sm">
             <User size={20} />

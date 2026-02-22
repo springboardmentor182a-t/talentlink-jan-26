@@ -41,7 +41,7 @@ const ClientDashboard = () => {
 
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* 2. Navbar */}
-        <Navbar />
+        <Navbar profile={data.profile} />
 
         {/* 3. Dashboard Content */}
         <main className="flex-1 overflow-y-auto p-8">

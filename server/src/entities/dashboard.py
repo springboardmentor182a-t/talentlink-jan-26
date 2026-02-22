@@ -39,8 +39,15 @@ class ActivityItem(BaseModel):
     time_ago: str                 
     type: str                     
 
+# --- 6. Profile Feed ---
+class ProfileItem(BaseModel):
+    full_name: str
+    role: str
+    account_type: str
+
 # --- MAIN RESPONSE ---
 class DashboardResponse(BaseModel):
+    profile: ProfileItem
     stats: DashboardStats
     spending_chart: SpendingChartData
     project_timeline: ProjectTimelineData
