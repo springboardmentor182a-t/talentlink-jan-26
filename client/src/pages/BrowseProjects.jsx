@@ -1,87 +1,90 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 
-const FreelancerDashboard = () => {
-  const [data, setData] = useState(null);
+const BrowseProjects = () => {
+  // 1. Setup State for our Database Data
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // --- 1. DEFINE THE API URL ---
-  // Checks for the environment variable first. If missing, uses localhost.
-  const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
-
-  // --- 2. FETCH DATA (Using the Variable) ---
+  // 2. Fetch from Backend on Component Load
   useEffect(() => {
-    console.log(`Connecting to backend at: ${API_URL}`);
-    axios.get(`${API_URL}/dashboard/`)
-      .then(res => setData(res.data))
-      .catch(err => console.error("Connection Error:", err));
+    const fetchProjects = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/projects/`);
+        const data = await response.json();
+        setProjects(data);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
   }, []);
 
-  // --- 3. APPLY FUNCTION (Using the Variable) ---
-  const handleApplyNow = async (projectId) => {
-    try {
-      const response = await axios.post(`${API_URL}/proposals/`, {
-        project_id: projectId,
-        cover_letter: "I am interested in this project!",
-        bid_amount: 500.0
-      });
-
-      if (response.status === 200 || response.status === 201) {
-        alert("Success! Proposal sent to backend.");
-      }
-    } catch (error) {
-      console.error(error);
-      alert(`Error: Could not reach ${API_URL}/proposals/`);
-    }
-  };
-
-  if (!data) return <div style={{ padding: '40px' }}>Connecting to {API_URL}...</div>;
+  if (loading) {
+    return <div style={{ padding: '40px', backgroundColor: '#F8F9FA', minHeight: '100vh' }}>Loading projects from database...</div>;
+  }
 
   return (
-    <div style={{ padding: '40px', backgroundColor: '#F8F9FA', minHeight: '100vh', fontFamily: 'sans-serif' }}>
-      <h1>{data.welcome_msg}</h1>
-      <p style={{ color: '#6C757D', marginBottom: '30px' }}>Ready to find your next project?</p>
+    <div style={{ padding: '40px', backgroundColor: '#F8F9FA', minHeight: '100vh' }}>
+      <h1 style={{ marginBottom: '5px' }}>Browse Projects</h1>
+      <p style={{ color: '#6C757D', marginBottom: '30px' }}>Find your next opportunity</p>
 
-      {/* Stats Cards Section */}
-      <div style={{ display: 'flex', gap: '20px', marginBottom: '40px' }}>
-        {Object.entries(data.stats).map(([key, val], i) => (
-          <div key={i} style={{ flex: 1, padding: '20px', backgroundColor: 'white', borderRadius: '15px', border: '1px solid #E9ECEF' }}>
-            <h2 style={{ margin: 0 }}>{val}</h2>
-            <p style={{ margin: 0, color: '#6C757D', fontSize: '14px' }}>{key.replace('_', ' ')}</p>
-          </div>
-        ))}
+      {/* Search and Filter Bar */}
+      <div style={{ display: 'flex', gap: '15px', marginBottom: '40px' }}>
+        <input type="text" placeholder="Search projects..." style={{ flex: 2, padding: '12px', borderRadius: '8px', border: '1px solid #E9ECEF' }} />
+        <select style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #E9ECEF', color: '#6C757D' }}>
+          <option>All Categories</option>
+        </select>
+        <select style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #E9ECEF', color: '#6C757D' }}>
+          <option>Budget Range</option>
+        </select>
+        <button className="btn-primary" style={{ flex: 1 }}>Search</button>
       </div>
 
-      <div style={{ display: 'flex', gap: '30px' }}>
-        {/* Recommended Projects List */}
-        <div style={{ flex: 2 }}>
-          <h3>🎯 Recommended Projects</h3>
-          {data.recommended_projects.map((project) => (
-            <div key={project.id} style={{ backgroundColor: 'white', padding: '25px', borderRadius: '15px', border: '1px solid #E9ECEF', marginBottom: '15px' }}>
-              <h4>{project.title}</h4>
-              <p style={{ color: '#6C757D' }}>{project.client} • {project.budget}</p>
-              <button
-                onClick={() => handleApplyNow(project.id)}
-                style={{ backgroundColor: '#FF7A1A', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer' }}
-              >
-                Apply Now
-              </button>
+      {/* Project Listings Grid */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
+        {projects.map((project) => (
+          <div key={project.id} className="card-white">
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+              <h3 style={{ margin: 0 }}>{project.title}</h3>
+              <span style={{ color: '#28A745', backgroundColor: '#E8F5E9', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>
+                {project.match} Match
+              </span>
             </div>
-          ))}
-        </div>
+            
+            {/* Safe fallback: If DB sends 'client', use it. If dummy sends 'company', use it. */}
+            <p style={{ color: '#FF7A1A', fontWeight: 'bold', margin: '0 0 10px 0' }}>
+              {project.company || project.client || 'Unknown Client'}
+            </p>
 
-        {/* Active Contracts Column */}
-        <div style={{ flex: 1 }}>
-          <h3>📑 Active Contracts</h3>
-          <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '15px', border: '1px solid #E9ECEF' }}>
-            <p style={{ fontWeight: 'bold' }}>{data.active_contract.title}</p>
-            <div style={{ height: '8px', backgroundColor: '#E9ECEF', borderRadius: '4px', marginTop: '10px' }}>
-              <div style={{ width: `${data.active_contract.progress}%`, height: '100%', backgroundColor: '#FF7A1A', borderRadius: '4px' }}></div>
+            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+              {/* Safe fallback: Use an empty array if project.tags doesn't exist in DB yet */}
+              {(project.tags || []).map((tag, index) => (
+                <span key={index} style={{ backgroundColor: '#F1F3F5', padding: '4px 10px', borderRadius: '4px', fontSize: '12px', color: '#495057' }}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #EEE', paddingTop: '20px' }}>
+              <div>
+                <span style={{ fontSize: '18px', fontWeight: 'bold' }}>{project.budget}</span>
+                <span style={{ fontSize: '14px', color: '#6C757D', marginLeft: '10px' }}>
+                  {project.type || 'Fixed Price'}
+                </span>
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button style={{ padding: '10px 20px', backgroundColor: 'white', border: '1px solid #E9ECEF', borderRadius: '8px', cursor: 'pointer' }}>Save</button>
+                <button className="btn-primary">Apply Now</button>
+              </div>
             </div>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );
 };
 
-export default FreelancerDashboard;
+export default BrowseProjects;

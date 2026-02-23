@@ -1,3 +1,4 @@
+from src.proposals import models
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -14,10 +15,7 @@ def get_dashboard_stats(db: Session = Depends(get_db)):
     # 1. Perform SQL Queries via SQLAlchemy
     active_projects_count = db.query(models.Project).count()
     
-    # (Assuming you have a Proposal table, you would count them like this)
-    # pending_proposals_count = db.query(models.Proposal).filter(models.Proposal.status == "Pending").count()
-    
-    # Get the most recent active contract
+   
     active_contract = db.query(models.Contract).filter(models.Contract.status == "Active").first()
     
     # 2. Return the dynamic data

@@ -1,87 +1,98 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
 
-const FreelancerDashboard = () => {
-  const [data, setData] = useState(null);
+const Contracts = () => {
+  // 1. Set up state for database data
+  const [contracts, setContracts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // --- 1. DEFINE THE API URL ---
-  // Checks for the environment variable first. If missing, uses localhost.
-  const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
-
-  // --- 2. FETCH DATA (Using the Variable) ---
+  // 2. Fetch data from backend when component loads
   useEffect(() => {
-    console.log(`Connecting to backend at: ${API_URL}`);
-    axios.get(`${API_URL}/dashboard/`)
-      .then(res => setData(res.data))
-      .catch(err => console.error("Connection Error:", err));
+    const fetchContracts = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/contracts/`);
+        const data = await response.json();
+        setContracts(data);
+      } catch (error) {
+        console.error("Error fetching contracts:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchContracts();
   }, []);
 
-  // --- 3. APPLY FUNCTION (Using the Variable) ---
-  const handleApplyNow = async (projectId) => {
-    try {
-      const response = await axios.post(`${API_URL}/proposals/`, {
-        project_id: projectId,
-        cover_letter: "I am interested in this project!",
-        bid_amount: 500.0
-      });
-
-      if (response.status === 200 || response.status === 201) {
-        alert("Success! Proposal sent to backend.");
-      }
-    } catch (error) {
-      console.error(error);
-      alert(`Error: Could not reach ${API_URL}/proposals/`);
-    }
-  };
-
-  if (!data) return <div style={{ padding: '40px' }}>Connecting to {API_URL}...</div>;
+  if (loading) {
+    return (
+      <div style={{ padding: '40px', backgroundColor: '#F8F9FA', minHeight: '100vh' }}>
+        Loading contracts...
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: '40px', backgroundColor: '#F8F9FA', minHeight: '100vh', fontFamily: 'sans-serif' }}>
-      <h1>{data.welcome_msg}</h1>
-      <p style={{ color: '#6C757D', marginBottom: '30px' }}>Ready to find your next project?</p>
+    <div style={{ padding: '40px', backgroundColor: '#F8F9FA', minHeight: '100vh' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        <h1>Contracts</h1>
+        <button style={{ backgroundColor: '#FF7A1A', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold' }}>
+          + New Contract
+        </button>
+      </div>
 
-      {/* Stats Cards Section */}
-      <div style={{ display: 'flex', gap: '20px', marginBottom: '40px' }}>
-        {Object.entries(data.stats).map(([key, val], i) => (
-          <div key={i} style={{ flex: 1, padding: '20px', backgroundColor: 'white', borderRadius: '15px', border: '1px solid #E9ECEF' }}>
-            <h2 style={{ margin: 0 }}>{val}</h2>
-            <p style={{ margin: 0, color: '#6C757D', fontSize: '14px' }}>{key.replace('_', ' ')}</p>
-          </div>
+      {/* Filter Tabs */}
+      <div style={{ display: 'flex', gap: '15px', marginBottom: '30px' }}>
+        {['All', 'Active', 'Draft', 'Pending', 'Completed'].map((tab) => (
+          <button 
+            key={tab} 
+            style={{ 
+              padding: '8px 20px', 
+              borderRadius: '20px', 
+              border: '1px solid #E9ECEF', 
+              backgroundColor: tab === 'All' ? '#FF7A1A' : 'white', 
+              color: tab === 'All' ? 'white' : '#6C757D', 
+              cursor: 'pointer' 
+            }}
+          >
+            {tab}
+          </button>
         ))}
       </div>
 
-      <div style={{ display: 'flex', gap: '30px' }}>
-        {/* Recommended Projects List */}
-        <div style={{ flex: 2 }}>
-          <h3>🎯 Recommended Projects</h3>
-          {data.recommended_projects.map((project) => (
-            <div key={project.id} style={{ backgroundColor: 'white', padding: '25px', borderRadius: '15px', border: '1px solid #E9ECEF', marginBottom: '15px' }}>
-              <h4>{project.title}</h4>
-              <p style={{ color: '#6C757D' }}>{project.client} • {project.budget}</p>
-              <button
-                onClick={() => handleApplyNow(project.id)}
-                style={{ backgroundColor: '#FF7A1A', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer' }}
-              >
-                Apply Now
+      {/* Contracts Grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '25px' }}>
+        {contracts.map((item, index) => {
+          // Fallbacks to keep the UI looking good even if DB is missing some fields right now
+          const statusColor = item.color || '#28A745';
+          const displayId = item.id || `CT-2024-00${index + 1}`;
+          const displayStatus = item.status || 'Active';
+          const displayBudget = item.budget || 'TBD';
+
+          return (
+            <div key={displayId} style={{ backgroundColor: 'white', padding: '25px', borderRadius: '15px', border: '1px solid #E9ECEF', position: 'relative' }}>
+              
+              <span style={{ position: 'absolute', top: '20px', right: '20px', fontSize: '12px', padding: '4px 10px', borderRadius: '5px', backgroundColor: '#F8F9FA', color: statusColor, border: `1px solid ${statusColor}` }}>
+                {displayStatus}
+              </span>
+              
+              <h4 style={{ margin: '0 0 10px 0' }}>{item.title}</h4>
+              <p style={{ fontSize: '12px', color: '#6C757D', margin: 0 }}>{displayId}</p>
+              
+              <hr style={{ border: 'none', borderTop: '1px solid #EEE', margin: '20px 0' }} />
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', marginBottom: '20px' }}>
+                <span style={{ color: '#6C757D' }}>Budget:</span>
+                <span style={{ fontWeight: 'bold' }}>{displayBudget}</span>
+              </div>
+              
+              <button style={{ width: '100%', padding: '10px', border: '1px solid #FF7A1A', color: '#FF7A1A', backgroundColor: 'transparent', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+                View Details -&gt;
               </button>
             </div>
-          ))}
-        </div>
-
-        {/* Active Contracts Column */}
-        <div style={{ flex: 1 }}>
-          <h3>📑 Active Contracts</h3>
-          <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '15px', border: '1px solid #E9ECEF' }}>
-            <p style={{ fontWeight: 'bold' }}>{data.active_contract.title}</p>
-            <div style={{ height: '8px', backgroundColor: '#E9ECEF', borderRadius: '4px', marginTop: '10px' }}>
-              <div style={{ width: `${data.active_contract.progress}%`, height: '100%', backgroundColor: '#FF7A1A', borderRadius: '4px' }}></div>
-            </div>
-          </div>
-        </div>
+          );
+        })}
       </div>
     </div>
   );
 };
 
-export default FreelancerDashboard;
+export default Contracts;
