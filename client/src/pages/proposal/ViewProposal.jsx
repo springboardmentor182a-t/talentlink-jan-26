@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_BASE = process.env.REACT_APP_API_BASE_URL;
+
 export default function ViewProposals({ projectId = 1 }) {
   const [proposals, setProposals] = useState([]);
 
   const loadProposals = async () => {
     const res = await axios.get(
-      http://localhost:8000/proposals/project/${projectId}
+      ${API_BASE}/proposals/project/${projectId}
     );
     setProposals(res.data);
   };
@@ -16,12 +18,12 @@ export default function ViewProposals({ projectId = 1 }) {
   }, []);
 
   const accept = async (id) => {
-    await axios.put(http://localhost:8000/proposals/${id}/accept);
+    await axios.put(${API_BASE}/proposals/${id}/accept);
     loadProposals();
   };
 
   const reject = async (id) => {
-    await axios.put(http://localhost:8000/proposals/${id}/reject);
+    await axios.put(${API_BASE}/proposals/${id}/reject);
     loadProposals();
   };
 
@@ -38,7 +40,9 @@ export default function ViewProposals({ projectId = 1 }) {
           <p>Status: {p.status}</p>
 
           <button onClick={() => accept(p.id)}>Accept</button>
-          <button onClick={() => reject(p.id)} style={{ marginLeft: 10 }}>Reject</button>
+          <button onClick={() => reject(p.id)} style={{ marginLeft: 10 }}>
+            Reject
+          </button>
         </div>
       ))}
     </div>
