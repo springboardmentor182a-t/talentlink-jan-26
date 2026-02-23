@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-const API_BASE = process.env.REACT_APP_API_BASE_URL;
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 export default function SubmitProposal({ projectId = 1, freelancerId = 1 }) {
   const [coverLetter, setCoverLetter] = useState("");
@@ -10,12 +10,12 @@ export default function SubmitProposal({ projectId = 1, freelancerId = 1 }) {
 
   const handleSubmit = async () => {
     try {
-      await axios.post(${API_BASE}/proposals/, {
+      await axios.post(${BASE_URL}/proposals/, {
         project_id: projectId,
         freelancer_id: freelancerId,
         cover_letter: coverLetter,
         proposed_budget: parseFloat(budget),
-        delivery_time: deliveryTime
+        delivery_time: deliveryTime,
       });
 
       alert("Proposal submitted!");
@@ -35,29 +35,32 @@ export default function SubmitProposal({ projectId = 1, freelancerId = 1 }) {
       <textarea
         placeholder="Cover Letter"
         value={coverLetter}
-        onChange={e => setCoverLetter(e.target.value)}
+        onChange={(e) => setCoverLetter(e.target.value)}
         style={{ width: "100%", height: 100 }}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
       <input
         type="number"
         placeholder="Proposed Budget"
         value={budget}
-        onChange={e => setBudget(e.target.value)}
+        onChange={(e) => setBudget(e.target.value)}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
       <input
         type="text"
         placeholder="Delivery Time"
         value={deliveryTime}
-        onChange={e => setDeliveryTime(e.target.value)}
+        onChange={(e) => setDeliveryTime(e.target.value)}
       />
 
-      <br /><br />
+      <br />
+      <br />
 
       <button onClick={handleSubmit}>Submit</button>
     </div>
