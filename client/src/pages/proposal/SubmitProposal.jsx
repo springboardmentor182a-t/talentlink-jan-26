@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 
+const API_BASE = process.env.REACT_APP_API_BASE_URL;
+
 export default function SubmitProposal({ projectId = 1, freelancerId = 1 }) {
   const [coverLetter, setCoverLetter] = useState("");
   const [budget, setBudget] = useState("");
@@ -8,7 +10,7 @@ export default function SubmitProposal({ projectId = 1, freelancerId = 1 }) {
 
   const handleSubmit = async () => {
     try {
-      await axios.post("http://localhost:8000/proposals/", {
+      await axios.post(${API_BASE}/proposals/, {
         project_id: projectId,
         freelancer_id: freelancerId,
         cover_letter: coverLetter,
