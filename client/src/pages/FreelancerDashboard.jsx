@@ -59,7 +59,7 @@ const FreelancerDashboard = () => {
             <div key={project.id} style={{ backgroundColor: 'white', padding: '25px', borderRadius: '15px', border: '1px solid #E9ECEF', marginBottom: '15px' }}>
               <h4>{project.title}</h4>
               <p style={{ color: '#6C757D' }}>{project.client} • {project.budget}</p>
-              <button 
+              <button
                 onClick={() => handleApplyNow(project.id)}
                 style={{ backgroundColor: '#FF7A1A', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer' }}
               >
@@ -71,7 +71,7 @@ const FreelancerDashboard = () => {
 
         {/* Active Contracts Column */}
         <div style={{ flex: 1 }}>
-          <h3>📋 Active Contracts</h3>
+          <h3>📑 Active Contracts</h3>
           <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '15px', border: '1px solid #E9ECEF' }}>
             <p style={{ fontWeight: 'bold' }}>{data.active_contract.title}</p>
             <div style={{ height: '8px', backgroundColor: '#E9ECEF', borderRadius: '4px', marginTop: '10px' }}>
