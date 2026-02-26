@@ -1,22 +1,53 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { messageAPI } from '../services/messages';
 import UserAvatar from './UserAvatar';
 
+/**
+ * NewConversation modal
+ *
+ * Previously called getMessageableUsers() on mount which returned every user
+ * on the platform — a user enumeration and performance problem.
+ *
+ * Now uses a search-as-you-type pattern: results only load after 2+ chars,
+ * matching the backend's minimum query length requirement.
+ */
 const NewConversation = ({ onClose, onSelectUser }) => {
-  const [users, setUsers] = useState([]);
-  const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [users, setUsers]       = useState([]);
+  const [search, setSearch]     = useState('');
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState(null);
+  const debounceRef             = useRef(null);
 
+  // Search with 300 ms debounce so we don't fire on every keystroke
   useEffect(() => {
-    messageAPI.getMessageableUsers()
-      .then(data => setUsers(data))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
 
-  const filtered = users.filter(u =>
-    u.username.toLowerCase().includes(search.toLowerCase())
-  );
+    if (search.trim().length < 2) {
+      setUsers([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const data = await messageAPI.searchUsers(search);
+        setUsers(data);
+      } catch {
+        setError('Failed to search users');
+        setUsers([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(debounceRef.current);
+  }, [search]);
+
+  const showHint    = search.trim().length < 2;
+  const showEmpty   = !loading && !showHint && users.length === 0 && !error;
 
   return (
     <div style={styles.overlay} onClick={e => e.target === e.currentTarget && onClose()}>
@@ -25,7 +56,7 @@ const NewConversation = ({ onClose, onSelectUser }) => {
         <div style={styles.modalHeader}>
           <div>
             <h3 style={styles.modalTitle}>New Conversation</h3>
-            <p style={styles.modalSub}>Select someone to message</p>
+            <p style={styles.modalSub}>Search for someone to message</p>
           </div>
           <button onClick={onClose} style={styles.closeBtn}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -41,25 +72,36 @@ const NewConversation = ({ onClose, onSelectUser }) => {
           </svg>
           <input
             type="text"
-            placeholder="Search by name..."
+            placeholder="Type a name (min. 2 characters)..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             autoFocus
             style={styles.searchInput}
           />
+          {search && (
+            <button onClick={() => setSearch('')} style={styles.clearBtn}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 6 6 18M6 6l12 12"/>
+              </svg>
+            </button>
+          )}
         </div>
 
         {/* User List */}
         <div style={styles.userList}>
+          {showHint && (
+            <div style={styles.stateMsg}>Type at least 2 characters to search</div>
+          )}
           {loading && (
-            <div style={styles.stateMsg}>Loading users...</div>
+            <div style={styles.stateMsg}>Searching...</div>
           )}
-          {!loading && filtered.length === 0 && (
-            <div style={styles.stateMsg}>
-              {search ? `No users found for "${search}"` : 'No users available'}
-            </div>
+          {error && (
+            <div style={{ ...styles.stateMsg, color: '#ef4444' }}>{error}</div>
           )}
-          {!loading && filtered.map(user => (
+          {showEmpty && (
+            <div style={styles.stateMsg}>No users found for &ldquo;{search}&rdquo;</div>
+          )}
+          {!loading && users.map(user => (
             <button
               key={user.id}
               onClick={() => onSelectUser(user.id, user)}
@@ -72,8 +114,8 @@ const NewConversation = ({ onClose, onSelectUser }) => {
                   <span style={{
                     ...styles.roleBadge,
                     background: user.role === 'client' ? '#fff7ed' : '#f0fdf4',
-                    color: user.role === 'client' ? '#ea580c' : '#16a34a',
-                    border: `1px solid ${user.role === 'client' ? '#fed7aa' : '#bbf7d0'}`,
+                    color:      user.role === 'client' ? '#ea580c' : '#16a34a',
+                    border:     `1px solid ${user.role === 'client' ? '#fed7aa' : '#bbf7d0'}`,
                   }}>
                     {user.role}
                   </span>
@@ -146,6 +188,8 @@ const styles = {
   searchWrap: {
     position: 'relative',
     margin: '14px 16px 8px',
+    display: 'flex',
+    alignItems: 'center',
   },
   searchIcon: {
     position: 'absolute',
@@ -156,7 +200,7 @@ const styles = {
   },
   searchInput: {
     width: '100%',
-    padding: '10px 14px 10px 34px',
+    padding: '10px 32px 10px 34px',
     border: '1.5px solid #e5e7eb',
     borderRadius: 10,
     fontSize: 13.5,
@@ -165,6 +209,16 @@ const styles = {
     background: '#f9fafb',
     outline: 'none',
     boxSizing: 'border-box',
+  },
+  clearBtn: {
+    position: 'absolute',
+    right: 10,
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    padding: 2,
+    display: 'flex',
+    alignItems: 'center',
   },
   userList: {
     maxHeight: 340,

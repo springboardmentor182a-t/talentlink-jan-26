@@ -2,7 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import MessageBubble from './MessageBubble';
 import UserAvatar from './UserAvatar';
 
-const ChatArea = ({ messages = [], selectedUser, currentUser, onSend, loading }) => {
+/**
+ * ChatArea
+ *
+ * Props:
+ *  messages      - array of message objects
+ *  selectedUser  - conversation partner { username, role, user_id, ... }
+ *  currentUser   - logged-in user { id, ... }
+ *  onSend        - (content: string) => void
+ *  loading       - bool — shows loading dots while fetching initial messages
+ *  isOnline      - bool — real presence from WebSocket manager
+ */
+const ChatArea = ({ messages = [], selectedUser, currentUser, onSend, loading, isOnline = false }) => {
   const [text, setText] = useState('');
   const bottomRef = useRef(null);
 
@@ -43,11 +54,18 @@ const ChatArea = ({ messages = [], selectedUser, currentUser, onSend, loading })
       {/* Header */}
       <div style={styles.header}>
         <div style={styles.headerLeft}>
-          <UserAvatar username={selectedUser.username} size={40} />
+          <div style={styles.avatarWrap}>
+            <UserAvatar username={selectedUser.username} size={40} />
+            {/* Online presence dot */}
+            {isOnline && <span style={styles.onlineDot} title="Online" />}
+          </div>
           <div>
             <div style={styles.headerName}>{selectedUser.username}</div>
             <div style={styles.headerStatus}>
-              {selectedUser.role || 'TalentLink User'}
+              {isOnline
+                ? <><span style={styles.onlinePulse} />Online</>
+                : (selectedUser.role || 'TalentLink User')
+              }
             </div>
           </div>
         </div>
@@ -152,6 +170,20 @@ const styles = {
     alignItems: 'center',
     gap: 12,
   },
+  avatarWrap: {
+    position: 'relative',
+    display: 'inline-flex',
+  },
+  onlineDot: {
+    position: 'absolute',
+    bottom: 1,
+    right: 1,
+    width: 10,
+    height: 10,
+    borderRadius: '50%',
+    background: '#22c55e',
+    border: '2px solid #fff',
+  },
   headerName: {
     fontWeight: 600,
     fontSize: 15,
@@ -167,7 +199,13 @@ const styles = {
     color: '#6b7280',
     fontFamily: 'Inter, sans-serif',
   },
-
+  onlinePulse: {
+    display: 'inline-block',
+    width: 7,
+    height: 7,
+    borderRadius: '50%',
+    background: '#22c55e',
+  },
   headerActions: {
     display: 'flex',
     gap: 4,

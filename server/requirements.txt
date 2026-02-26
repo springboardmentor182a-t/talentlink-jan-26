@@ -6,6 +6,5 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-dotenv==1.0.1
 python-multipart==0.0.12
-
-# Production only — uncomment when DATABASE_URL=postgresql://...
-# psycopg2-binary==2.9.9
+cachetools==5.5.0       # TTLCache for rate limiter — replaces leaking defaultdict(list)
+psycopg2-binary==2.9.9   # PostgreSQL driver — required when DATABASE_URL=postgresql://
