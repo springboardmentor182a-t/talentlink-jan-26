@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from src.database.core import get_db
 from src.users import schemas, service
+from typing import List
 
 router = APIRouter()
 
@@ -43,8 +44,65 @@ def create_freelancer_profile(
 
 @router.post("/{user_id}/client-profile", response_model=schemas.ClientProfileResponse)
 def create_client_profile(
-    user_id: int,
-    profile: schemas.ClientProfileCreate,
+    user_id: int, 
+    profile: schemas.ClientProfileCreate, 
     db: Session = Depends(get_db)
 ):
+    """Create or update a client profile dynamically using the UserService"""
     return service.UserService.create_client_profile(db=db, user_id=user_id, profile=profile)
+
+
+# 4. Get Freelancer Profile (THE MISSING FUNCTION)
+@router.get("/{user_id}/freelancer_profile", response_model=schemas.FreelancerProfileResponse)
+def get_freelancer_profile(user_id: int, db: Session = Depends(get_db)):
+    from . import models
+    profile = db.query(models.FreelancerProfile).filter(models.FreelancerProfile.user_id == user_id).first()
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    return profile
+
+
+# 5. Get Client Profile (THE MISSING FUNCTION)
+@router.get("/{user_id}/client_profile", response_model=schemas.ClientProfileResponse)
+def get_client_profile(user_id: int, db: Session = Depends(get_db)):
+    from . import models
+    profile = db.query(models.ClientProfile).filter(models.ClientProfile.user_id == user_id).first()
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+    return profile
+
+
+# 6. Create a Proposal (Submit Application)
+@router.post("/{user_id}/proposals", response_model=schemas.ProposalResponse)
+def create_proposal(user_id: int, proposal: schemas.ProposalCreate, db: Session = Depends(get_db)):
+    from . import models
+    
+    # 1. Find the freelancer profile for this user
+    freelancer = db.query(models.FreelancerProfile).filter(models.FreelancerProfile.user_id == user_id).first()
+    
+    if not freelancer:
+        raise HTTPException(status_code=404, detail="You must have a Freelancer Profile to apply.")
+    
+    # 2. PREVENT DUPLICATES: Check if this freelancer already applied to this specific project
+    existing_proposal = db.query(models.Proposal).filter(
+        models.Proposal.freelancer_id == freelancer.id,
+        models.Proposal.project_id == proposal.project_id
+    ).first()
+    
+    if existing_proposal:
+        raise HTTPException(
+            status_code=400, 
+            detail="You have already submitted a proposal for this project."
+        )
+    
+    # 3. Create proposal linked to that freelancer
+    return service.create_proposal(db=db, proposal=proposal, freelancer_id=freelancer.id)
+
+# 7. Get My Proposals (View Application History)
+@router.get("/{user_id}/proposals", response_model=List[schemas.ProposalResponse])
+def get_my_proposals(user_id: int, db: Session = Depends(get_db)):
+    from . import models
+    freelancer = db.query(models.FreelancerProfile).filter(models.FreelancerProfile.user_id == user_id).first()
+    if not freelancer:
+        return [] # Return empty list if no profile
+    return freelancer.proposals

@@ -1,13 +1,10 @@
-import axios from 'axios';
-
-// "import.meta.env" is how Vite reads the .env file
-const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+import axios from './axios'; // <-- Changed to use your custom axios setup!
 
 // 1. Create Freelancer Profile
 export const createFreelancerProfile = async (userId, profileData) => {
   try {
     const response = await axios.post(
-      `${API_URL}/users/${userId}/freelancer-profile`, 
+      `users/${userId}/freelancer-profile`, 
       profileData
     );
     return response.data;
@@ -21,7 +18,7 @@ export const createFreelancerProfile = async (userId, profileData) => {
 export const createClientProfile = async (userId, profileData) => {
   try {
     const response = await axios.post(
-      `${API_URL}/users/${userId}/client-profile`, 
+      `users/${userId}/client-profile`, 
       profileData
     );
     return response.data;
@@ -31,11 +28,10 @@ export const createClientProfile = async (userId, profileData) => {
   }
 };
 
-// 3. Get Freelancer Profile (FIXED: Uses axios instead of api)
+// 3. Get Freelancer Profile
 export const getFreelancerProfile = async (userId) => {
   try {
-    // Note the underscore: freelancer_profile
-    const response = await axios.get(`${API_URL}/users/${userId}/freelancer_profile`);
+    const response = await axios.get(`users/${userId}/freelancer_profile`);
     return response.data;
   } catch (error) {
     console.error("API Error:", error);
@@ -43,14 +39,38 @@ export const getFreelancerProfile = async (userId) => {
   }
 };
 
-// 4. Get Client Profile (FIXED: Uses axios instead of api)
+// 4. Get Client Profile
 export const getClientProfile = async (userId) => {
   try {
-    // Note the underscore: client_profile
-    const response = await axios.get(`${API_URL}/users/${userId}/client_profile`);
+    const response = await axios.get(`users/${userId}/client_profile`);
     return response.data;
   } catch (error) {
     console.error("API Error:", error);
+    throw error;
+  }
+};
+
+// 5. Create a Proposal (Apply for a Job)
+export const createProposal = async (userId, proposalData) => {
+  try {
+    const response = await axios.post(
+      `users/${userId}/proposals`,
+      proposalData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("API Error:", error);
+    throw error;
+  }
+};
+
+// 6. Get My Proposals (Freelancer Contracts Page)
+export const getMyProposals = async (userId) => {
+  try {
+    const response = await axios.get(`users/${userId}/proposals`);
+    return response.data;
+  } catch (error) {
+    console.error("API Error fetching proposals:", error);
     throw error;
   }
 };
