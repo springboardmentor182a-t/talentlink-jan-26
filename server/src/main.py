@@ -43,8 +43,6 @@ app.include_router(users_router, prefix="/api/users", tags=["Users"])
 app.include_router(todos_router, prefix="/api/todos", tags=["Todos"])
 app.include_router(user_router.router)
 app.include_router(project_router.router)
->>>>>>> daec8aa (Add Find Projects API (FastAPI))
-
 
 @app.get("/")
 async def root():
