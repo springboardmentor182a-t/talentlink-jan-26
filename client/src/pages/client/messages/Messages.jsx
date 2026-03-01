@@ -66,7 +66,7 @@ const Messages = () => {
     <div className="messages-page">
       <div className="messages-container">
         <div className="conversations-list">
-          <h2>Conversations</h2>
+          <h2>Messages</h2>
           {conversations.length === 0 && <p className="placeholder">No conversations yet.</p>}
           {conversations.map((c) => (
             <div

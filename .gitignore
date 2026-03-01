@@ -2,6 +2,9 @@
 client/node_modules
 client/build
 
+node_modules
+
+
 # Python
 server/venv
 server/__pycache__/

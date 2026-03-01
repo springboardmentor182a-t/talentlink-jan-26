@@ -17,12 +17,12 @@ export const FreelancerRoutes = () => {
   return (
     <FreelancerLayout>
       <Routes>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/projects" element={<Projects />} />
-        <Route path="/proposals" element={<Proposals />} />
-        <Route path="/earnings" element={<Earnings />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/messages" element={<Messages />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="projects" element={<Projects />} />
+        <Route path="proposals" element={<Proposals />} />
+        <Route path="earnings" element={<Earnings />} />
+        <Route path="profile" element={<Profile />} />
+        <Route path="messages" element={<Messages />} />
       </Routes>
     </FreelancerLayout>
   );
