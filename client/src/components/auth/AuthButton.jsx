@@ -1,14 +1,9 @@
-const AuthButton = ({ text }) => {
+const AuthButton = ({ text, onClick, disabled }) => {
   return (
     <button
-      style={{
-        width: "100%",
-        padding: "10px",
-        background: "#000",
-        color: "#fff",
-        borderRadius: "6px",
-        border: "none",
-      }}
+      className="btn btn-primary"
+      onClick={onClick}
+      disabled={disabled}
     >
       {text}
     </button>
