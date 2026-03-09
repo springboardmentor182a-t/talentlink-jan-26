@@ -13,3 +13,5 @@ Thumbs.db
 
 # Env files
 .env
+
+*.db
