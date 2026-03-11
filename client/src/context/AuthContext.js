@@ -3,38 +3,48 @@ import { createContext, useState, useEffect } from "react";
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [role, setRole] = useState("client");
-  const [token, setToken] = useState("mock-token");
+  const [user, setUser]   = useState(null);
+  const [role, setRole]   = useState(null);
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  // Restore session on page refresh
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/users/me`);
-        const data = await response.json();
-        setUser(data);
-      } catch (error) {
-        console.error("Error fetching user:", error);
-        setUser({ name: "Intern User (Fallback)", email: "intern@example.com" });
+    try {
+      const savedToken = localStorage.getItem("token");
+      const savedUser  = localStorage.getItem("user");
+      const savedRole  = localStorage.getItem("role");
+      if (savedToken && savedUser && savedRole) {
+        setToken(savedToken);
+        setUser(JSON.parse(savedUser));
+        setRole(savedRole);
       }
-    };
-    fetchUser();
+    } catch (e) {
+      localStorage.clear();
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const login = (data) => {
-    setUser(data.user);
-    setRole(data.role);
-    setToken(data.token);
-    localStorage.setItem("token", data.token);
+  const login = ({ token, user, role }) => {
+    setToken(token);
+    setUser(user);
+    setRole(role);
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("role", role);
   };
 
   const logout = () => {
-    //setUser(null);
-    //setRole(null);
-    //setToken(null);
-    //localStorage.clear();
-    console.log("Logout bypassed");
+    setToken(null);
+    setUser(null);
+    setRole(null);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("role");
   };
+
+  if (loading) return null;
 
   return (
     <AuthContext.Provider value={{ user, role, token, login, logout }}>

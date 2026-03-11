@@ -1,12 +1,12 @@
-const InputField = ({ label, type, value, onChange }) => {
+const InputField = ({ label, type, value, onChange, placeholder }) => {
   return (
-    <div style={{ marginBottom: "12px" }}>
+    <div className="form-group">
       <label>{label}</label>
       <input
         type={type}
         value={value}
         onChange={onChange}
-        style={{ width: "100%", padding: "8px", marginTop: "4px" }}
+        placeholder={placeholder}
       />
     </div>
   );
