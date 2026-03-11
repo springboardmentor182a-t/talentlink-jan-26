@@ -30,7 +30,7 @@ const Navbar = ({ profile }) => {
               {profile?.full_name || "Client User"}
             </p>
             <p className="text-xs text-gray-500">
-              {profile?.account_type || "Premium Account"}
+              {profile?.role || "Client"}
             </p>
           </div>
           <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 border-2 border-white shadow-sm">
