@@ -1,0 +1,26 @@
+.profile-page {
+  padding: var(--space-xl);
+  background-color: var(--bg-light);
+  min-height: 100vh;
+}
+
+.profile-card {
+  max-width: 600px;
+  margin: auto;
+}
+
+.profile-field {
+  margin-bottom: var(--space-md);
+}
+
+.profile-field label {
+  display: block;
+  font-size: 14px;
+  color: var(--text-gray);
+  margin-bottom: 6px;
+}
+
+.profile-field input,
+.profile-field textarea {
+  width: 100%;
+}
