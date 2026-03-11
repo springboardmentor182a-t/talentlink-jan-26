@@ -1,22 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 import StatsCard from '../components/dashboard/StatsCard';
 import AnalyticsChart from '../components/dashboard/AnalyticsChart';
 import RecentProjects from '../components/dashboard/RecentProjects';
 import { Briefcase, FileText, CheckCircle, Star, LogOut } from 'lucide-react';
 
 const ClientDashboard = () => {
+    const { user, logout } = useContext(AuthContext);
+    const navigate = useNavigate();
     const [stats, setStats] = useState(null);
     const [projects, setProjects] = useState([]);
     const [chartData, setChartData] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const handleLogout = () => {
+        logout();
+        // navigate('/client/login');
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const [statsRes, projectsRes, chartRes] = await Promise.all([
-                    fetch('http://localhost:8000/api/client/dashboard/stats'),
-                    fetch('http://localhost:8000/api/client/dashboard/recent-projects'),
-                    fetch('http://localhost:8000/api/client/dashboard/charts')
+                    fetch(`${process.env.REACT_APP_BASE_URL}/api/client/dashboard/stats`),
+                    fetch(`${process.env.REACT_APP_BASE_URL}/api/client/dashboard/recent-projects`),
+                    fetch(`${process.env.REACT_APP_BASE_URL}/api/client/dashboard/charts`)
                 ]);
 
                 const statsData = await statsRes.json();
@@ -46,20 +55,22 @@ const ClientDashboard = () => {
             <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '40px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
                     <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontWeight: 600 }}>Tech Solutions Inc.</div>
+                        <div style={{ fontWeight: 600 }}>{user?.name || "Client"}</div>
                         <div style={{ fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>Client</div>
                     </div>
-                    <button style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        backgroundColor: 'transparent',
-                        border: '1px solid var(--border)',
-                        color: 'var(--foreground)',
-                        padding: '8px 16px',
-                        cursor: 'pointer',
-                        borderRadius: 'var(--radius)'
-                    }}>
+                    <button
+                        onClick={handleLogout}
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            backgroundColor: 'transparent',
+                            border: '1px solid var(--border)',
+                            color: 'var(--foreground)',
+                            padding: '8px 16px',
+                            cursor: 'pointer',
+                            borderRadius: 'var(--radius)'
+                        }}>
                         <LogOut size={16} /> Logout
                     </button>
                 </div>
