@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate, useContext } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useContext } from "react";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
 
 // Auth pages
@@ -11,7 +12,7 @@ import ForgotPassword   from "./pages/auth/ForgotPassword";
 
 // Proposal pages
 import SubmitProposal   from "./pages/proposal/SubmitProposal";
-import ViewProposals    from "./pages/proposal/ViewProposals";
+import ViewProposal     from "./pages/proposal/ViewProposal";
 import ProposalTracking from "./pages/proposal/ProposalTracking";
 
 import Sidebar from "./layout/Sidebar";
@@ -66,7 +67,7 @@ function AppRoutes() {
           <ProtectedRoute allowedRole="freelancer"><ProposalTracking /></ProtectedRoute>
         } />
         <Route path="/view-proposals/:projectId" element={
-          <ProtectedRoute allowedRole="client"><ViewProposals /></ProtectedRoute>
+          <ProtectedRoute allowedRole="client"><ViewProposal /></ProtectedRoute>
         } />
 
         {/* Dashboard routes */}
