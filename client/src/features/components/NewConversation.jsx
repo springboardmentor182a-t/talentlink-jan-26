@@ -1,14 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { messageAPI } from '../services/messages';
 import UserAvatar from './UserAvatar';
+import '../../assets/messages.css';
 
 /**
  * NewConversation modal
  *
- * Previously called getMessageableUsers() on mount which returned every user
- * on the platform — a user enumeration and performance problem.
- *
- * Now uses a search-as-you-type pattern: results only load after 2+ chars,
+ * Uses search-as-you-type: results only load after 2+ chars,
  * matching the backend's minimum query length requirement.
  */
 const NewConversation = ({ onClose, onSelectUser }) => {
@@ -46,19 +44,19 @@ const NewConversation = ({ onClose, onSelectUser }) => {
     return () => clearTimeout(debounceRef.current);
   }, [search]);
 
-  const showHint    = search.trim().length < 2;
-  const showEmpty   = !loading && !showHint && users.length === 0 && !error;
+  const showHint  = search.trim().length < 2;
+  const showEmpty = !loading && !showHint && users.length === 0 && !error;
 
   return (
-    <div style={styles.overlay} onClick={e => e.target === e.currentTarget && onClose()}>
-      <div style={styles.modal}>
+    <div className="new-conv-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="new-conv-modal">
         {/* Header */}
-        <div style={styles.modalHeader}>
+        <div className="new-conv-header">
           <div>
-            <h3 style={styles.modalTitle}>New Conversation</h3>
-            <p style={styles.modalSub}>Search for someone to message</p>
+            <h3 className="new-conv-title">New Conversation</h3>
+            <p className="new-conv-subtitle">Search for someone to message</p>
           </div>
-          <button onClick={onClose} style={styles.closeBtn}>
+          <button onClick={onClose} className="new-conv-close-btn">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 6 6 18M6 6l12 12"/>
             </svg>
@@ -66,8 +64,8 @@ const NewConversation = ({ onClose, onSelectUser }) => {
         </div>
 
         {/* Search */}
-        <div style={styles.searchWrap}>
-          <svg style={styles.searchIcon} width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div className="new-conv-search-wrap">
+          <svg className="new-conv-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
           <input
@@ -76,10 +74,10 @@ const NewConversation = ({ onClose, onSelectUser }) => {
             value={search}
             onChange={e => setSearch(e.target.value)}
             autoFocus
-            style={styles.searchInput}
+            className="new-conv-search-input"
           />
           {search && (
-            <button onClick={() => setSearch('')} style={styles.clearBtn}>
+            <button onClick={() => setSearch('')} className="new-conv-clear-btn">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 6 6 18M6 6l12 12"/>
               </svg>
@@ -88,31 +86,37 @@ const NewConversation = ({ onClose, onSelectUser }) => {
         </div>
 
         {/* User List */}
-        <div style={styles.userList}>
+        <div className="new-conv-user-list">
           {showHint && (
-            <div style={styles.stateMsg}>Type at least 2 characters to search</div>
+            <div className="new-conv-state-msg">Type at least 2 characters to search</div>
           )}
           {loading && (
-            <div style={styles.stateMsg}>Searching...</div>
+            <div className="new-conv-state-msg">Searching...</div>
           )}
           {error && (
-            <div style={{ ...styles.stateMsg, color: '#ef4444' }}>{error}</div>
+            <div className="new-conv-state-msg new-conv-state-msg--error">{error}</div>
           )}
           {showEmpty && (
-            <div style={styles.stateMsg}>No users found for &ldquo;{search}&rdquo;</div>
+            <div className="new-conv-state-msg">No users found for &ldquo;{search}&rdquo;</div>
           )}
           {!loading && users.map(user => (
             <button
               key={user.id}
               onClick={() => onSelectUser(user.id, user)}
-              style={styles.userItem}
+              className="new-conv-user-item"
             >
               <UserAvatar username={user.username} size={40} />
-              <div style={styles.userInfo}>
-                <span style={styles.userName}>{user.username}</span>
+              <div className="new-conv-user-info">
+                <span className="new-conv-user-name">{user.username}</span>
                 {user.role && (
+                  // role badge colours are dynamic — inline style is intentional here
                   <span style={{
-                    ...styles.roleBadge,
+                    fontSize: 11,
+                    fontWeight: 500,
+                    padding: '2px 8px',
+                    borderRadius: 999,
+                    fontFamily: 'Inter, sans-serif',
+                    textTransform: 'capitalize',
                     background: user.role === 'client' ? '#fff7ed' : '#f0fdf4',
                     color:      user.role === 'client' ? '#ea580c' : '#16a34a',
                     border:     `1px solid ${user.role === 'client' ? '#fed7aa' : '#bbf7d0'}`,
@@ -121,7 +125,7 @@ const NewConversation = ({ onClose, onSelectUser }) => {
                   </span>
                 )}
               </div>
-              <svg style={styles.arrowIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="new-conv-arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="m9 18 6-6-6-6"/>
               </svg>
             </button>
@@ -130,146 +134,6 @@ const NewConversation = ({ onClose, onSelectUser }) => {
       </div>
     </div>
   );
-};
-
-const styles = {
-  overlay: {
-    position: 'fixed',
-    inset: 0,
-    background: 'rgba(0,0,0,0.35)',
-    backdropFilter: 'blur(4px)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-    padding: 20,
-  },
-  modal: {
-    background: '#fff',
-    borderRadius: 16,
-    width: '100%',
-    maxWidth: 420,
-    boxShadow: '0 20px 60px rgba(0,0,0,0.18)',
-    overflow: 'hidden',
-  },
-  modalHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    padding: '20px 20px 16px',
-    borderBottom: '1px solid #f3f4f6',
-  },
-  modalTitle: {
-    margin: 0,
-    fontSize: 17,
-    fontWeight: 700,
-    fontFamily: 'Poppins, sans-serif',
-    color: '#111827',
-  },
-  modalSub: {
-    margin: '3px 0 0',
-    fontSize: 13,
-    color: '#9ca3af',
-    fontFamily: 'Inter, sans-serif',
-  },
-  closeBtn: {
-    background: '#f3f4f6',
-    border: 'none',
-    borderRadius: 8,
-    width: 32,
-    height: 32,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    color: '#6b7280',
-    flexShrink: 0,
-  },
-  searchWrap: {
-    position: 'relative',
-    margin: '14px 16px 8px',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  searchIcon: {
-    position: 'absolute',
-    left: 11,
-    top: '50%',
-    transform: 'translateY(-50%)',
-    pointerEvents: 'none',
-  },
-  searchInput: {
-    width: '100%',
-    padding: '10px 32px 10px 34px',
-    border: '1.5px solid #e5e7eb',
-    borderRadius: 10,
-    fontSize: 13.5,
-    fontFamily: 'Inter, sans-serif',
-    color: '#111827',
-    background: '#f9fafb',
-    outline: 'none',
-    boxSizing: 'border-box',
-  },
-  clearBtn: {
-    position: 'absolute',
-    right: 10,
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    padding: 2,
-    display: 'flex',
-    alignItems: 'center',
-  },
-  userList: {
-    maxHeight: 340,
-    overflowY: 'auto',
-    padding: '8px 8px 12px',
-  },
-  stateMsg: {
-    textAlign: 'center',
-    padding: '32px 16px',
-    color: '#9ca3af',
-    fontSize: 13,
-    fontFamily: 'Inter, sans-serif',
-  },
-  userItem: {
-    width: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    padding: '10px 12px',
-    border: 'none',
-    background: 'transparent',
-    borderRadius: 10,
-    cursor: 'pointer',
-    textAlign: 'left',
-    transition: 'background 0.12s',
-  },
-  userInfo: {
-    flex: 1,
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    minWidth: 0,
-  },
-  userName: {
-    fontWeight: 500,
-    fontSize: 14,
-    fontFamily: 'Inter, sans-serif',
-    color: '#111827',
-  },
-  roleBadge: {
-    fontSize: 11,
-    fontWeight: 500,
-    padding: '2px 8px',
-    borderRadius: 999,
-    fontFamily: 'Inter, sans-serif',
-    textTransform: 'capitalize',
-  },
-  arrowIcon: {
-    flexShrink: 0,
-    opacity: 0.4,
-  },
 };
 
 export default NewConversation;

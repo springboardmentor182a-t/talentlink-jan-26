@@ -14,6 +14,7 @@ import src.entities.user     # noqa: F401
 import src.entities.todo     # noqa: F401
 import src.entities.message  # noqa: F401
 import src.users.models      # noqa: F401
+import src.entities.contract
 
 from src.rate_limiter import rate_limit_middleware
 from src.exceptions import error_handler_middleware
@@ -21,6 +22,7 @@ from src.auth.controller import router as auth_router
 from src.users.router import router as users_router
 from src.todos.controller import router as todos_router
 from src.messages.controller import router as messages_router
+from src.contracts.controller import router as contracts_router
 
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 
@@ -77,20 +79,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.middleware("http")(rate_limit_middleware)
 app.middleware("http")(error_handler_middleware)
+app.middleware("http")(rate_limit_middleware)
 
 app.include_router(auth_router,     prefix="/api/auth",     tags=["Authentication"])
 app.include_router(users_router,    prefix="/api/users",    tags=["Users"])
 app.include_router(todos_router,    prefix="/api/todos",    tags=["Todos"])
 app.include_router(messages_router, prefix="/api/messages", tags=["Messages"])
+app.include_router(contracts_router, prefix="/api/contracts", tags=["Contracts"])
 
 
 # ── WebSocket Connection Manager ──────────────────────────────────────────────
 # Keyed by user_id (int) → WebSocket instance.
 # One connection per user — second tab replaces first gracefully.
 #
-# ⚠️ MULTI-WORKER LIMITATION: This in-memory dict only works with a single
+#  MULTI-WORKER LIMITATION: This in-memory dict only works with a single
 # uvicorn worker (--workers 1). With multiple workers each process has its own
 # dict, so cross-worker broadcasts silently fail. Fix before scaling:
 # replace with a Redis pub/sub backend (e.g. via broadcaster or fastapi-socketio).

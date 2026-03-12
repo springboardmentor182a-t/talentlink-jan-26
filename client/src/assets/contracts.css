@@ -1,0 +1,582 @@
+/* =============================================================================
+   contracts.css — TalentLink Contracts Module
+   Covers: ContractsClient.jsx, ContractsFreelancer.jsx
+   Follows the same pattern as messages.css — theme variables only,
+   BEM modifier classes, no hardcoded colours except where no theme var exists.
+============================================================================= */
+
+
+/* ── Page shell ───────────────────────────────────────────────────────────── */
+
+.contracts-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-secondary);
+  padding: 28px 32px;
+  overflow-y: auto;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+
+/* ── Header row ───────────────────────────────────────────────────────────── */
+
+.contracts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+}
+
+.contracts-header__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  color: var(--color-secondary);
+}
+
+.contracts-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+/* ── Search bar (client view) ─────────────────────────────────────────────── */
+
+.contracts-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.contracts-search-icon {
+  position: absolute;
+  left: 11px;
+  pointer-events: none;
+  color: var(--color-tertiary);
+}
+
+.contracts-search-input {
+  padding: 9px 12px 9px 34px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-family: var(--font-text);
+  color: var(--color-secondary);
+  background: var(--bg-primary);
+  outline: none;
+  width: 220px;
+  transition: border-color 0.15s;
+}
+
+.contracts-search-input:focus {
+  border-color: var(--color-primary);
+}
+
+
+/* ── Filter tabs ──────────────────────────────────────────────────────────── */
+
+.contracts-filters {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0;
+}
+
+.filter-tab {
+  padding: 9px 16px;
+  border: none;
+  background: transparent;
+  font-size: 13.5px;
+  font-family: var(--font-text);
+  color: var(--color-tertiary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.filter-tab:hover {
+  color: var(--color-secondary);
+}
+
+.filter-tab--active {
+  color: var(--color-primary);
+  font-weight: 600;
+  border-bottom-color: var(--color-primary);
+}
+
+
+/* ── Status badges ────────────────────────────────────────────────────────── */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: var(--font-text);
+  letter-spacing: 0.02em;
+  text-transform: capitalize;
+}
+
+.status-badge--active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge--draft {
+  background: var(--bg-tertiary);
+  color: var(--color-tertiary);
+}
+
+.status-badge--pending {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.status-badge--completed {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.status-badge--rejected {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.status-badge--cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+
+/* ── Freelancer card grid ─────────────────────────────────────────────────── */
+
+.contracts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+@media (max-width: 1200px) {
+  .contracts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .contracts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ── Contract card (freelancer view) ─────────────────────────────────────── */
+
+.contract-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 18px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: box-shadow 0.15s;
+}
+
+.contract-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.contract-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.contract-card__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-heading);
+  color: var(--color-secondary);
+  line-height: 1.35;
+}
+
+.contract-card__id {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--color-tertiary);
+  font-family: var(--font-text);
+}
+
+.contract-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.contract-card__meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-family: var(--font-text);
+  color: var(--color-tertiary);
+}
+
+.contract-card__meta-label {
+  font-weight: 500;
+  color: var(--color-secondary);
+  min-width: 46px;
+}
+
+.contract-card__avatar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px solid var(--bg-tertiary);
+}
+
+.contract-card__avatar-initial {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  flex-shrink: 0;
+}
+
+.contract-card__avatar-name {
+  font-size: 13px;
+  font-family: var(--font-text);
+  font-weight: 500;
+  color: var(--color-secondary);
+}
+
+.contract-card__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+
+/* ── Client list view ─────────────────────────────────────────────────────── */
+
+.contracts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.contract-row {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: box-shadow 0.15s;
+}
+
+.contract-row:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.contract-row__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.contract-row__title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.contract-row__title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-heading);
+  color: var(--color-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.contract-row__meta {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.contract-row__meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.contract-row__meta-label {
+  font-size: 11px;
+  color: var(--color-tertiary);
+  font-family: var(--font-text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.contract-row__meta-value {
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-text);
+  color: var(--color-secondary);
+}
+
+.contract-row__progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contract-row__progress-label {
+  font-size: 12px;
+  font-family: var(--font-text);
+  color: var(--color-tertiary);
+  white-space: nowrap;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.contract-row__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+
+/* ── Empty & loading states ───────────────────────────────────────────────── */
+
+.contracts-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 40px;
+  color: var(--color-tertiary);
+  text-align: center;
+}
+
+.contracts-empty__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.contracts-empty__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--font-heading);
+  color: var(--color-secondary);
+}
+
+.contracts-empty__subtitle {
+  margin: 0;
+  font-size: 13.5px;
+  font-family: var(--font-text);
+  color: var(--color-tertiary);
+}
+
+.contracts-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 60px;
+}
+
+.contracts-loading__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  animation: contracts-bounce 0.6s infinite alternate;
+  display: inline-block;
+}
+
+.contracts-loading__dot:nth-child(2) { animation-delay: 0.15s; }
+.contracts-loading__dot:nth-child(3) { animation-delay: 0.30s; }
+
+@keyframes contracts-bounce {
+  from { transform: translateY(0);    opacity: 0.6; }
+  to   { transform: translateY(-7px); opacity: 1;   }
+}
+
+
+/* ── New contract modal ───────────────────────────────────────────────────── */
+
+.new-contract-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.new-contract-modal {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+}
+
+.new-contract-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--bg-tertiary);
+  position: sticky;
+  top: 0;
+  background: var(--bg-primary);
+}
+
+.new-contract-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  color: var(--color-secondary);
+}
+
+.new-contract-close-btn {
+  background: var(--bg-tertiary);
+  border: none;
+  border-radius: var(--radius-sm);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-tertiary);
+  flex-shrink: 0;
+}
+
+.new-contract-close-btn:hover {
+  background: var(--border-color);
+}
+
+.new-contract-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.new-contract-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.new-contract-label {
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-text);
+  color: var(--color-secondary);
+}
+
+.new-contract-input,
+.new-contract-textarea {
+  padding: 9px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 13.5px;
+  font-family: var(--font-text);
+  color: var(--color-secondary);
+  background: var(--bg-secondary);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.new-contract-input:focus,
+.new-contract-textarea:focus {
+  border-color: var(--color-primary);
+}
+
+.new-contract-textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.new-contract-row {
+  display: flex;
+  gap: 12px;
+}
+
+.new-contract-row .new-contract-field {
+  flex: 1;
+}
+
+.new-contract-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px 20px;
+  border-top: 1px solid var(--bg-tertiary);
+}

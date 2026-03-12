@@ -16,3 +16,17 @@ Thumbs.db
 
 *.db
 talent.db
+
+# Python cache anywhere in the project
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# Test artifacts
+server/test.db
+server/.pytest_cache/
+server/htmlcov/
+server/.coverage
+
+# Docker
+**/.dockerignore

@@ -1,0 +1,76 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Usage:
+#   1. Copy .env.example → .env and fill in every value
+#   2. docker compose up --build
+#   3. App → http://localhost:3000   API → http://localhost:8000
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: talentlink_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB}
+      POSTGRES_USER:     ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5433:5432"   # localhost only — never expose Postgres publicly
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+  # ── FastAPI ─────────────────────────────────────────────────────────────────
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: talentlink_server
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy   # wait for Postgres before starting
+    environment:
+      DATABASE_URL:                postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      SECRET_KEY:                  ${SECRET_KEY}
+      ALGORITHM:                   ${ALGORITHM:-HS256}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      ALLOWED_ORIGINS:             ${ALLOWED_ORIGINS:-http://localhost:3000}
+      APP_ENV:                     ${APP_ENV:-production}
+      TRUSTED_PROXY:               ${TRUSTED_PROXY:-false}
+      SMTP_HOST:                   ${SMTP_HOST:-}
+      SMTP_PORT:                   ${SMTP_PORT:-587}
+      SMTP_USER:                   ${SMTP_USER:-}
+      SMTP_PASSWORD:               ${SMTP_PASSWORD:-}
+      SMTP_FROM:                   ${SMTP_FROM:-}
+      FRONTEND_URL:                ${FRONTEND_URL:-http://localhost:3000}
+    ports:
+      - "8000:8000"
+
+
+  # ── React / nginx ───────────────────────────────────────────────────────────
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000/api}
+    container_name: talentlink_client
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - "3000:80"
+
+
+volumes:
+  postgres_data:

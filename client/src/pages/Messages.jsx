@@ -4,6 +4,7 @@ import { useMessages } from '../features/hooks/useMessages';
 import ConversationsList from '../features/components/ConversationsList';
 import ChatArea from '../features/components/ChatArea';
 import NewConversation from '../features/components/NewConversation';
+import '../assets/messages.css';
 
 const Messages = () => {
   const { user } = useAuth();
@@ -44,8 +45,6 @@ const Messages = () => {
     setSelectedUserId(userId);
     const found = conversations.find(c => c.user_id === userId);
     if (found) setSelectedUser(found);
-    // No setTimeout hack — markRead fires naturally in the useEffect above
-    // after messages load and render.
   };
 
   // Called from NewConversation modal.
@@ -62,15 +61,15 @@ const Messages = () => {
   };
 
   return (
-    <div style={styles.page}>
+    <div className="messages-page">
       {/* Connection indicator — only visible while WS is establishing */}
       {!wsConnected && (
-        <div style={styles.offlineBanner}>
+        <div className="messages-offline-banner">
           ⚡ Connecting to real-time chat…
         </div>
       )}
 
-      <div style={styles.chatShell}>
+      <div className="messages-chat-shell">
         <ConversationsList
           conversations={conversations}
           selectedUserId={selectedUserId}
@@ -96,40 +95,6 @@ const Messages = () => {
       )}
     </div>
   );
-};
-
-const styles = {
-  page: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    background: '#f9fafb',
-    padding: 20,
-    overflow: 'hidden',
-    minWidth: 0,
-  },
-  chatShell: {
-    flex: 1,
-    display: 'flex',
-    background: '#fff',
-    borderRadius: 14,
-    border: '1px solid #e5e7eb',
-    boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
-    overflow: 'hidden',
-    minHeight: 0,
-  },
-  offlineBanner: {
-    background: '#fff7ed',
-    color: '#c2410c',
-    fontSize: 12,
-    fontFamily: 'Inter, sans-serif',
-    textAlign: 'center',
-    padding: '6px 0',
-    borderRadius: 8,
-    marginBottom: 8,
-    border: '1px solid #fed7aa',
-  },
 };
 
 export default Messages;
