@@ -28,7 +28,7 @@ export default function FreelancerLogin() {
 
   const handleSubmit = async () => {
     setError("");
-    if (!email  !password) { setError("Please enter your email and password."); return; }
+    if (!email || !password) { setError("Please enter your email and password."); return; }
     try {
       setLoading(true);
       const res = await api.post("/auth/login", { email, password });
@@ -45,7 +45,7 @@ export default function FreelancerLogin() {
         typeof detail === "string"
           ? detail
           : Array.isArray(detail)
-            ? detail[0]?.msg  "Invalid email or password. Please try again."
+            ? detail[0]?.msg || "Invalid email or password. Please try again."
             : "Invalid email or password. Please try again."
       );
     } finally { setLoading(false); }
@@ -62,3 +62,57 @@ export default function FreelancerLogin() {
           <div style={{ width:40, height:40, background:"linear-gradient(135deg,#7c3aed,#a855f7)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontSize:20 }}>👤</div>
           <span style={{ fontWeight:700, fontSize:20, color:"#7c3aed" }}>TalentLink</span>
         </div>
+
+        <h2 style={{ fontSize:22, fontWeight:700, color:"#111827", marginBottom:4, textAlign:"center" }}>Freelancer Login</h2>
+        <p style={{ fontSize:14, color:"#6b7280", marginBottom:24, textAlign:"center" }}>Access your dashboard to browse projects and manage proposals</p>
+
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:20 }}>
+          <button onClick={() => alert("Google login coming soon!")}
+            style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:11, border:"1.5px solid #e5e7eb", borderRadius:8, cursor:"pointer", backgroundColor:"white", fontSize:14, fontWeight:600, color:"#374151" }}>
+            <GoogleIcon /> Google
+          </button>
+          <button onClick={() => alert("GitHub login coming soon!")}
+            style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:11, border:"1.5px solid #24292e", borderRadius:8, cursor:"pointer", backgroundColor:"#24292e", fontSize:14, fontWeight:600, color:"white" }}>
+            <GitHubIcon /> GitHub
+          </button>
+        </div>
+
+        <div style={{ display:"flex", alignItems:"center", gap:12, margin:"20px 0", color:"#9ca3af", fontSize:12 }}>
+          <div style={{ flex:1, height:1, backgroundColor:"#e5e7eb" }} />
+          or continue with email
+          <div style={{ flex:1, height:1, backgroundColor:"#e5e7eb" }} />
+        </div>
+
+        {error && (
+          <div style={{ backgroundColor:"#fef2f2", border:"1.5px solid #fecaca", borderRadius:8, padding:"10px 14px", fontSize:13, color:"#dc2626", marginBottom:16 }}>
+            ⚠️ {error}
+          </div>
+        )}
+
+        <label style={lbl}>Email</label>
+        <input style={inp} type="email" placeholder="freelancer@example.com" value={email} onChange={e => setEmail(e.target.value)} />
+
+        <label style={lbl}>Password</label>
+        <input
+          style={inp} type="password" placeholder="••••••••" value={password}
+          onChange={e => setPassword(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && handleSubmit()}
+        />
+
+        <button
+          onClick={handleSubmit} disabled={loading}
+          style={{ width:"100%", padding:13, background: loading ? undefined : "linear-gradient(135deg,#7c3aed,#a855f7)", backgroundColor: loading ? "#9ca3af" : undefined, color:"white", border:"none", borderRadius:8, cursor: loading ? "not-allowed" : "pointer", fontWeight:700, fontSize:15 }}>
+          {loading ? "Signing in..." : "Sign In →"}
+        </button>
+
+        <div style={{ textAlign:"center", marginTop:14, fontSize:13, color:"#6b7280" }}>
+          <Link to="/forgot-password" style={{ color:"#7c3aed", fontWeight:600, textDecoration:"none" }}>Forgot Password?</Link>
+        </div>
+        <div style={{ textAlign:"center", marginTop:10, fontSize:13, color:"#6b7280" }}>
+          Don't have an account?{" "}
+          <Link to="/freelancer/signup" style={{ color:"#7c3aed", fontWeight:600, textDecoration:"none" }}>Sign up</Link>
+        </div>
+      </div>
+    </div>
+  );
+}
