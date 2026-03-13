@@ -22,7 +22,7 @@ app.add_middleware(
 )
 
 # ── Routers ──────────────────────────────────
-app.include_router(auth_router, prefix="/auth", tags=["Auth"])
+app.include_router(auth_router, tags=["Auth"])
 
 @app.get("/")
 def root():
