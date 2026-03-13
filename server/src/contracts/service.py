@@ -21,29 +21,38 @@ def _calc_progress(contract: Contract) -> int:
 
 
 def _resolve_parties(db: Session, contract: Contract) -> tuple[int, int]:
-    """Return (client_id, freelancer_id) by joining through proposal.
+    """Return (client_user_id, freelancer_user_id) — both in the users.id space.
 
-    client_id and freelancer_id are never stored on the Contract itself —
-    they are resolved via proposal → project (client) and proposal (freelancer).
-    Raises 500 if the proposal or project relationship is broken (data integrity issue).
+    Proposal.freelancer_id is a FK to profiles_freelancer.id, NOT users.id.
+    Without the FreelancerProfile lookup below, every permission check would
+    silently compare the wrong ID space and produce incorrect 403/200 responses.
     """
-    # Import here to avoid circular imports at module load time
-    from src.entities.proposal import Proposal  # noqa: PLC0415
-    from src.entities.project import Project    # noqa: PLC0415
+    from src.entities.proposal import Proposal      # noqa: PLC0415
+    from src.entities.project import Project        # noqa: PLC0415
+    from src.users.models import FreelancerProfile  # noqa: PLC0415
 
     proposal = db.query(Proposal).filter(Proposal.id == contract.proposal_id).first()
     if not proposal:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Contract is linked to a missing proposal — data integrity error",
+            detail="Contract is linked to a missing proposal -- data integrity error",
         )
     project = db.query(Project).filter(Project.id == proposal.project_id).first()
     if not project:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Proposal is linked to a missing project — data integrity error",
+            detail="Proposal is linked to a missing project -- data integrity error",
         )
-    return project.client_id, proposal.freelancer_id
+    # proposal.freelancer_id is profiles_freelancer.id -- resolve to users.id
+    profile = db.query(FreelancerProfile).filter(
+        FreelancerProfile.id == proposal.freelancer_id
+    ).first()
+    if not profile:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Proposal linked to missing freelancer profile -- data integrity error",
+        )
+    return project.client_id, profile.user_id
 
 
 def _assert_party(db: Session, contract: Contract, user_id: int) -> None:
@@ -61,7 +70,7 @@ class ContractService:
     # ── Create ─────────────────────────────────────────────────────────────────
 
     @staticmethod
-    def create_contract(db: Session, data: ContractCreate, client_id: int) -> Contract:
+    def create_contract(db: Session, data: ContractCreate, client_id: int) -> dict:
         """Client only. Validates proposal ownership, creates contract in draft."""
         from src.entities.proposal import Proposal  # noqa: PLC0415
         from src.entities.project import Project    # noqa: PLC0415
@@ -78,6 +87,15 @@ class ContractService:
             )
 
         if hasattr(proposal, "contract") and proposal.contract is not None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="A contract already exists for this proposal",
+            )
+
+        # Belt-and-suspenders: also check directly in case the ORM relationship
+        # isn't wired yet (proposal→contract back-ref is commented out pending merge).
+        existing = db.query(Contract).filter(Contract.proposal_id == data.proposal_id).first()
+        if existing:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="A contract already exists for this proposal",
@@ -104,7 +122,7 @@ class ContractService:
 
         db.commit()
         db.refresh(contract)
-        return contract
+        return ContractService._to_response_dict(contract)
 
     # ── Read ───────────────────────────────────────────────────────────────────
 
@@ -114,9 +132,13 @@ class ContractService:
 
         Joins through proposal to identify both parties without storing
         client_id/freelancer_id directly on the contract.
+
+        For the freelancer branch we must join through FreelancerProfile because
+        Proposal.freelancer_id is profiles_freelancer.id, not users.id.
         """
-        from src.entities.proposal import Proposal  # noqa: PLC0415
-        from src.entities.project import Project    # noqa: PLC0415
+        from src.entities.proposal import Proposal      # noqa: PLC0415
+        from src.entities.project import Project        # noqa: PLC0415
+        from src.users.models import FreelancerProfile  # noqa: PLC0415
 
         if role == "client":
             contracts = (
@@ -127,10 +149,12 @@ class ContractService:
                 .all()
             )
         else:
+            # Proposal.freelancer_id -> FreelancerProfile.id -> FreelancerProfile.user_id
             contracts = (
                 db.query(Contract)
                 .join(Proposal, Proposal.id == Contract.proposal_id)
-                .filter(Proposal.freelancer_id == user_id)
+                .join(FreelancerProfile, FreelancerProfile.id == Proposal.freelancer_id)
+                .filter(FreelancerProfile.user_id == user_id)
                 .all()
             )
 
@@ -213,6 +237,48 @@ class ContractService:
 
         contract.terms  = data.terms
         contract.status = "rejected"
+        db.commit()
+        db.refresh(contract)
+        return ContractService._to_response_dict(contract)
+
+    @staticmethod
+    def renegotiate_contract(
+        db: Session, contract_id: int, data, client_id: int
+    ) -> dict:
+        """Client only. Counter-proposes updated terms/budget on a rejected contract.
+
+        Transitions rejected → pending_sign, giving the ball back to the freelancer.
+        Requires at least one of terms or budget to be set — an empty renegotiation
+        is rejected with 400 to prevent the client from re-sending without changes.
+        """
+        from src.contracts.models import ContractRenegotiate  # noqa: PLC0415
+
+        contract = db.query(Contract).filter(Contract.id == contract_id).first()
+        if not contract:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contract not found")
+
+        owner_client_id, _ = _resolve_parties(db, contract)
+        if owner_client_id != client_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not your contract")
+
+        if contract.status != "rejected":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Can only renegotiate a contract with status 'rejected', not '{contract.status}'",
+            )
+
+        if data.terms is None and data.budget is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Provide at least one of 'terms' or 'budget' to renegotiate",
+            )
+
+        if data.terms is not None:
+            contract.terms = data.terms
+        if data.budget is not None:
+            contract.budget = data.budget
+
+        contract.status = "pending_sign"
         db.commit()
         db.refresh(contract)
         return ContractService._to_response_dict(contract)

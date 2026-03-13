@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './features/hooks/useAuth';
-import Layout from "./components/Layout";
+import Layout from "./layout/PageContainer";
 import "./assets/theme.css";
 
 // Profile & Proposal Pages
@@ -50,9 +50,14 @@ const PublicOnlyRoute = ({ children }) => {
 };
 
 
-export default function App() {
+// Separate component so useAuth() is called inside the Router context
+const ContractsRoute = () => {
   const { user } = useAuth();
+  return user?.role === 'client' ? <ContractsClient /> : <ContractsFreelancer />;
+};
 
+
+export default function App() {
   return (
     <Router>
       <Routes>
@@ -86,14 +91,7 @@ export default function App() {
           <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
 
           {/* Contracts — role-based split */}
-          <Route path="/contracts" element={
-            <ProtectedRoute>
-              {user?.role === 'client'
-                ? <ContractsClient />
-                : <ContractsFreelancer />
-              }
-            </ProtectedRoute>
-          } />
+          <Route path="/contracts" element={<ProtectedRoute><ContractsRoute /></ProtectedRoute>} />
 
         </Route>
 

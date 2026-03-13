@@ -7,7 +7,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   useEffect(() => {
     // Rehydrate session from localStorage on app load
     const storedUser = localStorage.getItem('user');
@@ -52,8 +51,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    const role = user?.role || 'freelancer';
     authAPI.logout();
     setUser(null);
+    window.location.href = `/login?tab=${role}`;
   };
 
   const value = {

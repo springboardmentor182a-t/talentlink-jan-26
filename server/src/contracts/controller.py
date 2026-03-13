@@ -5,7 +5,7 @@ from typing import List
 from src.database.core import get_db
 from src.auth.dependencies import get_current_user
 from src.entities.user import User
-from src.contracts.models import ContractCreate, ContractEditTerms, MilestoneUpdate, ContractResponse
+from src.contracts.models import ContractCreate, ContractEditTerms, ContractRenegotiate, MilestoneUpdate, ContractResponse
 from src.contracts.service import ContractService
 
 router = APIRouter()
@@ -83,6 +83,24 @@ def edit_terms(
         from fastapi import HTTPException
         raise HTTPException(status_code=403, detail="Only freelancers can propose term edits")
     return ContractService.edit_terms(db, contract_id, data, current_user.id)
+
+
+@router.patch("/{contract_id}/renegotiate", response_model=ContractResponse)
+def renegotiate_contract(
+    contract_id: int,
+    data: ContractRenegotiate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Counter-propose updated terms/budget after freelancer rejects. Client only.
+
+    Transitions rejected → pending_sign, sending the revised contract back to
+    the freelancer to accept or propose further edits.
+    """
+    if current_user.role != "client":
+        from fastapi import HTTPException
+        raise HTTPException(status_code=403, detail="Only clients can renegotiate contracts")
+    return ContractService.renegotiate_contract(db, contract_id, data, current_user.id)
 
 
 @router.post("/{contract_id}/cancel", response_model=ContractResponse)

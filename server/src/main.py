@@ -14,7 +14,7 @@ import src.entities.user     # noqa: F401
 import src.entities.todo     # noqa: F401
 import src.entities.message  # noqa: F401
 import src.users.models      # noqa: F401
-import src.entities.contract
+import src.entities.contract # noqa: F401
 
 from src.rate_limiter import rate_limit_middleware
 from src.exceptions import error_handler_middleware

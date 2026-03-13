@@ -10,7 +10,7 @@ RUN npm ci
 # VITE_API_URL is baked into the JS bundle at build time by Vite.
 # Must be the URL the BROWSER uses to reach the API — not the internal Docker hostname.
 # Example: http://localhost:8000/api (local) or https://api.talentlink.com/api (prod)
-ARG VITE_API_URL=http://localhost:8000/api
+ARG VITE_API_URL=/api
 ENV VITE_API_URL=$VITE_API_URL
 
 COPY . .

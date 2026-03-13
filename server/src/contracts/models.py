@@ -36,6 +36,17 @@ class ContractEditTerms(BaseModel):
     terms: str = Field(..., min_length=1)
 
 
+class ContractRenegotiate(BaseModel):
+    """Client-only — counter-propose after freelancer has rejected terms.
+
+    At least one of terms or budget must be provided so the renegotiation
+    actually changes something. Both are optional individually so the client
+    can update either or both.
+    """
+    terms:  Optional[str]     = Field(None, min_length=1)
+    budget: Optional[Decimal] = Field(None, gt=0)
+
+
 class MilestoneUpdate(BaseModel):
     """Freelancer-only — mark a milestone complete or incomplete."""
     is_completed: bool

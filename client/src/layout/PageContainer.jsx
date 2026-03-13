@@ -1,11 +1,12 @@
+import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 
-const Layout = ({ children }) => {
+const Layout = () => {
   return (
     <div style={styles.shell}>
       <Sidebar />
       <div style={styles.content}>
-        {children}
+        <Outlet />                           
       </div>
     </div>
   );
