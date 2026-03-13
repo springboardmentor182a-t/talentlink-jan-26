@@ -33,7 +33,14 @@ export default function FreelancerSignup() {
       await api.post("/auth/register", { name, email, password, role: "freelancer" });
       navigate("/freelancer/login");
     } catch (err) {
-      setError(err.response?.data?.detail || "Registration failed. Please try again.");
+      const detail = err.response?.data?.detail;
+      setError(
+        typeof detail === "string"
+          ? detail
+          : Array.isArray(detail)
+            ? detail[0]?.msg || "Registration failed. Please try again."
+            : "Registration failed. Please try again."
+      );
     } finally { setLoading(false); }
   };
 
