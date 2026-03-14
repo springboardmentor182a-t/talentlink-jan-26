@@ -4,7 +4,7 @@ import axios from 'axios';
 const FreelancerProfile = () => {
   // 1. Create state to hold the skills from the database
   const [skills, setSkills] = useState([]);
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
   // 2. Define the API URL
   const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
