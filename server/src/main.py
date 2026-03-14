@@ -1,10 +1,17 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+from src.database.core import engine, Base, SessionLocal
+from src.entities.project import Project
+import src.entities
 
 app = FastAPI()
 
+Base.metadata.create_all(bind=engine)
+
 # -----------------------------
-# CORS CONFIG (VERY IMPORTANT)
+# CORS CONFIG
 # -----------------------------
 origins = [
     "http://localhost:3000",
@@ -25,64 +32,74 @@ app.add_middleware(
 def home():
     return {"message": "TalentLink API Running"}
 
+
 # -----------------------------
-# PROJECTS ROUTE
+# PROJECTS ROUTE (DATABASE + SEARCH)
 # -----------------------------
 @app.get("/projects")
-def get_projects():
-    return [
-        {
-            "id": 1,
-            "title": "E-commerce Website Development",
-            "description": "Looking for an experienced developer to build a modern e-commerce platform with React and Node.js. Must have experience with payment integrations.",
-            "skills": ["React", "Node.js", "MongoDB", "Stripe"],
-            "budget": "$2,500 - $4,000",
-            "duration": "2-3 months",
-            "client": "TechCorp Solutions"
-        },
-        {
-            "id": 2,
-            "title": "Mobile App UI/UX Design",
-            "description": "Need a creative designer to create modern, user-friendly mobile app designs for iOS and Android. Portfolio required.",
-            "skills": ["Figma", "UI/UX", "Mobile Design", "Prototyping"],
-            "budget": "$1,200 - $2,000",
-            "duration": "3-4 weeks",
-            "client": "StartupXYZ"
-        },
-        {
-            "id": 3,
-            "title": "Content Writer for Tech Blog",
-            "description": "Seeking experienced tech writer to create engaging articles about software development, AI, and emerging technologies.",
-            "skills": ["Content Writing", "SEO", "Research", "Tech Knowledge"],
-            "budget": "$500 - $800",
-            "duration": "1 month",
-            "client": "Digital Media Co."
-        },
-        {
-            "id": 4,
-            "title": "Python Backend Developer",
-            "description": "Need experienced Python developer for building RESTful APIs and microservices. Experience with FastAPI and PostgreSQL required.",
-            "skills": ["Python", "FastAPI", "PostgreSQL", "Docker"],
-            "budget": "$3,000 - $5,000",
-            "duration": "2-3 months",
-            "client": "DataFlow Inc."
-        },
-        {
-            "id": 5,
-            "title": "Social Media Marketing Campaign",
-            "description": "Looking for social media expert to manage and grow our Instagram and TikTok presence. Must have proven track record.",
-            "skills": ["Social Media", "Content Strategy", "Analytics", "Instagram"],
-            "budget": "$800 - $1,500",
-            "duration": "1-2 months",
-            "client": "Fashion Brand Co."
-        },
-        {
-            "id": 6,
-            "title": "WordPress Plugin Development",
-            "description": "Need WordPress expert to develop custom plugin for e-commerce functionality. Must follow WordPress coding standards.",
-            "skills": ["WordPress", "PHP", "MySQL", "JavaScript"],
-            "budget": "$1,500 - $2,500",
-            "duration": "1 month",
-            "client": "Web Agency Pro"
-        }
-    ]
+def get_projects(search: str = Query(default="")):
+
+    db = SessionLocal()
+
+    query = db.query(Project)
+
+    if search:
+        query = query.filter(Project.title.ilike(f"%{search}%"))
+
+    projects = query.all()
+
+    result = []
+
+    for p in projects:
+        result.append({
+            "id": p.id,
+            "title": p.title,
+            "description": p.description,
+            "budget": p.budget,
+            "duration": p.duration,
+            "skills_required": p.skills_required,
+            "status": p.status
+        })
+
+    db.close()
+
+    return result
+
+
+# -----------------------------
+# APPLY TO PROJECT
+# -----------------------------
+class Application(BaseModel):
+    project_id: int
+    freelancer_id: int
+
+
+@app.post("/apply")
+def apply_project(application: Application):
+
+    print("Freelancer", application.freelancer_id, "applied to project", application.project_id)
+
+    return {
+        "message": "Application submitted successfully"
+    }
+from pydantic import BaseModel
+
+# -----------------------------
+# APPLY REQUEST MODEL
+# -----------------------------
+class ApplyRequest(BaseModel):
+    project_id: int
+    freelancer_id: int
+
+
+# -----------------------------
+# APPLY ROUTE
+# -----------------------------
+@app.post("/apply")
+def apply_project(data: ApplyRequest):
+
+    print(f"Freelancer {data.freelancer_id} applied to project {data.project_id}")
+
+    return {
+        "message": "Application submitted successfully"
+    }

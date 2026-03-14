@@ -1,6 +1,7 @@
 import React from "react";
 
 function ProjectCard({
+  id,
   title,
   description,
   skills,
@@ -10,6 +11,29 @@ function ProjectCard({
   time,
   proposals,
 }) {
+
+  const applyProject = (projectId) => {
+
+    fetch("http://127.0.0.1:8000/apply", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        project_id: projectId,
+        freelancer_id: 1,
+      }),
+    })
+      .then((res) => res.json())
+      .then(() => {
+        alert("Application submitted successfully");
+      })
+      .catch((err) => {
+        console.error("Apply error:", err);
+      });
+
+  };
+
   return (
     <div
       style={{
@@ -23,7 +47,7 @@ function ProjectCard({
       <h3 style={{ fontSize: "18px", fontWeight: "700" }}>{title}</h3>
 
       <p style={{ color: "#6b7280", fontSize: "13px", marginBottom: "10px" }}>
-        ⏱ {time} • Remote •{" "}
+        ⏱ {time} • 🌍 Remote •{" "}
         <span style={{ color: "#4f46e5" }}>{proposals} proposals</span>
       </p>
 
@@ -50,16 +74,24 @@ function ProjectCard({
 
       <hr />
 
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "12px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginTop: "12px",
+        }}
+      >
         <div style={{ display: "flex", gap: "40px" }}>
           <div>
             <div style={{ color: "#6b7280", fontSize: "13px" }}>Budget</div>
-            <b>{budget}</b>
+            <b>${budget}</b>
           </div>
+
           <div>
             <div style={{ color: "#6b7280", fontSize: "13px" }}>Duration</div>
             <b>{duration}</b>
           </div>
+
           <div>
             <div style={{ color: "#6b7280", fontSize: "13px" }}>Client</div>
             <b>{client}</b>
@@ -67,6 +99,7 @@ function ProjectCard({
         </div>
 
         <button
+          onClick={() => applyProject(id)}
           style={{
             background: "linear-gradient(90deg,#4f46e5,#7c3aed)",
             color: "white",
@@ -74,6 +107,7 @@ function ProjectCard({
             borderRadius: "10px",
             border: "none",
             fontWeight: "600",
+            cursor: "pointer",
           }}
         >
           Apply Now
