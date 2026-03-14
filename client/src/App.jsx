@@ -1,59 +1,90 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './features/hooks/useAuth';
+import Layout from "./components/Layout";
+import "./assets/theme.css";
 
-// --- Layout & Components ---
-import Sidebar from './layout/Sidebar';
+// Profile & Proposal Pages (Your Code)
+import FreelancerProfile from "./pages/FreelancerProfile";
+import ClientProfile from "./pages/ClientProfile";
+import FreelancerView from "./pages/FreelancerView";
+import ClientView from "./pages/ClientView";
+import SubmitProposal from "./pages/SubmitProposal";
+import FreelancerContracts from "./pages/FreelancerContracts";
 
-// --- Auth Pages (From main-group-D) ---
-import RoleSelection from './pages/RoleSelection';
-import Login from './pages/Login';
+// Auth pages (Teammate's Code)
+import RoleSelection    from './pages/RoleSelection';
+import Login            from './pages/Login';
 import SignupFreelancer from './pages/SignupFreelancer';
-import SignupClient from './pages/SignupClient';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
+import SignupClient     from './pages/SignupClient';
+import ForgotPassword   from './pages/ForgotPassword';
+import ResetPassword    from './pages/ResetPassword';
+import Dashboard        from './pages/Dashboard';
+import Messages         from './pages/Messages';
+import PageContainer    from './layout/PageContainer';
 
-// --- Dashboard & Internal Pages (From Your Branch) ---
-import FreelancerDashboard from './pages/FreelancerDashboard';
-import BrowseProjects from './pages/BrowseProjects';
-import Contracts from './pages/Contracts';
-import Messages from './pages/Messages';
-import FreelancerProfile from './pages/FreelancerProfile';
-import ClientProfile from './pages/ClientProfile';
 
-// Create a layout so the Sidebar ONLY appears on internal pages
-const DashboardLayout = () => (
-  <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#F8F9FA' }}>
-    <Sidebar />
-    <div style={{ flex: 1, marginLeft: '300px', padding: '40px' }}>
-      <Outlet />
-    </div>
-  </div>
-);
+/**
+ * ProtectedRoute
+ * Redirects unauthenticated users to /login.
+ */
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  return user ? children : <Navigate to="/login" replace />;
+};
 
-function App() {
+
+/**
+ * PublicOnlyRoute
+ * Redirects already-authenticated users away from auth pages.
+ */
+const PublicOnlyRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) return null;
+  if (!user) return children;
+
+  if (user.role === 'freelancer') return <Navigate to="/freelancer/dashboard" replace />;
+  if (user.role === 'client')     return <Navigate to="/client/dashboard" replace />;
+  return <Navigate to="/dashboard" replace />;
+};
+
+export default function App() {
   return (
     <Router>
       <Routes>
-        {/* --- Public Auth Flow (No Sidebar) --- */}
-        <Route path="/" element={<RoleSelection />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup/freelancer" element={<SignupFreelancer />} />
-        <Route path="/signup/client" element={<SignupClient />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+        {/* ── Public auth flow ───────────────────────────────────────── */}
+        <Route path="/" element={<PublicOnlyRoute><RoleSelection /></PublicOnlyRoute>} />
+        <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
+        <Route path="/signup/freelancer" element={<PublicOnlyRoute><SignupFreelancer /></PublicOnlyRoute>} />
+        <Route path="/signup/client" element={<PublicOnlyRoute><SignupClient /></PublicOnlyRoute>} />
+        <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-        {/* --- Authenticated Dashboard Flow (With Sidebar) --- */}
-        <Route element={<DashboardLayout />}>
-          {/* Redirect /dashboard to Freelancer Dashboard by default for now */}
-          <Route path="/dashboard" element={<FreelancerDashboard />} />
-          <Route path="/projects" element={<BrowseProjects />} />
-          <Route path="/contracts" element={<Contracts />} />
-          <Route path="/messages" element={<Messages />} />
-          <Route path="/profile/freelancer" element={<FreelancerProfile />} />
-          <Route path="/profile/client" element={<ClientProfile />} />
+        {/* ── Protected routes — require login ──────────────────────── */}
+        <Route element={<Layout />}>
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/freelancer/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/client/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+
+          {/* Your Profile Pages */}
+          <Route path="/profile/freelancer" element={<ProtectedRoute><FreelancerView /></ProtectedRoute>} />
+          <Route path="/profile/freelancer/edit" element={<ProtectedRoute><FreelancerProfile /></ProtectedRoute>} />
+          <Route path="/profile/client" element={<ProtectedRoute><ClientView /></ProtectedRoute>} />
+          <Route path="/profile/client/edit" element={<ProtectedRoute><ClientProfile /></ProtectedRoute>} />
+          
+          {/* Your Proposal Pages */}
+          <Route path="/projects/:projectId/apply" element={<ProtectedRoute><SubmitProposal /></ProtectedRoute>} />
+          <Route path="/contracts" element={<ProtectedRoute><FreelancerContracts /></ProtectedRoute>} />
+
+          {/* Messages */}
+          <Route path="/messages" element={
+            <ProtectedRoute>
+              <PageContainer><Messages /></PageContainer>
+            </ProtectedRoute>
+          } />
         </Route>
       </Routes>
     </Router>
   );
 }
-
-export default App;
