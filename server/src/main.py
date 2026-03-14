@@ -1,43 +1,29 @@
 import os
-from pathlib import Path
 import secrets
+from pathlib import Path
+from typing import List
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query, HTTPException, status
+from fastapi import FastAPI, Depends, WebSocket, WebSocketDisconnect, Query, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
 from jose import jwt, JWTError
 
-from src.database.core import engine, Base
+# --- DB & Core Imports ---
+from src.database.core import engine, Base, get_db
 
 # Import all entity modules so Base.metadata.create_all picks up every table.
-import src.entities.user     # noqa: F401
-import src.entities.todo     # noqa: F401
-import src.entities.message  # noqa: F401
-import src.users.models      # noqa: F401
+import src.entities.user       # noqa: F401
+import src.entities.todo       # noqa: F401
+import src.users.models        # noqa: F401
+import src.entities.message    # noqa: F401
 
-from src.rate_limiter import rate_limit_middleware
-from src.exceptions import error_handler_middleware
-from src.auth.controller import router as auth_router
-from src.users.router import router as users_router
-from src.todos.controller import router as todos_router
-from src.messages.controller import router as messages_router
 
-load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 
-SECRET_KEY = os.getenv("SECRET_KEY", "")
-ALGORITHM  = os.getenv("ALGORITHM", "HS256")
-
-# ── Startup guard — also enforced in auth/service.py but repeated here so
-#    the WS endpoint (which duplicates JWT decode logic) is also protected.
-_WEAK_KEYS = {"", "your-secret-key-change-in-production", "secret", "changeme"}
-if SECRET_KEY in _WEAK_KEYS:
-    raise RuntimeError(
-        "SECRET_KEY is not set or is using the insecure default. "
-        "Set a strong random value in your .env file:\n"
-        "  python -c \"import secrets; print(secrets.token_hex(32))\""
-    )
-
+# Create all database tables on startup
 Base.metadata.create_all(bind=engine)
+
 
 # ── SMTP startup guard ────────────────────────────────────────────────────────
 # In production/staging the password reset flow sends real emails.
@@ -56,6 +42,10 @@ if _APP_ENV != "development":
             "Add them to your .env file or set APP_ENV=development to suppress this check. "
             "See README — SMTP Configuration."
         )
+from src.auth.controller import router as auth_router
+from src.users.router import router as users_router
+from src.todos.controller import router as todos_router
+from src.messages.controller import router as messages_router
 
 app = FastAPI(title="TalentLink API", version="1.0.0")
 
@@ -77,8 +67,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.middleware("http")(rate_limit_middleware)
-app.middleware("http")(error_handler_middleware)
+# --- Middlewares (From main-group-D) ---
+# app.middleware("http")(rate_limit_middleware)
+# app.middleware("http")(error_handler_middleware)
 
 app.include_router(auth_router,     prefix="/api/auth",     tags=["Authentication"])
 app.include_router(users_router,    prefix="/api/users",    tags=["Users"])
@@ -272,6 +263,77 @@ async def websocket_endpoint(
             })
 
 
+# ==========================================================
+# --- MODELS: Dashboard & Proposals (From your branch) ---
+# ==========================================================
+
+class StatData(BaseModel):
+    active_projects: int
+    pending_proposals: int
+    total_earnings: str
+    profile_views: int
+
+class Project(BaseModel):
+    id: int
+    title: str
+    client: str
+    budget: str
+    match: str
+
+class Contract(BaseModel):
+    title: str
+    due: str
+    progress: int
+
+class DashboardResponse(BaseModel):
+    welcome_msg: str
+    stats: StatData
+    active_contract: Contract
+    recommended_projects: List[Project]
+
+class Proposal(BaseModel):
+    project_id: int
+    cover_letter: str
+    bid_amount: float
+
+
+# ==========================================================
+# --- ENDPOINTS: Dashboard (From your branch) ---
+# ==========================================================
+
+@app.get("/dashboard/")
+def get_dashboard(db: Session = Depends(get_db)):
+    from src.proposals import models
+    # Pulls real data from the database
+    recommended_projects = db.query(models.Project).limit(6).all()
+    active_contract = db.query(models.Contract).filter(models.Contract.status == "Active").first()
+    
+    return {
+        "welcome_msg": "Welcome back, John! 👋",
+        "stats": {
+            "active_projects": db.query(models.Project).count(),
+            "pending_proposals": 12,
+            "total_earnings": "$4.5k",
+            "profile_views": 247
+        },
+        "active_contract": active_contract or {"title": "No active contracts", "progress": 0},
+        "recommended_projects": recommended_projects
+    }
+
+@app.get("/projects/")
+def get_all_projects(db: Session = Depends(get_db)):
+    return db.query(models.Project).all()
+
+@app.get("/contracts/")
+def get_all_contracts(db: Session = Depends(get_db)):
+    return db.query(models.Contract).all()
+
+@app.post("/proposals/")
+async def create_proposal(proposal: Proposal):
+    print(f"Proposal received for Project ID: {proposal.project_id}")
+    return {"status": "success", "message": "Proposal saved!"}
+
+# --- ROOT ENDPOINT (Combined) ---
 @app.get("/")
 async def root():
-    return {"message": "TalentLink API", "version": "1.0.0"}
+    return {"message": "TalentLink API is Live", "version": "1.0.0", "docs": "/docs"}

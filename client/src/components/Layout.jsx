@@ -1,6 +1,6 @@
-// client/src/components/Layout.jsx
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar.jsx";
+
 export default function Layout() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -8,9 +8,12 @@ export default function Layout() {
       <Sidebar />
 
       {/* 2. The Main Content Area */}
-      <main className="flex-1 ml-64">
-        {/* The 'Outlet' is where the page content (Profile, Dashboard) appears */}
-        <Outlet />
+      {/* Changed: Removed the ml-64 margin so it snaps to the new sidebar */}
+      <main className="flex-1 overflow-x-hidden">
+        {/* The 'Outlet' is where the page content appears */}
+        <div className="p-8 h-full">
+           <Outlet />
+        </div>
       </main>
     </div>
   );
