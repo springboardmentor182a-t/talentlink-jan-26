@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from src.database.core import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -10,10 +11,16 @@ from src.auth.controller import router as auth_router
 from src.jobs.controller import router as jobs_router
 from src.proposals.controller import router as proposals_router
 
+# Create all database tables
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(
+    title="TalentLink API",
+    description="Authentication and Proposal management endpoints for TalentLink",
+    version="1.0.0"
+)
 
+# CORS — allow React frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
@@ -25,3 +32,10 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(jobs_router)
 app.include_router(proposals_router)
+# ── Routers ──────────────────────────────────
+app.include_router(auth_router,      prefix="/auth",      tags=["Auth"])
+app.include_router(proposals_router, prefix="/proposals", tags=["Proposals"])
+
+@app.get("/")
+def root():
+    return {"message": "TalentLink API is running ✅"}

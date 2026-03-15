@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from src.database.core import SessionLocal, get_db
+from src.database.core import get_db
 from src.auth.models import RegisterRequest, LoginRequest, TokenResponse
 from src.auth.service import register_user, authenticate_user, create_token
 
@@ -13,11 +14,10 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)):
     user = register_user(db, data.name, data.email, data.password, data.role)
     if not user:
         raise HTTPException(status_code=400, detail="User already exists")
-
     return {"message": "Registration successful"}
 
 
-@router.post("/login", response_model=TokenResponse)
+@router.post("/login")
 def login(data: LoginRequest, db: Session = Depends(get_db)):
     print(f"Login attempt for: {data.email}")
     user = authenticate_user(db, data.email, data.password)
@@ -30,4 +30,16 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
         "role": user.role
     })
 
-    return {"access_token": token}
+    # ✅ Return full user object so frontend AuthContext can store it
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "token": token,        # ✅ matches AuthContext login(data.token)
+        "role": user.role,     # ✅ matches AuthContext login(data.role)
+        "user": {              # ✅ matches AuthContext login(data.user)
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "role": user.role,
+        }
+    }
