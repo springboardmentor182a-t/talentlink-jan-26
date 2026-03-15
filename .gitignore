@@ -14,5 +14,5 @@ Thumbs.db
 # Env files
 .env
 
-*.db
-talent.db
+
+talentlink.db

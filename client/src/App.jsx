@@ -10,17 +10,19 @@ import FreelancerView from "./pages/FreelancerView";
 import ClientView from "./pages/ClientView";
 import SubmitProposal from "./pages/SubmitProposal";
 import FreelancerContracts from "./pages/FreelancerContracts";
+import PostProject from "./pages/PostProject";
+import ProjectFeed from "./pages/ProjectFeed";
 
 // Auth pages (Teammate's Code)
-import RoleSelection    from './pages/RoleSelection';
-import Login            from './pages/Login';
+import RoleSelection from './pages/RoleSelection';
+import Login from './pages/Login';
 import SignupFreelancer from './pages/SignupFreelancer';
-import SignupClient     from './pages/SignupClient';
-import ForgotPassword   from './pages/ForgotPassword';
-import ResetPassword    from './pages/ResetPassword';
-import Dashboard        from './pages/Dashboard';
-import Messages         from './pages/Messages';
-import PageContainer    from './layout/PageContainer';
+import SignupClient from './pages/SignupClient';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import Dashboard from './pages/Dashboard';
+import Messages from './pages/Messages';
+import PageContainer from './layout/PageContainer';
 
 
 /**
@@ -45,7 +47,7 @@ const PublicOnlyRoute = ({ children }) => {
   if (!user) return children;
 
   if (user.role === 'freelancer') return <Navigate to="/freelancer/dashboard" replace />;
-  if (user.role === 'client')     return <Navigate to="/client/dashboard" replace />;
+  if (user.role === 'client') return <Navigate to="/client/dashboard" replace />;
   return <Navigate to="/dashboard" replace />;
 };
 
@@ -67,13 +69,15 @@ export default function App() {
           <Route path="/freelancer/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/client/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
-          {/* Your Profile Pages */}
+          {/* Profile Pages */}
           <Route path="/profile/freelancer" element={<ProtectedRoute><FreelancerView /></ProtectedRoute>} />
           <Route path="/profile/freelancer/edit" element={<ProtectedRoute><FreelancerProfile /></ProtectedRoute>} />
           <Route path="/profile/client" element={<ProtectedRoute><ClientView /></ProtectedRoute>} />
           <Route path="/profile/client/edit" element={<ProtectedRoute><ClientProfile /></ProtectedRoute>} />
-          
-          {/* Your Proposal Pages */}
+
+          {/* Marketplace & Proposal Pages */}
+          <Route path="/projects" element={<ProtectedRoute><ProjectFeed /></ProtectedRoute>} />
+          <Route path="/post-project" element={<ProtectedRoute><PostProject /></ProtectedRoute>} />
           <Route path="/projects/:projectId/apply" element={<ProtectedRoute><SubmitProposal /></ProtectedRoute>} />
           <Route path="/contracts" element={<ProtectedRoute><FreelancerContracts /></ProtectedRoute>} />
 

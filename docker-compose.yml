@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules # Anonymous volume to prevent local node_modules from overriding container's
+    environment:
+      - NODE_ENV=development
+      # Sometimes needed on Windows for Vite live reload inside containers
+      - CHOKIDAR_USEPOLLING=true
+
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./server:/app
+      # Mount the database to the root directory of the container. 
+      # Since relative path in server is sqlite:///../talentlink.db, 
+      # from /app, ../talentlink.db correctly resolves to /talentlink.db
+      - ./talentlink.db:/talentlink.db
+    environment:
+      # Explicitly map the database URL to the mounted location
+      - DATABASE_URL=sqlite:////talentlink.db

@@ -8,19 +8,31 @@ from src.users import models, schemas # Keep these if your proposal function nee
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+import logging
+from sqlalchemy.exc import SQLAlchemyError
+from fastapi import HTTPException
+
+logger = logging.getLogger(__name__)
+
 # Optional: Keep your standalone proposal function if it's being used elsewhere
 def create_proposal(db: Session, proposal: schemas.ProposalCreate, freelancer_id: int):
-    # 1. Convert the Schema (Pydantic) to a Model (Database)
-    db_proposal = models.Proposal(
-        **proposal.dict(),
-        freelancer_id=freelancer_id,
-        status="pending",
-    )
-    # 2. Add and Save
-    db.add(db_proposal)
-    db.commit()
-    db.refresh(db_proposal)
-    return db_proposal
+    try:
+        # 1. Convert the Schema (Pydantic) to a Model (Database)
+        db_proposal = models.Proposal(
+            **proposal.dict(),
+            freelancer_id=freelancer_id,
+            status="pending",
+        )
+        # 2. Add and Save
+        db.add(db_proposal)
+        db.commit()
+        db.refresh(db_proposal)
+        logger.info(f"Successfully created proposal {db_proposal.id} for freelancer {freelancer_id}")
+        return db_proposal
+    except SQLAlchemyError as err:
+        db.rollback()
+        logger.error(f"Database error creating proposal for freelancer {freelancer_id}: {str(err)}")
+        raise HTTPException(status_code=500, detail="An internal database error occurred while submitting your proposal.")
 
 
 class UserService:
