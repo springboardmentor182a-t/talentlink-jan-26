@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text
+from sqlalchemy import Column, Integer, String, Text, ForeignKey
 from ..database.core import Base
 
 class Project(Base):
@@ -11,3 +11,4 @@ class Project(Base):
     budget_max = Column(Integer, nullable=True)
     duration = Column(String(100), nullable=True)
     skills = Column(String(255), nullable=True)
+    client_id = Column(Integer, ForeignKey("users.id"))

@@ -9,6 +9,7 @@ class ProjectOut(BaseModel):
     budget_max: Optional[int]
     duration: Optional[str]
     skills: Optional[str]
+    client_id: int
 
     class Config:
         orm_mode = True

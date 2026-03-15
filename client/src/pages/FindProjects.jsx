@@ -9,7 +9,7 @@ const FindProjects = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/projects/")
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/projects/`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch projects");
@@ -28,35 +28,40 @@ const FindProjects = () => {
   }, []);
 
   return (
-    <div className="find-projects-container">
+    <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }}>
 
-      {/* Header */}
-      <div className="find-projects-header">
-        <h1>Browse Projects</h1>
-        <p>Find your next opportunity</p>
+      <div className="find-projects-container">
+
+        {/* Header */}
+        <div className="find-projects-header">
+          <h1>Browse Projects</h1>
+          <p>Find your next opportunity</p>
+        </div>
+
+        {/* Filters */}
+        <ProjectFilters />
+
+        {/* Loading */}
+        {loading && <p>Loading projects...</p>}
+
+        {/* Error */}
+        {error && <p className="error-text">{error}</p>}
+
+        {/* Project List */}
+        {!loading && !error && (
+          <div className="projects-list">
+            {projects.length === 0 ? (
+              <p>No projects available.</p>
+            ) : (
+              projects.map((project) => (
+                <ProjectCard key={project.id} project={project} />
+              ))
+            )}
+          </div>
+        )}
+
       </div>
 
-      {/* Filters */}
-      <ProjectFilters />
-
-      {/* Loading */}
-      {loading && <p>Loading projects...</p>}
-
-      {/* Error */}
-      {error && <p className="error-text">{error}</p>}
-
-      {/* Project List */}
-      {!loading && !error && (
-        <div className="projects-list">
-          {projects.length === 0 ? (
-            <p>No projects available.</p>
-          ) : (
-            projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))
-          )}
-        </div>
-      )}
     </div>
   );
 };
