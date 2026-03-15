@@ -21,7 +21,7 @@ function App() {
       <ProposalProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<ChooseRole />} />
+            <Route path="/" element={<FreelancerDashboard />} />
             <Route path="/client/login" element={<ClientLogin />} />
             <Route path="/client/signup" element={<ClientSignup />} />
             <Route path="/freelancer/login" element={<FreelancerLogin />} />
