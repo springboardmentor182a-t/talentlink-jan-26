@@ -57,7 +57,10 @@ export default function FreelancerLogin() {
   return (
     <div style={{ minHeight:"100vh", backgroundColor:"#f5f3ff", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Segoe UI',sans-serif" }}>
       <div style={{ backgroundColor:"#fff", borderRadius:16, padding:"40px 36px", width:"100%", maxWidth:420, boxShadow:"0 4px 24px rgba(0,0,0,0.09)" }}>
-
+<button onClick={() => navigate("/")}
+  style={{ background:"none", border:"none", fontSize:14, color:"#2563eb", cursor:"pointer", padding:0, marginBottom:16, display:"flex", alignItems:"center", gap:6 }}>
+  ← Back
+</button>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:24 }}>
           <div style={{ width:40, height:40, background:"linear-gradient(135deg,#7c3aed,#a855f7)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontSize:20 }}>👤</div>
           <span style={{ fontWeight:700, fontSize:20, color:"#7c3aed" }}>TalentLink</span>
