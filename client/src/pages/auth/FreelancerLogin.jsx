@@ -29,6 +29,17 @@ export default function FreelancerLogin() {
     setError("");
     if (!email || !password) { setError("Please enter your email and password."); return; }
     try {
+      const res = await api.post("/auth/login", {
+        email: username,
+        password: password,
+      });
+
+      login({
+        token: res.data.access_token,
+        role: "freelancer",
+        user: { username },
+      });
+
       setLoading(true);
       const res = await api.post("/auth/login", { email, password });
       const userRole = res.data.role?.toLowerCase();
