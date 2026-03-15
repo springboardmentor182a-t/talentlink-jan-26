@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List
+from typing import Optional, List, Literal
 from datetime import datetime, timezone
 from decimal import Decimal
 
@@ -75,7 +75,7 @@ class ContractResponse(BaseModel):
     terms:       Optional[str]
     start_date:  Optional[datetime]
     end_date:    Optional[datetime]
-    status:      str
+    status:      Literal['draft', 'pending_sign', 'active', 'rejected', 'completed', 'cancelled']
     milestones:  List[MilestoneResponse]
     progress:    int   # computed: 0-100, not a DB column
     created_at:  datetime

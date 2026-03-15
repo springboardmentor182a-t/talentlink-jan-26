@@ -4,13 +4,14 @@ import { authAPI } from '../services/auth';
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser]       = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError]     = useState(null);
+
   useEffect(() => {
     // Rehydrate session from localStorage on app load
     const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
+    const token      = localStorage.getItem('token');
     if (storedUser && token) {
       setUser(JSON.parse(storedUser));
     }
@@ -21,14 +22,11 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       const data = await authAPI.register(userData);
-      
-      // Store token and user after registration (auto-login)
       if (data.access_token && data.user) {
         localStorage.setItem('token', data.access_token);
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
       }
-      
       return data;
     } catch (err) {
       setError(err.response?.data?.detail || 'Registration failed');
@@ -50,6 +48,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Called by OAuthCallback after extracting token from URL fragment
+  const loginWithToken = (token, userData) => {
+    localStorage.setItem('token', token);
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
+  };
+
   const logout = () => {
     const role = user?.role || 'freelancer';
     authAPI.logout();
@@ -63,6 +68,7 @@ export const AuthProvider = ({ children }) => {
     error,
     register,
     login,
+    loginWithToken,
     logout,
     isAuthenticated: !!user,
   };

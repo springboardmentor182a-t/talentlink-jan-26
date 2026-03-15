@@ -166,9 +166,258 @@ function NewContractModal({ onClose, onCreate }) {
   );
 }
 
+// ── Renegotiate Modal ──────────────────────────────────────────────────────
+
+function RenegotiateModal({ contract, onClose, onRenegotiate }) {
+  const [form, setForm] = useState({
+    terms:  contract.terms  ?? '',
+    budget: contract.budget ?? '',
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError]           = useState(null);
+
+  const set = (field) => (e) => setForm(prev => ({ ...prev, [field]: e.target.value }));
+
+  const handleSubmit = async () => {
+    // At least one field must differ from the current contract values
+    const newTerms  = form.terms.trim()  || null;
+    const newBudget = form.budget !== '' ? parseFloat(form.budget) : null;
+
+    const termsChanged  = newTerms  !== null && newTerms  !== (contract.terms  ?? '');
+    const budgetChanged = newBudget !== null && newBudget !== parseFloat(contract.budget);
+
+    if (!termsChanged && !budgetChanged) {
+      setError('Change at least one field (terms or budget) before resubmitting.');
+      return;
+    }
+    if (newBudget !== null && newBudget <= 0) {
+      setError('Budget must be greater than 0.');
+      return;
+    }
+
+    setError(null);
+    setSubmitting(true);
+    try {
+      await onRenegotiate(contract.id, {
+        ...(termsChanged  && { terms:  newTerms }),
+        ...(budgetChanged && { budget: newBudget }),
+      });
+    } catch (err) {
+      setError(err.response?.data?.detail ?? 'Failed to submit counter-proposal.');
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="new-contract-overlay">
+      <div className="new-contract-modal">
+        <div className="new-contract-header">
+          <div>
+            <h2 className="new-contract-title">Review &amp; Counter-propose</h2>
+            <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--color-tertiary)', fontFamily: 'var(--font-text)' }}>
+              Freelancer proposed edits on <strong>{contract.title}</strong>. Update terms or budget and resubmit.
+            </p>
+          </div>
+          <button className="new-contract-close-btn" onClick={onClose}>✕</button>
+        </div>
+
+        <div className="new-contract-body">
+          {error && (
+            <p style={{ color: '#dc2626', fontSize: 13, fontFamily: 'var(--font-text)', margin: 0 }}>
+              {error}
+            </p>
+          )}
+
+          <div className="new-contract-field">
+            <label className="new-contract-label">Budget (USD)</label>
+            <input
+              className="new-contract-input"
+              type="number"
+              min="0"
+              step="0.01"
+              value={form.budget}
+              onChange={set('budget')}
+            />
+          </div>
+
+          <div className="new-contract-field">
+            <label className="new-contract-label">Terms</label>
+            <textarea
+              className="new-contract-textarea"
+              rows={6}
+              placeholder="Update the contract terms..."
+              value={form.terms}
+              onChange={set('terms')}
+            />
+          </div>
+        </div>
+
+        <div className="new-contract-footer">
+          <button className="btn-secondary btn-sm" onClick={onClose}>Cancel</button>
+          <button
+            className="btn-primary btn-sm"
+            onClick={handleSubmit}
+            disabled={submitting}
+          >
+            {submitting ? 'Submitting…' : 'Send Counter-proposal'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+// ── Contract Detail Modal (read-only for client) ───────────────────────────
+
+function ContractDetailModal({ contract, onClose }) {
+  const { status, progress, milestones } = contract;
+  const showProgress = status === 'active' || status === 'completed';
+
+  return (
+    <div className="new-contract-overlay">
+      <div className="new-contract-modal" style={{ maxWidth: 600 }}>
+        <div className="new-contract-header">
+          <div>
+            <h2 className="new-contract-title">{contract.title}</h2>
+            <div style={{ marginTop: 6 }}>
+              <StatusBadge status={status} />
+            </div>
+          </div>
+          <button className="new-contract-close-btn" onClick={onClose}>✕</button>
+        </div>
+
+        <div className="new-contract-body">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="new-contract-field">
+              <span className="new-contract-label">Budget</span>
+              <span style={{ fontFamily: 'var(--font-text)', fontSize: 14, color: 'var(--color-secondary)', fontWeight: 600 }}>
+                {formatBudget(contract.budget)}
+              </span>
+            </div>
+            <div className="new-contract-field">
+              <span className="new-contract-label">Contract ID</span>
+              <span style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 13, color: 'var(--color-tertiary)' }}>
+                CT-{String(contract.id).padStart(4, '0')}
+              </span>
+            </div>
+            <div className="new-contract-field">
+              <span className="new-contract-label">Start Date</span>
+              <span style={{ fontFamily: 'var(--font-text)', fontSize: 13, color: 'var(--color-secondary)' }}>
+                {formatDate(contract.start_date)}
+              </span>
+            </div>
+            <div className="new-contract-field">
+              <span className="new-contract-label">End Date</span>
+              <span style={{ fontFamily: 'var(--font-text)', fontSize: 13, color: 'var(--color-secondary)' }}>
+                {formatDate(contract.end_date)}
+              </span>
+            </div>
+          </div>
+
+          {showProgress && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                <span className="new-contract-label">Progress</span>
+                <span style={{ fontSize: 12, fontFamily: 'var(--font-text)', color: 'var(--color-tertiary)' }}>
+                  {progress}%
+                </span>
+              </div>
+              <div className="progress-bar">
+                <div className="progress-bar__fill" style={{ width: `${progress}%` }} />
+              </div>
+            </div>
+          )}
+
+          {contract.terms && (
+            <div className="new-contract-field">
+              <span className="new-contract-label">Terms</span>
+              <div style={{
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                padding: '10px 12px',
+                fontSize: 13,
+                fontFamily: 'var(--font-text)',
+                color: 'var(--color-secondary)',
+                whiteSpace: 'pre-wrap',
+                lineHeight: 1.55,
+                maxHeight: 140,
+                overflowY: 'auto',
+              }}>
+                {contract.terms}
+              </div>
+            </div>
+          )}
+
+          <div className="new-contract-field">
+            <span className="new-contract-label">
+              Milestones{milestones.length > 0 && ` (${milestones.filter(m => m.is_completed).length}/${milestones.length} done)`}
+            </span>
+            {milestones.length === 0 ? (
+              <p style={{ fontSize: 13, color: 'var(--color-tertiary)', fontFamily: 'var(--font-text)', margin: 0 }}>
+                No milestones set for this contract.
+              </p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {milestones.map(m => (
+                  <div
+                    key={m.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      padding: '9px 12px',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 'var(--radius-md)',
+                    }}
+                  >
+                    <div style={{
+                      width: 16, height: 16, borderRadius: '50%', flexShrink: 0,
+                      background: m.is_completed ? '#22c55e' : 'var(--border-color)',
+                    }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <span style={{
+                        fontSize: 13,
+                        fontFamily: 'var(--font-text)',
+                        color: 'var(--color-secondary)',
+                        textDecoration: m.is_completed ? 'line-through' : 'none',
+                        opacity: m.is_completed ? 0.55 : 1,
+                      }}>
+                        {m.title}
+                      </span>
+                      {m.due_date && (
+                        <span style={{ display: 'block', fontSize: 11, color: 'var(--color-tertiary)', fontFamily: 'var(--font-text)', marginTop: 1 }}>
+                          Due {formatDate(m.due_date)}
+                        </span>
+                      )}
+                    </div>
+                    {m.is_completed && (
+                      <span style={{ fontSize: 11, color: '#22c55e', fontFamily: 'var(--font-text)', fontWeight: 600, flexShrink: 0 }}>
+                        ✓ Done
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="new-contract-footer">
+          <button className="btn-secondary btn-sm" onClick={onClose}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 // ── Contract Row ───────────────────────────────────────────────────────────
 
-function ContractRow({ contract, onSend, onView, onCancel }) {
+function ContractRow({ contract, onSend, onView, onCancel, onRenegotiate }) {
   const { status, progress } = contract;
 
   return (
@@ -213,7 +462,7 @@ function ContractRow({ contract, onSend, onView, onCancel }) {
           </button>
         )}
         {status === 'rejected' && (
-          <button className="btn-outline btn-sm" onClick={() => onView(contract)}>
+          <button className="btn-outline btn-sm" onClick={() => onRenegotiate(contract)}>
             Review Edits
           </button>
         )}
@@ -251,6 +500,7 @@ const ContractsClient = () => {
   const [activeFilter, setActiveFilter] = useState('all');
   const [search, setSearch]             = useState('');
   const [showNewModal, setShowNewModal] = useState(false);
+  const [renegotiateContract, setRenegotiateContract] = useState(null);
 
   useEffect(() => {
     const fetchContracts = async () => {
@@ -292,14 +542,22 @@ const ContractsClient = () => {
     }
   };
 
+  const [detailContract, setDetailContract] = useState(null);
+
   const handleView = (contract) => {
-    alert(`Contract "${contract.title}" — detail view coming soon`);
+    setDetailContract(contract);
   };
 
   const handleCreate = async (data) => {
     const res = await ContractsService.create(data);
     setContracts(prev => [res.data, ...prev]);
     setShowNewModal(false);
+  };
+
+  const handleRenegotiate = async (id, data) => {
+    const res = await ContractsService.renegotiate(id, data);
+    setContracts(prev => prev.map(c => c.id === id ? res.data : c));
+    setRenegotiateContract(null);
   };
 
   return (
@@ -381,6 +639,7 @@ const ContractsClient = () => {
               onSend={handleSend}
               onView={handleView}
               onCancel={handleCancel}
+              onRenegotiate={(c) => setRenegotiateContract(c)}
             />
           ))}
         </div>
@@ -390,6 +649,21 @@ const ContractsClient = () => {
         <NewContractModal
           onClose={() => setShowNewModal(false)}
           onCreate={handleCreate}
+        />
+      )}
+
+      {renegotiateContract && (
+        <RenegotiateModal
+          contract={renegotiateContract}
+          onClose={() => setRenegotiateContract(null)}
+          onRenegotiate={handleRenegotiate}
+        />
+      )}
+
+      {detailContract && (
+        <ContractDetailModal
+          contract={detailContract}
+          onClose={() => setDetailContract(null)}
         />
       )}
     </div>

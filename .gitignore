@@ -30,3 +30,10 @@ server/.coverage
 
 # Docker
 **/.dockerignore
+
+# Dependencies
+client/client/node_modules/
+server/venv/
+
+# Dev override (optional — some teams commit this, some don't)
+docker-compose.dev.yml

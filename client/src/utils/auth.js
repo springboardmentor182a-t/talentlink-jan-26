@@ -12,10 +12,7 @@ export const redirectToDashboard = (user, navigate) => {
     case 'client':
       navigate('/client/dashboard');
       break;
-    case 'both':
-      navigate('/dashboard');
-      break;
     default:
       navigate('/');
   }
-};
+}

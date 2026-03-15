@@ -285,7 +285,13 @@ class ContractService:
 
     @staticmethod
     def cancel_contract(db: Session, contract_id: int, user_id: int) -> dict:
-        """Either party. Cancels active or pending_sign contracts."""
+        """Cancel a contract. Role-restricted by status:
+
+        - pending_sign: either party can cancel (freelancer hasn't signed yet,
+          client may have changed their mind).
+        - active: client only. A freelancer cannot unilaterally walk out of a
+          signed contract — they must request cancellation through the client.
+        """
         contract = db.query(Contract).filter(Contract.id == contract_id).first()
         if not contract:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contract not found")
@@ -297,6 +303,16 @@ class ContractService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Cannot cancel a contract with status '{contract.status}'",
             )
+
+        # Active contracts: client-only cancellation.
+        # Freelancers can cancel pending_sign (before signing) but not active.
+        if contract.status == "active":
+            client_id, _ = _resolve_parties(db, contract)
+            if user_id != client_id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Only the client can cancel an active contract",
+                )
 
         contract.status = "cancelled"
         db.commit()
@@ -336,8 +352,11 @@ class ContractService:
         milestone.is_completed = is_completed
         db.flush()
 
-        # Auto-complete: if every milestone is now done, mark contract completed
-        if all(m.is_completed for m in contract.milestones):
+        # Auto-complete: only when there is at least one milestone and all are done.
+        # all([]) returns True for an empty list — without the length guard a contract
+        # with no milestones would auto-complete on the first milestone update call,
+        # which is unreachable in practice but would be a silent logic bug if it ever ran.
+        if contract.milestones and all(m.is_completed for m in contract.milestones):
             contract.status = "completed"
 
         db.commit()

@@ -42,63 +42,184 @@ function formatBudget(amount) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(amount);
 }
 
-function getInitials(name) {
-  if (!name) return '?';
-  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-}
+// ── Contract Detail Modal ──────────────────────────────────────────────────
 
-// ── Contract Card ──────────────────────────────────────────────────────────
+function ContractDetailModal({ contract, onClose, onMilestoneToggle }) {
+  const [localContract, setLocalContract] = useState(contract);
+  const [toggling, setToggling]           = useState(null); // milestone id being toggled
 
-function ContractCard({ contract, onSign, onEditTerms, onView }) {
-  const { status } = contract;
+  useEffect(() => setLocalContract(contract), [contract]);
+
+  const handleToggle = async (milestone) => {
+    setToggling(milestone.id);
+    try {
+      const updated = await onMilestoneToggle(milestone.id, !milestone.is_completed);
+      if (updated) setLocalContract(updated);
+    } finally {
+      setToggling(null);
+    }
+  };
+
+  const { status, progress, milestones } = localContract;
+  const showProgress = status === 'active' || status === 'completed';
 
   return (
-    <div className="contract-card">
-      <div className="contract-card__top">
-        <div>
-          <p className="contract-card__id">CT-{String(contract.id).padStart(4, '0')}</p>
-          <h3 className="contract-card__title">{contract.title}</h3>
+    <div className="new-contract-overlay">
+      <div className="new-contract-modal" style={{ maxWidth: 600 }}>
+        {/* Header */}
+        <div className="new-contract-header">
+          <div>
+            <h2 className="new-contract-title">{localContract.title}</h2>
+            <div style={{ marginTop: 6 }}>
+              <StatusBadge status={status} />
+            </div>
+          </div>
+          <button className="new-contract-close-btn" onClick={onClose}>✕</button>
         </div>
-        <StatusBadge status={status} />
-      </div>
 
-      <div className="contract-card__meta">
-        <div className="contract-card__meta-row">
-          <span className="contract-card__meta-label">Budget</span>
-          {formatBudget(contract.budget)}
-        </div>
-        <div className="contract-card__meta-row">
-          <span className="contract-card__meta-label">Start</span>
-          {formatDate(contract.start_date)}
-        </div>
-        <div className="contract-card__meta-row">
-          <span className="contract-card__meta-label">End</span>
-          {formatDate(contract.end_date)}
-        </div>
-      </div>
+        <div className="new-contract-body">
+          {/* Meta grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="new-contract-field">
+              <span className="new-contract-label">Budget</span>
+              <span style={{ fontFamily: 'var(--font-text)', fontSize: 14, color: 'var(--color-secondary)', fontWeight: 600 }}>
+                {formatBudget(localContract.budget)}
+              </span>
+            </div>
+            <div className="new-contract-field">
+              <span className="new-contract-label">Contract ID</span>
+              <span style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 13, color: 'var(--color-tertiary)' }}>
+                CT-{String(localContract.id).padStart(4, '0')}
+              </span>
+            </div>
+            <div className="new-contract-field">
+              <span className="new-contract-label">Start Date</span>
+              <span style={{ fontFamily: 'var(--font-text)', fontSize: 13, color: 'var(--color-secondary)' }}>
+                {formatDate(localContract.start_date)}
+              </span>
+            </div>
+            <div className="new-contract-field">
+              <span className="new-contract-label">End Date</span>
+              <span style={{ fontFamily: 'var(--font-text)', fontSize: 13, color: 'var(--color-secondary)' }}>
+                {formatDate(localContract.end_date)}
+              </span>
+            </div>
+          </div>
 
-      {/* Client avatar placeholder — proposal/user join not yet available */}
-      <div className="contract-card__avatar">
-        <div className="contract-card__avatar-initial">CL</div>
-        <span className="contract-card__avatar-name">Client</span>
-      </div>
+          {/* Progress bar */}
+          {showProgress && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                <span className="new-contract-label">Progress</span>
+                <span style={{ fontSize: 12, fontFamily: 'var(--font-text)', color: 'var(--color-tertiary)' }}>
+                  {progress}%
+                </span>
+              </div>
+              <div className="progress-bar">
+                <div className="progress-bar__fill" style={{ width: `${progress}%` }} />
+              </div>
+            </div>
+          )}
 
-      <div className="contract-card__actions">
-        {status === 'pending_sign' && (
-          <>
-            <button className="btn-primary btn-sm" onClick={() => onSign(contract.id)}>
-              Sign Contract
-            </button>
-            <button className="btn-secondary btn-sm" onClick={() => onEditTerms(contract)}>
-              Propose Edits
-            </button>
-          </>
-        )}
-        {(status === 'active' || status === 'completed' || status === 'draft' || status === 'rejected') && (
-          <button className="btn-secondary btn-sm" onClick={() => onView(contract)}>
-            View Details
-          </button>
-        )}
+          {/* Terms */}
+          {localContract.terms && (
+            <div className="new-contract-field">
+              <span className="new-contract-label">Terms</span>
+              <div style={{
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                padding: '10px 12px',
+                fontSize: 13,
+                fontFamily: 'var(--font-text)',
+                color: 'var(--color-secondary)',
+                whiteSpace: 'pre-wrap',
+                lineHeight: 1.55,
+                maxHeight: 140,
+                overflowY: 'auto',
+              }}>
+                {localContract.terms}
+              </div>
+            </div>
+          )}
+
+          {/* Milestones with checkboxes */}
+          <div className="new-contract-field">
+            <span className="new-contract-label">
+              Milestones{milestones.length > 0 && ` (${milestones.filter(m => m.is_completed).length}/${milestones.length} done)`}
+            </span>
+
+            {milestones.length === 0 ? (
+              <p style={{ fontSize: 13, color: 'var(--color-tertiary)', fontFamily: 'var(--font-text)', margin: 0 }}>
+                No milestones set for this contract.
+              </p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {milestones.map(m => (
+                  <div
+                    key={m.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      padding: '9px 12px',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: 'var(--radius-md)',
+                      opacity: toggling === m.id ? 0.55 : 1,
+                      transition: 'opacity 0.15s',
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={m.is_completed}
+                      disabled={status !== 'active' || toggling === m.id}
+                      onChange={() => handleToggle(m)}
+                      style={{
+                        width: 16,
+                        height: 16,
+                        cursor: status === 'active' ? 'pointer' : 'default',
+                        flexShrink: 0,
+                        accentColor: 'var(--color-primary)',
+                      }}
+                    />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <span style={{
+                        fontSize: 13,
+                        fontFamily: 'var(--font-text)',
+                        color: 'var(--color-secondary)',
+                        textDecoration: m.is_completed ? 'line-through' : 'none',
+                        opacity: m.is_completed ? 0.55 : 1,
+                      }}>
+                        {m.title}
+                      </span>
+                      {m.due_date && (
+                        <span style={{ display: 'block', fontSize: 11, color: 'var(--color-tertiary)', fontFamily: 'var(--font-text)', marginTop: 1 }}>
+                          Due {formatDate(m.due_date)}
+                        </span>
+                      )}
+                    </div>
+                    {m.is_completed && (
+                      <span style={{ fontSize: 11, color: '#22c55e', fontFamily: 'var(--font-text)', fontWeight: 600, flexShrink: 0 }}>
+                        ✓ Done
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {status !== 'active' && milestones.length > 0 && (
+              <p style={{ fontSize: 12, color: 'var(--color-tertiary)', fontFamily: 'var(--font-text)', margin: '4px 0 0' }}>
+                Milestones can only be updated on active contracts.
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="new-contract-footer">
+          <button className="btn-secondary btn-sm" onClick={onClose}>Close</button>
+        </div>
       </div>
     </div>
   );
@@ -147,14 +268,85 @@ function EditTermsModal({ contract, onClose, onSubmit }) {
   );
 }
 
+// ── Contract Card ──────────────────────────────────────────────────────────
+
+function ContractCard({ contract, onSign, onEditTerms, onView }) {
+  const { status } = contract;
+
+  return (
+    <div className="contract-card">
+      <div className="contract-card__top">
+        <div>
+          <p className="contract-card__id">CT-{String(contract.id).padStart(4, '0')}</p>
+          <h3 className="contract-card__title">{contract.title}</h3>
+        </div>
+        <StatusBadge status={status} />
+      </div>
+
+      <div className="contract-card__meta">
+        <div className="contract-card__meta-row">
+          <span className="contract-card__meta-label">Budget</span>
+          {formatBudget(contract.budget)}
+        </div>
+        <div className="contract-card__meta-row">
+          <span className="contract-card__meta-label">Start</span>
+          {formatDate(contract.start_date)}
+        </div>
+        <div className="contract-card__meta-row">
+          <span className="contract-card__meta-label">End</span>
+          {formatDate(contract.end_date)}
+        </div>
+      </div>
+
+      {/* Progress bar for active/completed */}
+      {(status === 'active' || status === 'completed') && (
+        <div className="contract-card__progress" style={{ marginTop: 10 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+            <span style={{ fontSize: 11, color: 'var(--color-tertiary)', fontFamily: 'var(--font-text)' }}>Progress</span>
+            <span style={{ fontSize: 11, color: 'var(--color-tertiary)', fontFamily: 'var(--font-text)' }}>{contract.progress}%</span>
+          </div>
+          <div className="progress-bar">
+            <div className="progress-bar__fill" style={{ width: `${contract.progress}%` }} />
+          </div>
+        </div>
+      )}
+
+      {/* Client avatar placeholder */}
+      <div className="contract-card__avatar">
+        <div className="contract-card__avatar-initial">CL</div>
+        <span className="contract-card__avatar-name">Client</span>
+      </div>
+
+      <div className="contract-card__actions">
+        {status === 'pending_sign' && (
+          <>
+            <button className="btn-primary btn-sm" onClick={() => onSign(contract.id)}>
+              Sign Contract
+            </button>
+            <button className="btn-secondary btn-sm" onClick={() => onEditTerms(contract)}>
+              Propose Edits
+            </button>
+          </>
+        )}
+        {(status === 'active' || status === 'completed' || status === 'draft' || status === 'rejected') && (
+          <button className="btn-secondary btn-sm" onClick={() => onView(contract)}>
+            View Details
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Main Page ──────────────────────────────────────────────────────────────
 
 const ContractsFreelancer = () => {
-  const [contracts, setContracts]         = useState([]);
-  const [loading, setLoading]             = useState(true);
-  const [error, setError]                 = useState(null);
-  const [activeFilter, setActiveFilter]   = useState('all');
+  const [contracts, setContracts]             = useState([]);
+  const [loading, setLoading]                 = useState(true);
+  const [error, setError]                     = useState(null);
+  const [activeFilter, setActiveFilter]       = useState('all');
   const [editingContract, setEditingContract] = useState(null);
+  const [detailContract, setDetailContract]   = useState(null);
 
   useEffect(() => {
     const fetchContracts = async () => {
@@ -193,9 +385,25 @@ const ContractsFreelancer = () => {
     }
   };
 
+  // Milestone toggle — called from inside ContractDetailModal
+  // Returns the updated contract dict so the modal can update its local state.
+  const handleMilestoneToggle = async (milestoneId, isCompleted) => {
+    try {
+      const res = await ContractsService.updateMilestone(milestoneId, isCompleted);
+      const updated = res.data;
+      // Sync the main list too so the card's progress bar updates
+      setContracts(prev => prev.map(c => c.id === updated.id ? updated : c));
+      // Keep detailContract in sync with the fresh data
+      setDetailContract(updated);
+      return updated;
+    } catch (err) {
+      alert(err.response?.data?.detail ?? 'Failed to update milestone');
+      return null;
+    }
+  };
+
   const handleView = (contract) => {
-    // Detail view is a future screen — navigate or open modal when built
-    alert(`Contract "${contract.title}" — detail view coming soon`);
+    setDetailContract(contract);
   };
 
   return (
@@ -273,6 +481,14 @@ const ContractsFreelancer = () => {
           contract={editingContract}
           onClose={() => setEditingContract(null)}
           onSubmit={handleEditTermsSubmit}
+        />
+      )}
+
+      {detailContract && (
+        <ContractDetailModal
+          contract={detailContract}
+          onClose={() => setDetailContract(null)}
+          onMilestoneToggle={handleMilestoneToggle}
         />
       )}
     </div>
