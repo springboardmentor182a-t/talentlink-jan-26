@@ -32,13 +32,12 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 # Password Utilities
 # ----------------------
 def hash_password(password: str) -> str:
-    """Hash password for storage (truncate to 72 bytes for bcrypt safety)."""
-    return pwd_context.hash(password[:72])
-
+    truncated = password.encode("utf-8")[:72]
+    return pwd_context.hash(truncated)
 
 def verify_password(plain: str, hashed: str) -> bool:
-    """Verify a plain password against the stored hash."""
-    return pwd_context.verify(plain[:72], hashed)
+    truncated = plain.encode("utf-8")[:72]
+    return pwd_context.verify(truncated, hashed)
 
 
 # ----------------------
