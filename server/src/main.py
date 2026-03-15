@@ -7,12 +7,14 @@ from src.database.core import engine, Base
 import src.entities.user      # noqa: F401 - registers User table
 import src.entities.todo      # noqa: F401 - registers Todo table
 import src.users.models       # noqa: F401 - registers FreelancerProfile, ClientProfile tables
+import src.projects.models    # noqa: F401 - registers Project table
 
 from src.rate_limiter import rate_limit_middleware
 from src.exceptions import error_handler_middleware
 from src.auth.controller import router as auth_router
 from src.users.router import router as users_router
 from src.todos.controller import router as todos_router
+from src.projects.router import router as projects_router
 
 # Create all database tables on startup
 Base.metadata.create_all(bind=engine)
@@ -36,6 +38,7 @@ app.middleware("http")(error_handler_middleware)
 app.include_router(auth_router,  prefix="/api/auth",  tags=["Authentication"])
 app.include_router(users_router, prefix="/api/users", tags=["Users"])
 app.include_router(todos_router, prefix="/api/todos", tags=["Todos"])
+app.include_router(projects_router, prefix="/api/projects", tags=["Projects"])
 
 
 @app.get("/")

@@ -18,6 +18,8 @@ import FreelancerView from "./pages/FreelancerView";
 import ClientView from "./pages/ClientView";
 import SubmitProposal from "./pages/SubmitProposal";
 import FreelancerContracts from "./pages/FreelancerContracts";
+import PostProject from "./pages/PostProject";
+import ProjectFeed from "./pages/ProjectFeed";
 
 export default function App() {
   return (
@@ -30,6 +32,11 @@ export default function App() {
         <Route path="/signup/client" element={<SignupClient />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+
+        {/* PUBLIC ROUTES WITH LAYOUT WRAPPER (For manual testing) */}
+        <Route element={<Layout />}>
+          <Route path="/projects" element={<ProjectFeed />} />
+        </Route>
 
         {/* 2. PRIVATE ROUTES (Sidebar Layout is applied here!) */}
         <Route element={<Layout />}>
@@ -45,6 +52,7 @@ export default function App() {
           
           {/* Your Proposal Pages */}
           <Route path="/projects/:projectId/apply" element={<SubmitProposal />} />
+          <Route path="/post-project" element={<PostProject />} />
           <Route path="/contracts" element={<FreelancerContracts />} />
         </Route>
       </Routes>
