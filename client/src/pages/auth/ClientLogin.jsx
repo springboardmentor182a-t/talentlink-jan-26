@@ -26,15 +26,6 @@ export default function ClientLogin() {
   const [loading, setLoading]   = useState(false);
 
   const handleSubmit = async () => {
-    const res = await api.post("/auth/login", {
-      email,
-      password,
-    });
-    login({
-      token: res.data.access_token,
-      role: "client",
-      user: { email },
-    });
     setError("");
     if (!email || !password) { setError("Please enter your email and password."); return; }
     try {

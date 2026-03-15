@@ -1,14 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.database.core import Base, engine
-from fastapi.middleware.cors import CORSMiddleware
-
-# Import all entities to ensure they are registered with Base metadata
-from src.entities.user import User
-from src.entities.job import Job
-from src.entities.proposal import Proposal
 from src.auth.controller import router as auth_router
-from src.jobs.controller import router as jobs_router
 from src.proposals.controller import router as proposals_router
 
 # Create all database tables
@@ -29,9 +22,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth_router)
-app.include_router(jobs_router)
-app.include_router(proposals_router)
 # ── Routers ──────────────────────────────────
 app.include_router(auth_router,      prefix="/auth",      tags=["Auth"])
 app.include_router(proposals_router, prefix="/proposals", tags=["Proposals"])
