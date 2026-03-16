@@ -35,5 +35,28 @@ server/.coverage
 client/client/node_modules/
 server/venv/
 
-# Dev override (optional — some teams commit this, some don't)
-docker-compose.dev.yml
+
+# Vite build output (different from React build)
+client/dist/
+
+# Python egg info
+server/*.egg-info/
+server/src/*.egg-info/
+
+# JWT / OAuth secrets backup files
+*.pem
+*.key
+
+# VS Code settings (optional — some teams share, some don't)
+.vscode/
+
+# Pytest cache anywhere
+**/.pytest_cache/
+
+# Coverage anywhere
+**/.coverage
+**/htmlcov/
+
+# Python compiled extensions
+**/*.so
+**/*.pyd

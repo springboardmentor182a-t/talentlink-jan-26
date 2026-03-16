@@ -22,10 +22,10 @@ import pytest
 from decimal import Decimal
 from datetime import datetime, timezone
 
-from sqlalchemy import Column, Integer
+from sqlalchemy import Column, Integer, String, Text, DECIMAL
 
 from src.database.core import Base
-from src.users.models import Proposal, FreelancerProfile  # already in the codebase
+from src.users.models import Proposal, FreelancerProfile, ClientProfile  # already in the codebase
 from src.entities.contract import Contract, ContractMilestone
 from src.contracts.service import ContractService
 from src.contracts.models import ContractCreate, ContractEditTerms, MilestoneCreate
@@ -37,40 +37,51 @@ from fastapi import HTTPException
 class Project(Base):
     __tablename__  = "projects"
     __table_args__ = {"extend_existing": True}
-    id        = Column(Integer, primary_key=True)
-    client_id = Column(Integer, nullable=False)
+    id          = Column(Integer, primary_key=True)
+    title       = Column(String(100), nullable=False)
+    description = Column(Text, nullable=False)
+    budget      = Column(DECIMAL(10, 2), nullable=False)
+    client_id   = Column(Integer, nullable=False)   # FK to profiles_client.id
+    status      = Column(String(50), default="open")
 
 
 # ── Patch sys.modules so the service lazy imports resolve ─────────────────────
+# src.users.models.Proposal is directly importable — no patch needed for it.
+# src.projects.models does not exist until findproject merges — patch it here.
 
-_proposal_mod = types.ModuleType("src.entities.proposal")
-_proposal_mod.Proposal = Proposal
-sys.modules.setdefault("src.entities.proposal", _proposal_mod)
+_projects_mod = types.ModuleType("src.projects")
+sys.modules.setdefault("src.projects", _projects_mod)
 
-_project_mod = types.ModuleType("src.entities.project")
-_project_mod.Project = Project
-sys.modules.setdefault("src.entities.project", _project_mod)
+_projects_models_mod = types.ModuleType("src.projects.models")
+_projects_models_mod.Project = Project
+sys.modules.setdefault("src.projects.models", _projects_models_mod)
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 def _make_world(db, *, client_id=1, freelancer_id=2):
-    """Insert a Project, FreelancerProfile, and Proposal. Return (project_id, proposal_id).
+    """Insert a Project, ClientProfile, FreelancerProfile, and Proposal.
+    Return (project_id, proposal_id).
 
-    freelancer_id is used as users.id for the freelancer.  We create a
-    FreelancerProfile with that user_id so _resolve_parties can look it up.
-    The Proposal stores the FreelancerProfile.id (not the user id) to match
-    production schema — _resolve_parties translates back to user_id.
+    client_id and freelancer_id are users.id values.
+    Project.client_id is profiles_client.id (not users.id directly) —
+    _resolve_parties now does a ClientProfile lookup to translate it.
+    Same pattern as FreelancerProfile for the freelancer side.
     SQLite does not enforce FKs, so we don't need real User rows.
     """
-    project = Project(id=client_id * 100, client_id=client_id)
+    # ClientProfile — project.client_id points to this, not to users.id
+    client_profile = ClientProfile(user_id=client_id)
+    db.add(client_profile)
+    db.flush()
+
+    project = Project(id=client_id * 100, client_id=client_profile.id, title="Test Project", description="A test project for contract testing purposes", budget=10000)
     db.add(project)
     db.flush()
 
-    # Create a FreelancerProfile whose user_id IS the freelancer_id we care about
+    # FreelancerProfile whose user_id IS the freelancer_id we care about
     profile = FreelancerProfile(user_id=freelancer_id)
     db.add(profile)
-    db.flush()  # profile.id is now set (auto-increment)
+    db.flush()
 
     # Proposal.freelancer_id is a FK to profiles_freelancer.id
     proposal = Proposal(

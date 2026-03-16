@@ -16,29 +16,30 @@ import sys
 import types
 import pytest
 from decimal import Decimal
-from sqlalchemy import Column, Integer
-
+from sqlalchemy import Column, Integer, String, Text, DECIMAL
 from src.database.core import Base
-from src.users.models import Proposal, FreelancerProfile
+from src.users.models import Proposal, FreelancerProfile, ClientProfile
 
-# ── Project stub ─────────────────────────────────────────────────────────────
+# ── Project stub — matches real Project model from findproject branch ─────────
 
 class Project(Base):
     __tablename__  = "projects"
     __table_args__ = {"extend_existing": True}
-    id        = Column(Integer, primary_key=True)
-    client_id = Column(Integer, nullable=False)
+    id          = Column(Integer, primary_key=True)
+    title       = Column(String(100), nullable=False)
+    description = Column(Text, nullable=False)
+    budget      = Column(DECIMAL(10, 2), nullable=False)
+    client_id   = Column(Integer, nullable=False)   # FK to profiles_client.id
+    status      = Column(String(50), default="open")
 
 
-# ── Patch sys.modules so lazy imports inside the service resolve ──────────────
+# Patch src.projects.models — real module doesn't exist until findproject merges
+_projects_mod = types.ModuleType("src.projects")
+sys.modules.setdefault("src.projects", _projects_mod)
 
-_proposal_mod = types.ModuleType("src.entities.proposal")
-_proposal_mod.Proposal = Proposal
-sys.modules.setdefault("src.entities.proposal", _proposal_mod)
-
-_project_mod = types.ModuleType("src.entities.project")
-_project_mod.Project = Project
-sys.modules.setdefault("src.entities.project", _project_mod)
+_projects_models_mod = types.ModuleType("src.projects.models")
+_projects_models_mod.Project = Project
+sys.modules.setdefault("src.projects.models", _projects_models_mod)
 
 
 # ── Auth helpers ──────────────────────────────────────────────────────────────
@@ -78,13 +79,19 @@ def _setup_world(client, db, *, client_user=CLIENT_USER, freelancer_user=FREELAN
     client_id,     client_headers     = _register_and_token(client, client_user)
     freelancer_id, freelancer_headers = _register_and_token(client, freelancer_user)
 
-    # FreelancerProfile — needed by _resolve_parties
+    # FreelancerProfile — needed by _resolve_parties (freelancer_id → users.id)
     profile = FreelancerProfile(user_id=freelancer_id)
     db.add(profile)
     db.flush()
 
-    # Project owned by the client
-    project = Project(id=client_id * 100, client_id=client_id)
+    # ClientProfile — needed by _resolve_parties (project.client_id → users.id)
+    # Project.client_id is profiles_client.id, not users.id directly.
+    client_profile = ClientProfile(user_id=client_id)
+    db.add(client_profile)
+    db.flush()
+
+    # Project owned by the client — client_id is ClientProfile.id (not users.id)
+    project = Project(id=client_id * 100, client_id=client_profile.id, title="Test Project", description="A test project for contract testing purposes", budget=10000)
     db.add(project)
     db.flush()
 

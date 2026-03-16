@@ -23,13 +23,21 @@ def _calc_progress(contract: Contract) -> int:
 def _resolve_parties(db: Session, contract: Contract) -> tuple[int, int]:
     """Return (client_user_id, freelancer_user_id) — both in the users.id space.
 
-    Proposal.freelancer_id is a FK to profiles_freelancer.id, NOT users.id.
-    Without the FreelancerProfile lookup below, every permission check would
-    silently compare the wrong ID space and produce incorrect 403/200 responses.
+    Two FK translation steps are required:
+
+    1. Proposal.freelancer_id is profiles_freelancer.id, NOT users.id.
+       FreelancerProfile lookup translates it to FreelancerProfile.user_id.
+
+    2. Project.client_id is profiles_client.id, NOT users.id.
+       ClientProfile lookup translates it to ClientProfile.user_id.
+
+    Without both lookups every permission check silently compares the wrong
+    ID space and produces incorrect 403/200 responses.
     """
-    from src.entities.proposal import Proposal      # noqa: PLC0415
-    from src.entities.project import Project        # noqa: PLC0415
+    from src.users.models import Proposal      # noqa: PLC0415
+    from src.projects.models import Project        # noqa: PLC0415
     from src.users.models import FreelancerProfile  # noqa: PLC0415
+    from src.users.models import ClientProfile      # noqa: PLC0415
 
     proposal = db.query(Proposal).filter(Proposal.id == contract.proposal_id).first()
     if not proposal:
@@ -43,16 +51,28 @@ def _resolve_parties(db: Session, contract: Contract) -> tuple[int, int]:
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Proposal is linked to a missing project -- data integrity error",
         )
-    # proposal.freelancer_id is profiles_freelancer.id -- resolve to users.id
-    profile = db.query(FreelancerProfile).filter(
+
+    # project.client_id is profiles_client.id — resolve to users.id
+    client_profile = db.query(ClientProfile).filter(
+        ClientProfile.id == project.client_id
+    ).first()
+    if not client_profile:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Project linked to missing client profile -- data integrity error",
+        )
+
+    # proposal.freelancer_id is profiles_freelancer.id — resolve to users.id
+    freelancer_profile = db.query(FreelancerProfile).filter(
         FreelancerProfile.id == proposal.freelancer_id
     ).first()
-    if not profile:
+    if not freelancer_profile:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Proposal linked to missing freelancer profile -- data integrity error",
         )
-    return project.client_id, profile.user_id
+
+    return client_profile.user_id, freelancer_profile.user_id
 
 
 def _assert_party(db: Session, contract: Contract, user_id: int) -> None:
@@ -72,8 +92,8 @@ class ContractService:
     @staticmethod
     def create_contract(db: Session, data: ContractCreate, client_id: int) -> dict:
         """Client only. Validates proposal ownership, creates contract in draft."""
-        from src.entities.proposal import Proposal  # noqa: PLC0415
-        from src.entities.project import Project    # noqa: PLC0415
+        from src.users.models import Proposal  # noqa: PLC0415
+        from src.projects.models import Project    # noqa: PLC0415
 
         proposal = db.query(Proposal).filter(Proposal.id == data.proposal_id).first()
         if not proposal:
@@ -136,8 +156,8 @@ class ContractService:
         For the freelancer branch we must join through FreelancerProfile because
         Proposal.freelancer_id is profiles_freelancer.id, not users.id.
         """
-        from src.entities.proposal import Proposal      # noqa: PLC0415
-        from src.entities.project import Project        # noqa: PLC0415
+        from src.users.models import Proposal      # noqa: PLC0415
+        from src.projects.models import Project        # noqa: PLC0415
         from src.users.models import FreelancerProfile  # noqa: PLC0415
 
         if role == "client":
