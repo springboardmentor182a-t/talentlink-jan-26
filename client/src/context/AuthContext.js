@@ -8,7 +8,6 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Restore session on page refresh
   useEffect(() => {
     try {
       const savedToken = localStorage.getItem("token");
@@ -44,10 +43,10 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("role");
   };
 
-  if (loading) return null;
+  // ✅ REMOVED: if (loading) return null  ← this was causing the redirect issue
 
   return (
-    <AuthContext.Provider value={{ user, role, token, login, logout }}>
+    <AuthContext.Provider value={{ user, role, token, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
