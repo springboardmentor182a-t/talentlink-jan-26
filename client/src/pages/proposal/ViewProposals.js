@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Navigate } from "react-router-dom";
 import api from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -50,36 +50,60 @@ function Badge({ status }) {
 
 export default function ViewProposals() {
   const { projectId } = useParams();
-  const { user, role, logout } = useContext(AuthContext);
+  const { user, role, logout, loading: authLoading } = useContext(AuthContext);
   const navigate = useNavigate();
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading]     = useState(true);
-
-  if (!user) {
-    return (
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", fontFamily:"'Segoe UI',sans-serif" }}>
-        <div style={{ backgroundColor:"#fff7ed", border:"1px solid #fed7aa", borderRadius:12, padding:24, color:"#c2410c", fontSize:14 }}>
-          ⚠️ You must be logged in.{" "}
-          <span style={{ textDecoration:"underline", cursor:"pointer" }} onClick={() => navigate("/client/login")}>Login here</span>
-        </div>
-      </div>
-    );
-  }
+  const [error, setError]         = useState("");
+  const [searchId, setSearchId]   = useState(projectId || "");
 
   const load = async () => {
     try {
       setLoading(true);
+      setError("");
       const res = await api.get(`/proposals/project/${projectId}`);
       setProposals(res.data);
-    } catch { alert("Error loading proposals."); }
-    finally { setLoading(false); }
+    } catch (err) {
+      const detail = err.response?.data?.detail;
+      setError(
+        typeof detail === "string"
+          ? detail
+          : Array.isArray(detail)
+            ? detail[0]?.msg || "Error loading proposals."
+            : "Error loading proposals."
+      );
+    } finally { setLoading(false); }
   };
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => { if (projectId) load(); }, [projectId]);
+  useEffect(() => { if (projectId && user) load(); }, [projectId, user]);
 
-  const accept = async (id) => { try { await api.put(`/proposals/${id}/accept`); load(); } catch { alert("Error accepting."); } };
-  const reject = async (id) => { try { await api.put(`/proposals/${id}/reject`); load(); } catch { alert("Error rejecting."); } };
+  const accept = async (id) => {
+    try { await api.put(`/proposals/${id}/accept`); load(); }
+    catch (err) { console.error("Accept error:", err.response?.data || err.message); }
+  };
+
+  const reject = async (id) => {
+    try { await api.put(`/proposals/${id}/reject`); load(); }
+    catch (err) { console.error("Reject error:", err.response?.data || err.message); }
+  };
+
+  const handleSearch = () => {
+    if (!searchId || isNaN(searchId) || Number(searchId) <= 0) {
+      alert("Please enter a valid Project ID");
+      return;
+    }
+    navigate(`/view-proposals/${searchId}`);
+  };
+
+  if (authLoading) {
+    return (
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh" }}>
+        <p style={{ color:"#6b7280" }}>Loading...</p>
+      </div>
+    );
+  }
+
+  if (!user) return <Navigate to="/client/login" replace />;
 
   const counts = {
     total:    proposals.length,
@@ -93,7 +117,6 @@ export default function ViewProposals() {
       <Sidebar onNavigate={navigate} />
 
       <div style={{ marginLeft:240, flex:1, display:"flex", flexDirection:"column" }}>
-        {/* Top navbar */}
         <div style={{ backgroundColor:"#fff", padding:"16px 32px", display:"flex", justifyContent:"space-between", alignItems:"center", borderBottom:"1px solid #e5e7eb" }}>
           <span style={{ fontSize:18, fontWeight:700, color:"#111827" }}>Proposals</span>
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
@@ -108,15 +131,36 @@ export default function ViewProposals() {
           </div>
         </div>
 
-        {/* Content */}
         <div style={{ padding:32 }}>
-          <button onClick={() => navigate(-1)} style={{ background:"none", border:"none", fontSize:14, color:"#6b7280", cursor:"pointer", padding:0, marginBottom:20 }}>
-            ← Back to Projects
-          </button>
+
+          {/* ✅ Project ID selector */}
+          <div style={{ backgroundColor:"#fff", borderRadius:12, padding:"20px 24px", marginBottom:24, boxShadow:"0 1px 4px rgba(0,0,0,0.07)" }}>
+            <div style={{ fontSize:14, fontWeight:600, color:"#374151", marginBottom:12 }}>🔍 View Proposals for a Project</div>
+            <div style={{ display:"flex", gap:12 }}>
+              <input
+                type="number" min="1"
+                placeholder="Enter Project ID (e.g. 1, 2, 3...)"
+                value={searchId}
+                onChange={e => setSearchId(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleSearch()}
+                style={{ flex:1, padding:"10px 14px", border:"1.5px solid #e5e7eb", borderRadius:8, fontSize:14, backgroundColor:"#f9fafb", outline:"none" }}
+              />
+              <button onClick={handleSearch}
+                style={{ padding:"10px 24px", background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"white", border:"none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:14 }}>
+                View →
+              </button>
+            </div>
+          </div>
+
           <h1 style={{ fontSize:26, fontWeight:700, color:"#111827", marginBottom:4 }}>Proposals for Project #{projectId}</h1>
           <p style={{ fontSize:14, color:"#6b7280", marginBottom:24 }}>{counts.total} proposal{counts.total !== 1 ? "s" : ""} received</p>
 
-          {/* Stats */}
+          {error && (
+            <div style={{ backgroundColor:"#fef2f2", border:"1.5px solid #fecaca", borderRadius:8, padding:"10px 14px", fontSize:13, color:"#dc2626", marginBottom:16 }}>
+              ⚠️ {error}
+            </div>
+          )}
+
           <div style={{ backgroundColor:"#fff", borderRadius:12, padding:"20px 28px", marginBottom:28, boxShadow:"0 1px 4px rgba(0,0,0,0.07)", display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:16 }}>
             {[
               { label:"Total",    val:counts.total,    color:"#111827" },
@@ -142,8 +186,6 @@ export default function ViewProposals() {
 
           {proposals.map(p => (
             <div key={p.id} style={{ backgroundColor:"#fff", borderRadius:12, padding:24, marginBottom:16, boxShadow:"0 1px 4px rgba(0,0,0,0.07)" }}>
-              
-              {/* Header */}
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:14 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:12 }}>
                   <div style={{ width:44, height:44, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:700, fontSize:18, color:"white" }}>
@@ -157,7 +199,6 @@ export default function ViewProposals() {
                 <Badge status={p.status} />
               </div>
 
-              {/* Cover Letter */}
               {p.cover_letter && (
                 <>
                   <div style={{ fontWeight:600, fontSize:13, color:"#374151", marginBottom:6 }}>Cover Letter</div>
@@ -165,14 +206,12 @@ export default function ViewProposals() {
                 </>
               )}
 
-              {/* Meta */}
               <div style={{ display:"flex", gap:32, marginTop:16, paddingTop:16, borderTop:"1px solid #f3f4f6" }}>
                 <div style={{ fontSize:13, color:"#6b7280" }}>Budget <strong style={{ display:"block", color:"#111827", marginTop:2 }}>${p.proposed_budget}</strong></div>
                 <div style={{ fontSize:13, color:"#6b7280" }}>Delivery <strong style={{ display:"block", color:"#111827", marginTop:2 }}>{p.delivery_time}</strong></div>
                 {p.created_at && <div style={{ fontSize:13, color:"#6b7280" }}>Submitted <strong style={{ display:"block", color:"#111827", marginTop:2 }}>{new Date(p.created_at).toLocaleDateString()}</strong></div>}
               </div>
 
-              {/* Actions - only for pending */}
               {p.status === "pending" && (
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginTop:16 }}>
                   <button onClick={() => accept(p.id)}
