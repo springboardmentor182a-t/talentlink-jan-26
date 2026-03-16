@@ -1,27 +1,78 @@
+import sys
+import os
+
+# Add the current directory to sys.path so it can find the 'src' folder
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+
+from sqlalchemy.orm import Session
 from src.database.core import SessionLocal, engine, Base
-from src.proposals import models
 
-# 1. Build the tables in the database
-Base.metadata.create_all(bind=engine)
-db = SessionLocal()
+# Import the actual classes based on your file structure
+from src.entities.user import User
+from src.users.models import ClientProfile
+from src.projects.models import Project
 
-# 2. Check if it's empty, then inject the data
-if not db.query(models.Project).first():
-    print("Injecting dummy data...")
-    db.add_all([
-        models.Project(title='Full Stack Web Application', company='TechCorp Solutions', budget='$3,000 - $6,000', type='Fixed Price', match='90%', tags=['React', 'Node.js', 'AWS']),
-        models.Project(title='Mobile App UI/UX Design', company='DesignHub Inc.', budget='$4,000 - $8,000', type='Hourly', match='89%', tags=['Figma', 'UI Design', 'Mobile']),
-        models.Project(title='E-commerce Platform Development', company='ShopMaster', budget='$5,000 - $10,000', type='Fixed Price', match='88%', tags=['PHP', 'MySQL', 'Payment APIs'])
-    ])
-    
-    db.add_all([
-        models.Contract(id='CT-2024-001', title='Website Redesign Project', client='Emma Creight', budget='$12,000', status='Active', color='#28A745'),
-        models.Contract(id='CT-2024-002', title='Mobile App Development', client='Alexander Roy', budget='$25,000', status='Pending Sign', color='#FF7A1A'),
-        models.Contract(id='CT-2024-003', title='Brand Identity Design', client='Evelyn Stanley', budget='$9,500', status='Draft', color='#6C757D')
-    ])
-    db.commit()
-    print("✅ Database successfully seeded!")
-else:
-    print("⚠️ Data already exists. Skipping.")
+def seed_data():
+    db = SessionLocal()
+    try:
+        print("Cleaning up old data (optional)...")
+        # Base.metadata.drop_all(bind=engine) # Uncomment if you want a total reset
+        Base.metadata.create_all(bind=engine)
 
-db.close()
+        # 1. Create a User (The Identity)
+        admin_user = db.query(User).filter(User.username == "admin").first()
+        if not admin_user:
+            admin_user = User(
+                username="admin",
+                email="admin@example.com",
+                hashed_password="fake_hashed_password", # In real life, use passlib
+                role="client"
+            )
+            db.add(admin_user)
+            db.commit()
+            db.refresh(admin_user)
+            print(f"✅ User created: {admin_user.username}")
+        else:
+            print("ℹ️ User 'admin' already exists.")
+
+        # 2. Create a Client Profile (The Metadata)
+        client_profile = db.query(ClientProfile).filter(ClientProfile.user_id == admin_user.id).first()
+        if not client_profile:
+            client_profile = ClientProfile(
+                user_id=admin_user.id,
+                company_name="TalentLink Corp",
+                industry="Tech",
+                company_description="Top tier AI-ML internship projects."
+            )
+            db.add(client_profile)
+            db.commit()
+            print("✅ Client Profile linked.")
+
+        # 3. Create a Project (The Work)
+        # We use admin_user.id as the client_id
+        if not db.query(Project).first():
+            new_project = Project(
+                title="Develop AI Search Engine",
+                description="Looking for an intern to integrate Gemini API into TalentLink.",
+                budget_min=1000,
+                budget_max=5000,
+                duration="3 months",
+                skills="Python, React, FastAPI",
+                client_id=admin_user.id
+            )
+            db.add(new_project)
+            db.commit()
+            print("✅ Sample Project posted.")
+        else:
+            print("ℹ️ Projects already exist in DB.")
+
+        print("\n🚀 Seeding Complete! Run uvicorn and check http://localhost:8000/projects/")
+
+    except Exception as e:
+        print(f"❌ Error during seeding: {e}")
+        db.rollback()
+    finally:
+        db.close()
+
+if __name__ == "__main__":
+    seed_data()
