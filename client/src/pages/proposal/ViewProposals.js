@@ -8,7 +8,7 @@ const NAV = [
   { icon:"➕", label:"Post Project",  path:"/client/post-project" },
   { icon:"📁", label:"My Projects",   path:"/client/projects", active:true },
   { icon:"💬", label:"Messages",      path:"/client/messages" },
-];
+]; 
 
 function Sidebar({ onNavigate }) {
   return (
