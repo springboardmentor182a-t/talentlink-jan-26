@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from src.database.core import engine, Base, get_db, SessionLocal
 import src.entities.user
 import src.users.models
-import src.projects.models  # <--- YOUR MODEL
+import src.projects.models  # <--- YOUR PROJECT MODELS
 import src.entities.todo
 import src.entities.message
 
@@ -48,7 +48,7 @@ app.include_router(todos_router, prefix="/api/todos", tags=["Todos"])
 app.include_router(projects_router, tags=["Projects"]) # <--- YOUR ENDPOINT
 app.include_router(messages_router, prefix="/api/messages", tags=["Messages"])
 
-# 5. TEAM D WEBSOCKET MANAGER (The reason for the extra lines)
+# 5. TEAM D WEBSOCKET MANAGER (Chat engine)
 class ConnectionManager:
     def __init__(self):
         self.active_connections: dict[int, WebSocket] = {}
@@ -75,10 +75,9 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-# 6. WEBSOCKET ENDPOINTS (Chat System)
+# 6. WEBSOCKET ENDPOINTS (For the Chat feature)
 @app.websocket("/ws/{user_id}")
 async def websocket_endpoint(websocket: WebSocket, user_id: int, ticket: str = Query(...)):
-    # Simple verification logic (The team's ticket system)
     await manager.connect(user_id, websocket)
     try:
         while True:
@@ -106,7 +105,7 @@ def seed_database():
         if not db.query(Project).first():
             db.add(Project(
                 title="Example Freelance Project",
-                description="Backend is successfully providing this data!",
+                description="The backend is successfully serving your projects!",
                 budget_min=100, budget_max=500, duration="1 month",
                 skills="React, FastAPI", client_id=admin.id
             ))
