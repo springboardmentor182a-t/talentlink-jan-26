@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
 
-// ── Sidebar nav items ──────────────────────
 const NAV = [
   { icon:"⊞",  label:"Dashboard",      path:"/freelancer/dashboard" },
   { icon:"🔍", label:"Browse Projects", path:"/freelancer/browse" },
@@ -11,7 +10,6 @@ const NAV = [
   { icon:"💬", label:"Messages",        path:"/freelancer/messages" },
 ];
 
-// ── Reusable sidebar ───────────────────────
 function Sidebar({ onNavigate }) {
   return (
     <div style={{ width:240, backgroundColor:"#fff", borderRight:"1px solid #e5e7eb", position:"fixed", top:0, left:0, height:"100vh", display:"flex", flexDirection:"column", padding:"24px 0", zIndex:100 }}>
@@ -41,13 +39,12 @@ export default function SubmitProposal() {
   const { user, role, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const [coverLetter, setCoverLetter] = useState("");
-  const [budget, setBudget]           = useState("");
+  const [coverLetter, setCoverLetter]   = useState("");
+  const [budget, setBudget]             = useState("");
   const [deliveryTime, setDeliveryTime] = useState("");
-  const [errors, setErrors]           = useState({});
-  const [loading, setLoading]         = useState(false);
+  const [errors, setErrors]             = useState({});
+  const [loading, setLoading]           = useState(false);
 
-  // Redirect if not logged in
   if (!user) {
     return (
       <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", fontFamily:"'Segoe UI',sans-serif" }}>
@@ -83,8 +80,16 @@ export default function SubmitProposal() {
       alert("✅ Proposal submitted successfully!");
       navigate("/proposal-tracking");
     } catch (err) {
-      alert(err.response?.data?.detail || "❌ Error submitting proposal. Please try again.");
-    } finally { setLoading(false); }
+      const detail = err.response?.data?.detail;
+      const msg = typeof detail === "string"
+        ? detail
+        : Array.isArray(detail)
+          ? detail[0]?.msg || "❌ Error submitting proposal. Please try again."
+          : "❌ Error submitting proposal. Please try again.";
+      alert(msg);
+    } finally {
+      setLoading(false);  // ← fixed: finally is inside try/catch now
+    }
   };
 
   const inp = { width:"100%", padding:"12px 14px", border:"1.5px solid #e5e7eb", borderRadius:8, fontSize:14, backgroundColor:"#f9fafb", outline:"none", boxSizing:"border-box" };
@@ -94,7 +99,6 @@ export default function SubmitProposal() {
       <Sidebar onNavigate={navigate} />
 
       <div style={{ marginLeft:240, flex:1, display:"flex", flexDirection:"column" }}>
-        {/* Top navbar */}
         <div style={{ backgroundColor:"#fff", padding:"16px 32px", display:"flex", justifyContent:"space-between", alignItems:"center", borderBottom:"1px solid #e5e7eb" }}>
           <span style={{ fontSize:18, fontWeight:700, color:"#111827" }}>Submit Proposal</span>
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
@@ -109,7 +113,6 @@ export default function SubmitProposal() {
           </div>
         </div>
 
-        {/* Content */}
         <div style={{ padding:32, maxWidth:760 }}>
           <button onClick={() => navigate(-1)} style={{ background:"none", border:"none", fontSize:14, color:"#6b7280", cursor:"pointer", padding:0, marginBottom:20 }}>
             ← Back
@@ -118,8 +121,6 @@ export default function SubmitProposal() {
           <p style={{ fontSize:14, color:"#6b7280", marginBottom:28 }}>Project #{projectId} — Fill in the details below to apply</p>
 
           <div style={{ backgroundColor:"#fff", borderRadius:12, padding:32, boxShadow:"0 1px 4px rgba(0,0,0,0.07)" }}>
-            
-            {/* Cover Letter */}
             <label style={{ display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 }}>Cover Letter *</label>
             <textarea
               value={coverLetter} onChange={e => setCoverLetter(e.target.value)}
@@ -129,7 +130,6 @@ export default function SubmitProposal() {
             {errors.coverLetter && <p style={{ fontSize:12, color:"#ef4444", margin:"0 0 16px" }}>{errors.coverLetter}</p>}
             {!errors.coverLetter && <div style={{ marginBottom:20 }} />}
 
-            {/* Budget + Delivery in a row */}
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20, marginBottom:8 }}>
               <div>
                 <label style={{ display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 }}>Proposed Budget ($) *</label>
