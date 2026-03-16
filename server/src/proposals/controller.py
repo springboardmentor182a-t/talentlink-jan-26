@@ -65,3 +65,4 @@ def reject_proposal(proposal_id: int, db: Session = Depends(get_db)):
     proposal.status = "rejected"
     db.commit()
     return {"message": "Rejected"}
+
