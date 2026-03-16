@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../features/hooks/useAuth';
 import Button from '../components/Buttons/Button';
 import '../assets/theme.css';
+import { MessageSquare } from 'lucide-react';
 
 // Demo stat cards — these are visual placeholders.
 // TODO: Replace with real API calls when the jobs/projects endpoints are ready.
@@ -50,9 +51,12 @@ const Dashboard = () => {
           )}
         </p>
 
-        <div style={{ marginTop: '24px' }}>
+        <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
           <Button variant="outline" onClick={handleLogout}>
             Logout
+          </Button>
+          <Button variant="primary" onClick={() => navigate('/messages')} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <MessageSquare size={16} /> Messages
           </Button>
         </div>
       </div>

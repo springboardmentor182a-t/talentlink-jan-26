@@ -1,6 +1,6 @@
-// client/src/components/Sidebar.jsx
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, User, Building2, Briefcase, Settings, LogOut } from "lucide-react";
+// 1. Added FileText to the lucide-react imports
+import { LayoutDashboard, User, Building2, Briefcase, FileText, Settings, LogOut } from "lucide-react";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -14,6 +14,8 @@ export default function Sidebar() {
     { path: "/profile/freelancer", label: "Freelancer Profile", icon: User },
     { path: "/profile/client", label: "Company Profile", icon: Building2 },
     { path: "/jobs", label: "Job Postings", icon: Briefcase }, // We will build this later
+    // 2. Added the Contracts link here
+    { path: "/contracts", label: "Contracts", icon: FileText }, 
   ];
 
   return (

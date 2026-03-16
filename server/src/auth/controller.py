@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from src.database.core import get_db
 from src.auth.models import (
     UserRegister, UserLogin, UserResponse, RegisterResponse,
+    LoginResponse,
     ForgotPasswordRequest, ForgotPasswordResponse,
     ResetPasswordRequest, ResetPasswordResponse,
 )
@@ -18,7 +19,7 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
     return AuthService.register_user(db, user_data)
 
 
-@router.post("/login")
+@router.post("/login", response_model=LoginResponse)
 async def login(login_data: UserLogin, db: Session = Depends(get_db)):
     """Authenticate user and return access token"""
     result = AuthService.authenticate_user(db, login_data)

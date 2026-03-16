@@ -3,7 +3,11 @@ import { useAuth } from './features/hooks/useAuth';
 import Layout from "./components/Layout";
 import "./assets/theme.css";
 
+
 // --- PROFILE & PROPOSAL PAGES ---
+
+// Profile & Proposal Pages (Your Code)
+
 import FreelancerProfile from "./pages/FreelancerProfile";
 import ClientProfile from "./pages/ClientProfile";
 import FreelancerView from "./pages/FreelancerView";
@@ -11,10 +15,14 @@ import ClientView from "./pages/ClientView";
 import SubmitProposal from "./pages/SubmitProposal";
 import FreelancerContracts from "./pages/FreelancerContracts";
 
+
 // --- YOUR NEW FEATURE ---
 import FindProjects from './pages/FindProjects'; 
 
 // --- AUTH & TEAM PAGES ---
+
+// Auth pages (Teammate's Code)
+
 import RoleSelection    from './pages/RoleSelection';
 import Login            from './pages/Login';
 import SignupFreelancer from './pages/SignupFreelancer';
@@ -24,6 +32,7 @@ import ResetPassword    from './pages/ResetPassword';
 import Dashboard        from './pages/Dashboard';
 import Messages         from './pages/Messages';
 import PageContainer    from './layout/PageContainer';
+
 
 /**
  * ProtectedRoute: Redirects unauthenticated users to /login.
@@ -46,6 +55,36 @@ const PublicOnlyRoute = ({ children }) => {
   return <Navigate to="/dashboard" replace />;
 };
 
+
+
+
+/**
+ * ProtectedRoute
+ * Redirects unauthenticated users to /login.
+ */
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  return user ? children : <Navigate to="/login" replace />;
+};
+
+
+/**
+ * PublicOnlyRoute
+ * Redirects already-authenticated users away from auth pages.
+ */
+const PublicOnlyRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) return null;
+  if (!user) return children;
+
+  if (user.role === 'freelancer') return <Navigate to="/freelancer/dashboard" replace />;
+  if (user.role === 'client')     return <Navigate to="/client/dashboard" replace />;
+  return <Navigate to="/dashboard" replace />;
+};
+
+
 export default function App() {
   return (
     <Router>
@@ -64,8 +103,10 @@ export default function App() {
           <Route path="/freelancer/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/client/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
+
           {/* Your Feature Page */}
           <Route path="/find-projects" element={<ProtectedRoute><FindProjects /></ProtectedRoute>} />
+
 
           {/* Your Profile Pages */}
           <Route path="/profile/freelancer" element={<ProtectedRoute><FreelancerView /></ProtectedRoute>} />
@@ -77,12 +118,19 @@ export default function App() {
           <Route path="/projects/:projectId/apply" element={<ProtectedRoute><SubmitProposal /></ProtectedRoute>} />
           <Route path="/contracts" element={<ProtectedRoute><FreelancerContracts /></ProtectedRoute>} />
 
+
           {/* Messages — FIXED NESTING HERE */}
           <Route path="/messages" element={
             <ProtectedRoute>
               <PageContainer>
                 <Messages />
               </PageContainer>
+
+          {/* Messages */}
+          <Route path="/messages" element={
+            <ProtectedRoute>
+              <PageContainer><Messages /></PageContainer>
+
             </ProtectedRoute>
           } />
         </Route>
