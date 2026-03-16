@@ -1,99 +1,122 @@
-from fastapi import FastAPI
+import os
+import secrets
+from pathlib import Path
+from dotenv import load_dotenv
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-import logging
 
 # 1. Database & Core Imports
 from src.database.core import engine, Base, get_db, SessionLocal
-
-# 2. MODEL IMPORTS (Essential for Base.metadata.create_all)
-import src.entities.user    # Contains the User model
-import src.users.models     # Contains Client/Freelancer profiles
-import src.projects.models  # Contains Project model
+import src.entities.user
+import src.users.models
+import src.projects.models  # <--- YOUR MODEL
 import src.entities.todo
+import src.entities.message
 
-# 3. Middleware & Routers
-from src.rate_limiter import rate_limit_middleware
+# 2. Router & Logic Imports
 from src.auth.controller import router as auth_router
 from src.users.router import router as users_router
 from src.todos.controller import router as todos_router
-from src.projects.router import router as projects_router
+from src.projects.router import router as projects_router # <--- YOUR ROUTER
+from src.messages.controller import router as messages_router
+from src.rate_limiter import rate_limit_middleware
+
+load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 
 # Initialize FastAPI
 app = FastAPI(title="TalentLink API", version="1.0.0")
 
-# --- CORS CONFIGURATION ---
-origins = [
-    "http://localhost:5173", 
-    "http://localhost:3000",
-    "http://127.0.0.1:5173"
-]
+# 3. CORS CONFIGURATION (Dynamic for Team D)
+_raw_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000")
+ALLOWED_ORIGINS = [o.strip() for o in _raw_origins.split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# --- MIDDLEWARE ---
 app.middleware("http")(rate_limit_middleware)
 
-# --- ROUTER INCLUSION ---
-app.include_router(auth_router, prefix="/api/auth")
-app.include_router(users_router, prefix="/api/users")
-app.include_router(todos_router, prefix="/api/todos")
-app.include_router(projects_router) 
+# 4. ROUTER INCLUSION
+app.include_router(auth_router, prefix="/api/auth", tags=["Authentication"])
+app.include_router(users_router, prefix="/api/users", tags=["Users"])
+app.include_router(todos_router, prefix="/api/todos", tags=["Todos"])
+app.include_router(projects_router, tags=["Projects"]) # <--- YOUR ENDPOINT
+app.include_router(messages_router, prefix="/api/messages", tags=["Messages"])
 
-# --- DATABASE STARTUP ---
+# 5. TEAM D WEBSOCKET MANAGER (The reason for the extra lines)
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: dict[int, WebSocket] = {}
 
-# Create tables immediately
+    async def connect(self, user_id: int, websocket: WebSocket):
+        await websocket.accept()
+        if user_id in self.active_connections:
+            try: await self.active_connections[user_id].close(code=4000)
+            except: pass
+        self.active_connections[user_id] = websocket
+
+    def disconnect(self, user_id: int, websocket: WebSocket):
+        if self.active_connections.get(user_id) is websocket:
+            del self.active_connections[user_id]
+
+    async def send_to_user(self, user_id: int, payload: dict):
+        websocket = self.active_connections.get(user_id)
+        if websocket:
+            try: await websocket.send_json(payload)
+            except: self.active_connections.pop(user_id, None)
+
+    def online_user_ids(self) -> list[int]:
+        return list(self.active_connections.keys())
+
+manager = ConnectionManager()
+
+# 6. WEBSOCKET ENDPOINTS (Chat System)
+@app.websocket("/ws/{user_id}")
+async def websocket_endpoint(websocket: WebSocket, user_id: int, ticket: str = Query(...)):
+    # Simple verification logic (The team's ticket system)
+    await manager.connect(user_id, websocket)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            if data == "ping": await websocket.send_text("pong")
+    except WebSocketDisconnect:
+        pass
+    finally:
+        manager.disconnect(user_id, websocket)
+
+# 7. DATABASE STARTUP & YOUR SEEDING LOGIC
 Base.metadata.create_all(bind=engine)
 
 def seed_database():
-    """Ensures a user exists so projects don't fail Foreign Key constraints."""
     db = SessionLocal()
     try:
-        # CORRECTED IMPORTS BASED ON YOUR FILE STRUCTURE
         from src.entities.user import User
         from src.projects.models import Project
         
-        # 1. Check for Admin User (Identity)
         admin = db.query(User).filter(User.username == "admin").first()
         if not admin:
-            admin = User(
-                username="admin", 
-                email="admin@example.com", 
-                hashed_password="admin_password_hash",
-                role="client"
-            )
-            db.add(admin)
-            db.commit()
-            db.refresh(admin)
-            print("✅ Successfully created default admin user.")
+            admin = User(username="admin", email="admin@example.com", hashed_password="hashed_password", role="client")
+            db.add(admin); db.commit(); db.refresh(admin)
 
-        # 2. Check for at least one project (to help testing frontend)
         if not db.query(Project).first():
-            test_project = Project(
+            db.add(Project(
                 title="Example Freelance Project",
-                description="This is a test project to verify the frontend is working.",
-                budget_min=100,
-                budget_max=500,
-                duration="1 month",
-                skills="React, FastAPI",
-                client_id=admin.id
-            )
-            db.add(test_project)
+                description="Backend is successfully providing this data!",
+                budget_min=100, budget_max=500, duration="1 month",
+                skills="React, FastAPI", client_id=admin.id
+            ))
             db.commit()
-            print("✅ Successfully seeded a test project.")
-            
+            print("✅ Database Seeded Successfully!")
     except Exception as e:
-        print(f"❌ Error seeding database: {e}")
+        print(f"❌ Seed Error: {e}")
     finally:
         db.close()
 
-# Run the seed
 seed_database()
 
 @app.get("/")
