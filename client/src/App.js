@@ -67,7 +67,7 @@ function AppRoutes() {
           <ProtectedRoute allowedRole="freelancer"><ProposalTracking /></ProtectedRoute>
         } />
         <Route path="/view-proposals/:projectId" element={
-          <ProtectedRoute allowedRole="client"><ViewProposal /></ProtectedRoute>
+          <ProtectedRoute allowedRole="client"><ViewProposals /></ProtectedRoute>
         } />
 
         {/* Dashboard routes */}
