@@ -4,7 +4,7 @@ from src.database.core import get_db
 from .model import Proposal
 from .schema import ProposalCreate, ProposalResponse
 
-router = APIRouter(prefix="/proposals", tags=["Proposals"])
+router = APIRouter(tags=["Proposals"])
 
 
 @router.post("/", response_model=ProposalResponse)
