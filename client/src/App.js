@@ -12,7 +12,7 @@ import ForgotPassword   from "./pages/auth/ForgotPassword";
 
 // Proposal pages
 import SubmitProposal   from "./pages/proposal/SubmitProposal";
-import ViewProposal     from "./pages/proposal/ViewProposal";
+import ViewProposals     from "./pages/proposal/ViewProposals";
 import ProposalTracking from "./pages/proposal/ProposalTracking";
 
 import Sidebar from "./layout/Sidebar";
