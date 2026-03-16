@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import api from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -19,7 +19,13 @@ function Sidebar({ onNavigate }) {
       </div>
       {NAV.map(n => (
         <div key={n.label}
-          onClick={() => onNavigate(n.path)}
+          onClick={() => {
+            if (n.path === "/proposal-tracking") {
+              onNavigate(n.path);
+            } else {
+              alert("This feature will be available after merge with dashboard branch!");
+            }
+          }}
           style={{
             display:"flex", alignItems:"center", gap:12, padding:"10px 24px", cursor:"pointer", fontSize:14,
             fontWeight: n.active ? 700 : 500,
@@ -49,34 +55,37 @@ function Badge({ status }) {
 }
 
 export default function ProposalTracking() {
-  const { user, role, logout } = useContext(AuthContext);
+  const { user, role, logout, loading: authLoading } = useContext(AuthContext);
   const navigate = useNavigate();
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading]     = useState(true);
+  const [projectId, setProjectId] = useState("");
 
-  if (!user) {
-    return (
-      <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", fontFamily:"'Segoe UI',sans-serif" }}>
-        <div style={{ backgroundColor:"#fff7ed", border:"1px solid #fed7aa", borderRadius:12, padding:24, color:"#c2410c", fontSize:14 }}>
-          ⚠️ You must be logged in.{" "}
-          <span style={{ textDecoration:"underline", cursor:"pointer" }} onClick={() => navigate("/freelancer/login")}>Login here</span>
-        </div>
-      </div>
-    );
-  }
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    const fetch = async () => {
+    if (!user) return;
+    const fetchProposals = async () => {
       try {
         setLoading(true);
         const res = await api.get(`/proposals/freelancer/${user.id}`);
         setProposals(res.data);
-      } catch { alert("Error loading proposals."); }
-      finally { setLoading(false); }
+      } catch (err) {
+        console.error("Proposals error:", err.response?.data || err.message);
+      } finally {
+        setLoading(false);
+      }
     };
-    fetch();
-  }, [user.id]);
+    fetchProposals();
+  }, [user]);
+
+  if (authLoading) {
+    return (
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", fontFamily:"'Segoe UI',sans-serif" }}>
+        <p style={{ color:"#6b7280" }}>Loading...</p>
+      </div>
+    );
+  }
+
+  if (!user) return <Navigate to="/freelancer/login" replace />;
 
   const counts = {
     pending:  proposals.filter(p => p.status === "pending").length,
@@ -84,12 +93,19 @@ export default function ProposalTracking() {
     rejected: proposals.filter(p => p.status === "rejected").length,
   };
 
+  const handleGoToProject = () => {
+    if (!projectId || isNaN(projectId) || Number(projectId) <= 0) {
+      alert("Please enter a valid Project ID");
+      return;
+    }
+    navigate(`/submit-proposal/${projectId}`);
+  };
+
   return (
     <div style={{ display:"flex", minHeight:"100vh", backgroundColor:"#f0f2f5", fontFamily:"'Segoe UI',sans-serif" }}>
       <Sidebar onNavigate={navigate} />
 
       <div style={{ marginLeft:240, flex:1, display:"flex", flexDirection:"column" }}>
-        {/* Top navbar */}
         <div style={{ backgroundColor:"#fff", padding:"16px 32px", display:"flex", justifyContent:"space-between", alignItems:"center", borderBottom:"1px solid #e5e7eb" }}>
           <span style={{ fontSize:18, fontWeight:700, color:"#111827" }}>My Proposals</span>
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
@@ -104,10 +120,28 @@ export default function ProposalTracking() {
           </div>
         </div>
 
-        {/* Content */}
         <div style={{ padding:32 }}>
           <h1 style={{ fontSize:26, fontWeight:700, color:"#111827", marginBottom:4 }}>Proposal Tracking</h1>
           <p style={{ fontSize:14, color:"#6b7280", marginBottom:28 }}>Monitor the status of all your submitted proposals</p>
+
+          {/* ✅ Submit proposal for any project */}
+          <div style={{ backgroundColor:"#fff", borderRadius:12, padding:"20px 24px", marginBottom:28, boxShadow:"0 1px 4px rgba(0,0,0,0.07)" }}>
+            <div style={{ fontSize:14, fontWeight:600, color:"#374151", marginBottom:12 }}>📝 Submit a Proposal for a Project</div>
+            <div style={{ display:"flex", gap:12 }}>
+              <input
+                type="number" min="1"
+                placeholder="Enter Project ID (e.g. 1, 2, 3...)"
+                value={projectId}
+                onChange={e => setProjectId(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleGoToProject()}
+                style={{ flex:1, padding:"10px 14px", border:"1.5px solid #e5e7eb", borderRadius:8, fontSize:14, backgroundColor:"#f9fafb", outline:"none" }}
+              />
+              <button onClick={handleGoToProject}
+                style={{ padding:"10px 24px", background:"linear-gradient(135deg,#7c3aed,#a855f7)", color:"white", border:"none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:14 }}>
+                Go →
+              </button>
+            </div>
+          </div>
 
           {/* Stats */}
           <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginBottom:28 }}>
@@ -131,11 +165,7 @@ export default function ProposalTracking() {
           {!loading && proposals.length === 0 && (
             <div style={{ backgroundColor:"#fff", borderRadius:12, padding:"60px 32px", textAlign:"center", boxShadow:"0 1px 4px rgba(0,0,0,0.07)" }}>
               <div style={{ fontSize:48, marginBottom:12 }}>📄</div>
-              <p style={{ color:"#6b7280", fontSize:15, marginBottom:16 }}>No proposals yet. Browse projects and submit your first proposal!</p>
-              <button onClick={() => navigate("/freelancer/browse")}
-                style={{ padding:"10px 24px", background:"linear-gradient(135deg,#7c3aed,#a855f7)", color:"white", border:"none", borderRadius:8, cursor:"pointer", fontWeight:600 }}>
-                Browse Projects
-              </button>
+              <p style={{ color:"#6b7280", fontSize:15 }}>No proposals yet. Enter a Project ID above to submit your first proposal!</p>
             </div>
           )}
 
