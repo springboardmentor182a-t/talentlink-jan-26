@@ -6,7 +6,7 @@ from src.database.core import get_db
 from src.auth.models import RegisterRequest, LoginRequest, TokenResponse
 from src.auth.service import register_user, authenticate_user, create_token
 
-router = APIRouter(tags=["Authentication"])  # ← removed prefix="/auth"
+router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
 @router.post("/register")
@@ -30,12 +30,13 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
         "role": user.role
     })
 
+    # ✅ Return full user object so frontend AuthContext can store it
     return {
         "access_token": token,
         "token_type": "bearer",
-        "token": token,
-        "role": user.role,
-        "user": {
+        "token": token,        # ✅ matches AuthContext login(data.token)
+        "role": user.role,     # ✅ matches AuthContext login(data.role)
+        "user": {              # ✅ matches AuthContext login(data.user)
             "id": user.id,
             "name": user.name,
             "email": user.email,
