@@ -4,3 +4,7 @@ sqlalchemy
 passlib[bcrypt]
 python-jose
 pydantic
+email-validator
+python-dotenv
+psycopg2-binary
+exceptiongroup
