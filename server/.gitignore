@@ -1,7 +1,9 @@
 # Python
 __pycache__/
 *.py[cod]
+*.pyc
 *.pyo
+*.pyd
 .Python
 
 # Virtual environment
@@ -12,6 +14,7 @@ env/
 # Environment variables — never commit these
 .env
 .env.*
+.env.local
 !.env.example
 
 # Test artifacts
