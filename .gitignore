@@ -1,62 +1,46 @@
 # React
 client/node_modules
 client/build
-
 # Python
 server/venv
 server/__pycache__/
 server/**/*.pyc
-
 # OS files
 .DS_Store
 Thumbs.db
-
 # Env files
 .env
-
 *.db
 talent.db
-
 # Python cache anywhere in the project
 **/__pycache__/
 **/*.pyc
 **/*.pyo
-
 # Test artifacts
 server/test.db
 server/.pytest_cache/
 server/htmlcov/
 server/.coverage
-
 # Docker
 **/.dockerignore
-
 # Dependencies
 client/client/node_modules/
 server/venv/
-
-
 # Vite build output (different from React build)
 client/dist/
-
 # Python egg info
 server/*.egg-info/
 server/src/*.egg-info/
-
 # JWT / OAuth secrets backup files
 *.pem
 *.key
-
 # VS Code settings (optional — some teams share, some don't)
 .vscode/
-
 # Pytest cache anywhere
 **/.pytest_cache/
-
 # Coverage anywhere
 **/.coverage
 **/htmlcov/
-
 # Python compiled extensions
 **/*.so
 **/*.pyd

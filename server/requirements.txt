@@ -7,6 +7,6 @@ passlib[bcrypt]==1.7.4
 bcrypt==4.0.1
 python-dotenv==1.0.1
 python-multipart==0.0.12
-cachetools==5.5.0       # TTLCache for rate limiter — replaces leaking defaultdict(list)
-psycopg2-binary==2.9.9   # PostgreSQL driver — required when DATABASE_URL=postgresql://
-httpx==0.27.0            # async HTTP client — used for OAuth token exchange with Google/GitHub
+cachetools==5.5.0
+psycopg2-binary==2.9.9
+httpx==0.27.0

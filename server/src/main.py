@@ -4,10 +4,10 @@ from pathlib import Path
 
 from cachetools import TTLCache as _TTLCache
 from dotenv import load_dotenv
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query, HTTPException, status
+from fastapi import FastAPI, Depends, WebSocket, WebSocketDisconnect, Query, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from jose import jwt, JWTError
 from sqlalchemy.orm import Session
+from jose import jwt, JWTError
 
 from src.database.core import engine, Base, get_db, SessionLocal
 
@@ -42,6 +42,7 @@ if SECRET_KEY in _WEAK_KEYS:
         "  python -c \"import secrets; print(secrets.token_hex(32))\""
     )
 
+# Create all database tables on startup
 Base.metadata.create_all(bind=engine)
 
 # ── SMTP startup guard ────────────────────────────────────────────────────────
@@ -189,8 +190,6 @@ async def websocket_endpoint(
     except WebSocketDisconnect:
         pass
     except RuntimeError:
-        # Socket closed before receive_text could run — StrictMode double-invoke
-        # or client navigated away. Safe to ignore.
         pass
     finally:
         manager.disconnect(user_id, websocket)
