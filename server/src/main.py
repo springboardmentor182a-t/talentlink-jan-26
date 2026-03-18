@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import os
+from dotenv import load_dotenv
+
 from src.database.core import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -9,7 +12,12 @@ from src.entities.job import Job
 from src.entities.proposal import Proposal
 from src.auth.controller import router as auth_router
 from src.jobs.controller import router as jobs_router
+from src.users.router import router as users_router
+from src.auth.controller import router as auth_router
+from src.client_dashboard.router import router as client_dashboard_router
 from src.proposals.controller import router as proposals_router
+
+load_dotenv()
 
 # Create all database tables
 Base.metadata.create_all(bind=engine)
@@ -20,10 +28,10 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS — allow React frontend
+# Configure CORS for React frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[os.getenv("CLIENT_ORIGIN", "http://localhost:3000")],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -34,6 +42,10 @@ app.include_router(jobs_router)
 app.include_router(proposals_router)
 # ── Routers ──────────────────────────────────
 app.include_router(auth_router,      prefix="/auth",      tags=["Auth"])
+# Include routers
+app.include_router(auth_router)
+app.include_router(client_dashboard_router)
+app.include_router(users_router)
 app.include_router(proposals_router, prefix="/proposals", tags=["Proposals"])
 
 @app.get("/")
