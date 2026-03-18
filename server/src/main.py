@@ -9,10 +9,14 @@ from sqlalchemy.orm import Session
 
 from pathlib import Path
 import secrets
+from pathlib import Path
+from typing import List
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Query, HTTPException, status
+from fastapi import FastAPI, Depends, WebSocket, WebSocketDisconnect, Query, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from sqlalchemy.orm import Session
 from jose import jwt, JWTError
 
 
@@ -41,34 +45,16 @@ app = FastAPI(title="TalentLink API", version="1.0.0")
 # 3. CORS CONFIGURATION (Dynamic for Team D)
 
 # Import all entity modules so Base.metadata.create_all picks up every table.
-import src.entities.user     # noqa: F401
-import src.entities.todo     # noqa: F401
-import src.entities.message  # noqa: F401
-import src.users.models      # noqa: F401
+import src.entities.user       # noqa: F401
+import src.entities.todo       # noqa: F401
+import src.users.models        # noqa: F401
+import src.entities.message    # noqa: F401
 
-from src.rate_limiter import rate_limit_middleware
-from src.exceptions import error_handler_middleware
-from src.auth.controller import router as auth_router
-from src.users.router import router as users_router
-from src.todos.controller import router as todos_router
-from src.messages.controller import router as messages_router
 
-load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 
-SECRET_KEY = os.getenv("SECRET_KEY", "")
-ALGORITHM  = os.getenv("ALGORITHM", "HS256")
-
-# ── Startup guard — also enforced in auth/service.py but repeated here so
-#    the WS endpoint (which duplicates JWT decode logic) is also protected.
-_WEAK_KEYS = {"", "your-secret-key-change-in-production", "secret", "changeme"}
-if SECRET_KEY in _WEAK_KEYS:
-    raise RuntimeError(
-        "SECRET_KEY is not set or is using the insecure default. "
-        "Set a strong random value in your .env file:\n"
-        "  python -c \"import secrets; print(secrets.token_hex(32))\""
-    )
-
+# Create all database tables on startup
 Base.metadata.create_all(bind=engine)
+
 
 # ── SMTP startup guard ────────────────────────────────────────────────────────
 # In production/staging the password reset flow sends real emails.
@@ -87,6 +73,10 @@ if _APP_ENV != "development":
             "Add them to your .env file or set APP_ENV=development to suppress this check. "
             "See README — SMTP Configuration."
         )
+from src.auth.controller import router as auth_router
+from src.users.router import router as users_router
+from src.todos.controller import router as todos_router
+from src.messages.controller import router as messages_router
 
 app = FastAPI(title="TalentLink API", version="1.0.0")
 

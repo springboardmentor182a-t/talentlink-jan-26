@@ -1,6 +1,5 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Enum, Text, DECIMAL, JSON, DateTime, Float
 # server/src/users/models.py
-from sqlalchemy import Column, Integer, String, ForeignKey, Text, DECIMAL, JSON, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Enum, Text, DECIMAL, JSON, DateTime, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -74,7 +73,6 @@ class ClientProfile(Base):
     user = relationship("User", back_populates="client_profile")
 
 # 5. The Proposal Table
-# 5. The Proposal Table
 class Proposal(Base):
     __tablename__ = "proposals"
     id = Column(Integer, primary_key=True, index=True)
@@ -98,3 +96,11 @@ class Proposal(Base):
 
     # Let the database handle the date automatically!
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+# --- NEW SKILL TABLE ADDED HERE ---
+class Skill(Base):
+    __tablename__ = "skills"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True, index=True)
