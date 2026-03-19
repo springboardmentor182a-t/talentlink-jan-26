@@ -26,33 +26,28 @@ class ClientDashboardService:
             ProjectSummary(
                 id=p.id,
                 title=p.title,
-                category=p.category,
-                budget=p.budget,
+                category=p.category if p.category else "General",  # ← fix None
+                budget=str(p.budget) if p.budget else "0",          # ← fix float
                 status=p.status
             ) for p in projects
         ]
 
     @staticmethod
     def get_chart_data(db: Session):
-        # Generate chart data for the past 7 days based on project creation
         end_date = datetime.utcnow()
         start_date = end_date - timedelta(days=6)
         
-        # Initialize dictionary with 0 counts for the last 7 days
-        days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
         chart_data_dict = {
             (start_date + timedelta(days=i)).strftime("%a"): 0 
             for i in range(7)
         }
         
-        # Get projects created in the last 7 days
         recent_projects = db.query(Project).filter(Project.created_at >= start_date).all()
         for p in recent_projects:
             day_name = p.created_at.strftime("%a")
             if day_name in chart_data_dict:
                 chart_data_dict[day_name] += 1
                 
-        # Format for responsive container
         ordered_data = [
             {"name": (start_date + timedelta(days=i)).strftime("%a"), "value": chart_data_dict[(start_date + timedelta(days=i)).strftime("%a")]}
             for i in range(7)
@@ -62,8 +57,7 @@ class ClientDashboardService:
 
     @staticmethod
     def get_unread_messages_count(db: Session):
-        # Placeholder for future implementation
-        return UnreadMessages(count=3) # Match screenshot
+        return UnreadMessages(count=3)
 
     @staticmethod
     def get_contract_stats(db: Session):
@@ -71,12 +65,10 @@ class ClientDashboardService:
         active = db.query(Contract).filter(Contract.status == 'active').count()
         completed = db.query(Contract).filter(Contract.status == 'completed').count()
         
-        # Simple summation for investment
         total_value = 0
         all_contracts = db.query(Contract).all()
         for c in all_contracts:
             try:
-                # Basic string to number conversion if possible, or just mock for demo
                 val = int(c.contract_value.replace('$', '').replace(',', ''))
                 total_value += val
             except:
@@ -134,15 +126,12 @@ class ClientDashboardService:
         if not proposal:
             return None
         
-        # 1. Update Proposal status
         proposal.status = 'accepted'
         
-        # 2. Update Project status
         project = db.query(Project).filter(Project.id == proposal.project_id).first()
         if project:
             project.status = 'in progress'
         
-        # 3. Create Contract
         contract = Contract(
             title=f"Contract for {project.title if project else 'Project'}",
             freelancer_name=proposal.freelancer_name,
@@ -152,9 +141,8 @@ class ClientDashboardService:
             start_date=datetime.utcnow()
         )
         db.add(contract)
-        db.flush() # Get contract.id
+        db.flush()
 
-        # 4. Create initial Milestone
         milestone = Milestone(
             contract_id=contract.id,
             title="Initial Deliverable",

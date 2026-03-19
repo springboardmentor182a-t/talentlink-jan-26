@@ -37,7 +37,7 @@ export default function ClientLogin() {
         return;
       }
       login({ token: res.data.token, role: userRole, user: res.data.user });
-      navigate("/client/dashboard");
+      navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.detail || "Invalid email or password. Please try again.");
     } finally { setLoading(false); }
@@ -48,6 +48,10 @@ export default function ClientLogin() {
       <div style={{ backgroundColor:"#fff", borderRadius:16, padding:"40px 36px", width:"100%", maxWidth:420, boxShadow:"0 4px 24px rgba(0,0,0,0.09)" }}>
         
         {/* Logo */}
+        <button onClick={() => navigate("/")}
+  style={{ background:"none", border:"none", fontSize:14, color:"#2563eb", cursor:"pointer", padding:0, marginBottom:16, display:"flex", alignItems:"center", gap:6 }}>
+  ← Back
+</button>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:24 }}>
           <div style={{ width:40, height:40, background:"linear-gradient(135deg,#2563eb,#3b82f6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontSize:20 }}>💼</div>
           <span style={{ fontWeight:700, fontSize:20, color:"#2563eb" }}>TalentLink</span>
