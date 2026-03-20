@@ -28,112 +28,18 @@ const ClientDashboard = () => {
                     fetch(`${process.env.REACT_APP_BASE_URL}/api/client/dashboard/charts`)
                 ]);
 
-                let statsData = await statsRes.json();
-                let projectsData = await projectsRes.json();
-                let chartDataResponse = await chartRes.json();
+                const statsData = statsRes.ok ? await statsRes.json() : null;
+                const projectsData = projectsRes.ok ? await projectsRes.json() : [];
+                const chartDataResponse = chartRes.ok ? await chartRes.json() : null;
 
-                // Mock data if API returns empty or error
-                if (!statsData || Object.keys(statsData).length === 0) {
-                    statsData = {
-                        active_projects: 3,
-                        active_contracts: 2,
-                        proposals_received: 12,
-                        total_spent: '$25,000'
-                    };
-                }
-                if (!projectsData || projectsData.length === 0) {
-                    projectsData = [
-                        {
-                            id: 1,
-                            title: 'Mobile App Development',
-                            budget: '$5,000',
-                            status: 'In Progress',
-                            progress: 60,
-                            freelancer: 'John Dev',
-                            deadline: '2024-03-15'
-                        },
-                        {
-                            id: 2,
-                            title: 'Website Redesign',
-                            budget: '$3,500',
-                            status: 'Completed',
-                            progress: 100,
-                            freelancer: 'Jane Designer',
-                            deadline: '2023-12-31'
-                        },
-                        {
-                            id: 3,
-                            title: 'API Integration',
-                            budget: '$2,000',
-                            status: 'In Progress',
-                            progress: 45,
-                            freelancer: 'Bob Backend',
-                            deadline: '2024-02-28'
-                        }
-                    ];
-                }
-                if (!chartDataResponse || !chartDataResponse.data || chartDataResponse.data.length === 0) {
-                    chartDataResponse = {
-                        data: [
-                            { month: 'Jan', value: 400 },
-                            { month: 'Feb', value: 600 },
-                            { month: 'Mar', value: 800 },
-                            { month: 'Apr', value: 1200 },
-                            { month: 'May', value: 1400 },
-                            { month: 'Jun', value: 1800 }
-                        ]
-                    };
-                }
-
-                setStats(statsData);
-                setProjects(projectsData);
-                setChartData(chartDataResponse.data);
+                setStats(statsData && Object.keys(statsData).length > 0 ? statsData : null);
+                setProjects(Array.isArray(projectsData) ? projectsData : []);
+                setChartData(chartDataResponse?.data?.length > 0 ? chartDataResponse.data : []);
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
-                // Set mock data on error
-                setStats({
-                    active_projects: 3,
-                    active_contracts: 2,
-                    proposals_received: 12,
-                    total_spent: '$25,000'
-                });
-                setProjects([
-                    {
-                        id: 1,
-                        title: 'Mobile App Development',
-                        budget: '$5,000',
-                        status: 'In Progress',
-                        progress: 60,
-                        freelancer: 'John Dev',
-                        deadline: '2024-03-15'
-                    },
-                    {
-                        id: 2,
-                        title: 'Website Redesign',
-                        budget: '$3,500',
-                        status: 'Completed',
-                        progress: 100,
-                        freelancer: 'Jane Designer',
-                        deadline: '2023-12-31'
-                    },
-                    {
-                        id: 3,
-                        title: 'API Integration',
-                        budget: '$2,000',
-                        status: 'In Progress',
-                        progress: 45,
-                        freelancer: 'Bob Backend',
-                        deadline: '2024-02-28'
-                    }
-                ]);
-                setChartData([
-                    { month: 'Jan', value: 400 },
-                    { month: 'Feb', value: 600 },
-                    { month: 'Mar', value: 800 },
-                    { month: 'Apr', value: 1200 },
-                    { month: 'May', value: 1400 },
-                    { month: 'Jun', value: 1800 }
-                ]);
+                setStats(null);
+                setProjects([]);
+                setChartData([]);
             } finally {
                 setLoading(false);
             }
@@ -181,41 +87,55 @@ const ClientDashboard = () => {
             </header>
 
             {/* Stats Grid */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                gap: '24px',
-                marginBottom: '32px'
-            }}>
-                <StatsCard
-                    title="Active Projects"
-                    value={stats.active_projects}
-                    icon={Briefcase}
-                    color="#2563eb"
-                    bgColor="#EFF6FF"
-                />
-                <StatsCard
-                    title="Pending Proposals"
-                    value={stats.pending_proposals}
-                    icon={FileText}
-                    color="#f97316"
-                    bgColor="#FFF7ED"
-                />
-                <StatsCard
-                    title="Active Contracts"
-                    value={stats.active_contracts}
-                    icon={CheckCircle}
-                    color="#16a34a"
-                    bgColor="#F0FDF4"
-                />
-                <StatsCard
-                    title="Completed Projects"
-                    value={stats.completed_projects}
-                    icon={Star}
-                    color="#9333ea"
-                    bgColor="#FAF5FF"
-                />
-            </div>
+            {stats ? (
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                    gap: '24px',
+                    marginBottom: '32px'
+                }}>
+                    <StatsCard
+                        title="Active Projects"
+                        value={stats.active_projects ?? 0}
+                        icon={Briefcase}
+                        color="#2563eb"
+                        bgColor="#EFF6FF"
+                    />
+                    <StatsCard
+                        title="Pending Proposals"
+                        value={stats.pending_proposals ?? 0}
+                        icon={FileText}
+                        color="#f97316"
+                        bgColor="#FFF7ED"
+                    />
+                    <StatsCard
+                        title="Active Contracts"
+                        value={stats.active_contracts ?? 0}
+                        icon={CheckCircle}
+                        color="#16a34a"
+                        bgColor="#F0FDF4"
+                    />
+                    <StatsCard
+                        title="Completed Projects"
+                        value={stats.completed_projects ?? 0}
+                        icon={Star}
+                        color="#9333ea"
+                        bgColor="#FAF5FF"
+                    />
+                </div>
+            ) : (
+                <div style={{
+                    padding: '24px',
+                    backgroundColor: '#F8FAFC',
+                    borderRadius: '12px',
+                    border: '1px solid #E2E8F0',
+                    textAlign: 'center',
+                    color: '#64748B',
+                    marginBottom: '32px'
+                }}>
+                    No statistics available yet.
+                </div>
+            )}
 
             {/* Main Content Grid */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
