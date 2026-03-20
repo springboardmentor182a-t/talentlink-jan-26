@@ -70,25 +70,21 @@ function AppRoutes() {
           <ProtectedRoute allowedRole="client"><ViewProposal /></ProtectedRoute>
         } />
 
-        {/* Dashboard routes */}
+        {/* Dashboard routes - auth guard temporarily removed */}
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute allowedRole="client">
-              <DashboardLayout>
-                <ClientDashboard />
-              </DashboardLayout>
-            </ProtectedRoute>
+            <DashboardLayout>
+              <ClientDashboard />
+            </DashboardLayout>
           }
         />
         <Route
           path="/contracts"
           element={
-            <ProtectedRoute allowedRole="client">
-              <DashboardLayout>
-                <Contracts />
-              </DashboardLayout>
-            </ProtectedRoute>
+            <DashboardLayout>
+              <Contracts />
+            </DashboardLayout>
           }
         />
 

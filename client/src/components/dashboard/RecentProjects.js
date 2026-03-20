@@ -20,7 +20,18 @@ const RecentProjects = ({ projects }) => {
             <p style={{ color: 'var(--muted-foreground)', marginBottom: '20px' }}>Your most recently posted projects</p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {projects.map((project) => (
+                {projects.length === 0 ? (
+                    <div style={{
+                        padding: '32px',
+                        textAlign: 'center',
+                        color: 'var(--muted-foreground)',
+                        backgroundColor: '#F8FAFC',
+                        borderRadius: '8px',
+                        border: '1px dashed var(--border)'
+                    }}>
+                        No recent projects found.
+                    </div>
+                ) : projects.map((project) => (
                     <div key={project.id} style={{
                         display: 'flex',
                         justifyContent: 'space-between',
