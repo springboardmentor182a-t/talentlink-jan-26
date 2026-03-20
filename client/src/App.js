@@ -18,6 +18,7 @@ import ProposalTracking from "./pages/proposal/ProposalTracking";
 import Sidebar from "./layout/Sidebar";
 import ClientDashboard from "./pages/ClientDashboard";
 import Contracts from "./pages/Contracts";
+import FreelancerContracts from "./pages/freelancer/FreelancerContracts";
 
 import "./App.css";
 
@@ -84,6 +85,14 @@ function AppRoutes() {
           element={
             <DashboardLayout>
               <Contracts />
+            </DashboardLayout>
+          }
+        />
+        <Route
+          path="/freelancer/contracts"
+          element={
+            <DashboardLayout>
+              <FreelancerContracts />
             </DashboardLayout>
           }
         />
