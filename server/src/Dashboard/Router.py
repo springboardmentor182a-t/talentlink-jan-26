@@ -1,31 +1,51 @@
-from src.proposals import models
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import func
 
-# Import your database connection
+# Imports
 from src.database.core import get_db
-# Import your database tables (adjust this path if your models are elsewhere)
-from src.proposals import models 
+from src.auth.dependencies import get_current_user
+from src.entities.user import User
+from src.users.models import FreelancerProfile, Proposal
+from src.proposals import models # Keeping your project/contract models
 
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
 @router.get("/")
-def get_dashboard_stats(db: Session = Depends(get_db)):
+def get_dashboard_stats(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user) # Ensures we only get data for the logged-in user!
+):
+    # 1. Get the actual profile for whoever is logged in
+    profile = db.query(FreelancerProfile).filter(FreelancerProfile.user_id == current_user.id).first()
     
-    # 1. Perform SQL Queries via SQLAlchemy
+    # Fallback to their email prefix if they haven't set a full name yet
+    user_name = profile.full_name if profile else current_user.email.split('@')[0]
+    freelancer_id = profile.id if profile else 0
+
+    # 2. Dynamically count pending proposals & sum earnings
+    pending_proposals_count = db.query(Proposal).filter(
+        Proposal.freelancer_id == freelancer_id,
+        Proposal.status == "pending"
+    ).count()
+
+    earnings_sum = db.query(func.sum(Proposal.bid_amount)).filter(
+        Proposal.freelancer_id == freelancer_id,
+        Proposal.status == "accepted"
+    ).scalar() or 0.0
+
+    # 3. Get Active Projects and Contracts (From your original code)
     active_projects_count = db.query(models.Project).count()
-    
-   
     active_contract = db.query(models.Contract).filter(models.Contract.status == "Active").first()
     
-    # 2. Return the dynamic data
+    # 4. Return the fully dynamic data!
     return {
-        "user": "John", # Later, you can update this to the actual logged-in user
+        "user": user_name,
         "stats": {
             "active_projects": active_projects_count,
-            "pending_proposals": 12, # Replace with pending_proposals_count when that table exists
-            "total_earnings": "$4.5k",
-            "profile_views": 247
+            "pending_proposals": pending_proposals_count,
+            "total_earnings": f"${earnings_sum:,.0f}",
+            "profile_views": getattr(profile, 'profile_views', 0) if profile else 0
         },
         "active_contract": {
             "title": active_contract.title if active_contract else "No active contracts",
