@@ -1,0 +1,82 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DEV ONLY — hot reload for both server and client.
+# Production compose is docker-compose.yml.
+#
+# Usage:
+#   1. Copy .env.example → .env and fill in values
+#   2. docker compose -f docker-compose.dev.yml up --build
+#   3. App → http://localhost:3000   API → http://localhost:8000
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: talentlink_db_dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB}
+      POSTGRES_USER:     ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+  # ── FastAPI — hot reload via --reload + volume mount ────────────────────────
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile          # reuse the same image (venv is already built)
+      target: deps                    # stop at the deps stage — no non-root user, src not baked in
+    container_name: talentlink_server_dev
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL:                postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      SECRET_KEY:                  ${SECRET_KEY}
+      ALGORITHM:                   ${ALGORITHM:-HS256}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      ALLOWED_ORIGINS:             ${ALLOWED_ORIGINS:-http://localhost:3000}
+      APP_ENV:                     ${APP_ENV:-development}
+      SMTP_HOST:                   ${SMTP_HOST:-}
+      SMTP_PORT:                   ${SMTP_PORT:-587}
+      SMTP_USER:                   ${SMTP_USER:-}
+      SMTP_PASSWORD:               ${SMTP_PASSWORD:-}
+      SMTP_FROM:                   ${SMTP_FROM:-}
+      FRONTEND_URL:                ${FRONTEND_URL:-http://localhost:3000}
+    volumes:
+      - ./server/src:/app/src         # mount source — uvicorn --reload picks up changes
+    ports:
+      - "8000:8000"
+    command: /app/venv/bin/uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+
+
+  # ── React — Vite dev server with HMR ────────────────────────────────────────
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev      # the lightweight node:20-alpine + npm run dev image
+    container_name: talentlink_client_dev
+    restart: unless-stopped
+    depends_on:
+      - server
+    volumes:
+      - ./client/src:/app/src         # mount source — Vite HMR picks up changes
+    ports:
+      - "3000:5173"
+
+
+volumes:
+  postgres_data_dev:
