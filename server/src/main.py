@@ -353,69 +353,6 @@ async def websocket_endpoint(
 from sqlalchemy.sql import func
 from src.users.models import FreelancerProfile, Proposal, Skill
 
-@app.get("/dashboard/")
-def get_dashboard(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    # Dynamically fetch profile for logged-in user
-    profile = db.query(FreelancerProfile).filter(FreelancerProfile.user_id == current_user.id).first()
-    user_name = profile.full_name if profile else current_user.email.split('@')[0]
-    freelancer_id = profile.id if profile else 0
-
-    # Count pending proposals
-    pending_proposals_count = db.query(Proposal).filter(
-        Proposal.freelancer_id == freelancer_id,
-        Proposal.status == "pending"
-    ).count()
-
-    # Sum total earnings
-    earnings_sum = db.query(func.sum(Proposal.bid_amount)).filter(
-        Proposal.freelancer_id == freelancer_id,
-        Proposal.status == "accepted"
-    ).scalar() or 0.0
-    
-    return {
-        "user": user_name,
-        "stats": {
-            "active_projects": 0, 
-            "pending_proposals": pending_proposals_count,
-            "total_earnings": f"${earnings_sum:,.0f}",
-            "profile_views": getattr(profile, 'profile_views', 0) if profile else 0
-        },
-        "active_contract": {
-            "title": "No active contracts",
-            "due": "N/A",
-            "progress": 0
-        }
-    }
-
-@app.post("/dashboard/seed-test-data")
-def seed_dashboard_data(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    """Creates fake profile and proposals to test the dynamic dashboard math"""
-    profile = db.query(FreelancerProfile).filter(FreelancerProfile.user_id == current_user.id).first()
-    if not profile:
-        profile = FreelancerProfile(
-            user_id=current_user.id,
-            full_name="John (Dynamic)",
-            title="Full Stack Developer"
-        )
-        db.add(profile)
-        db.commit()
-        db.refresh(profile)
-
-    fake_proposals = [
-        Proposal(freelancer_id=profile.id, project_id=1, bid_amount=1500.00, status="accepted"),
-        Proposal(freelancer_id=profile.id, project_id=2, bid_amount=3000.00, status="accepted"),
-        Proposal(freelancer_id=profile.id, project_id=3, bid_amount=500.00, status="pending"),
-        Proposal(freelancer_id=profile.id, project_id=4, bid_amount=800.00, status="pending"),
-    ]
-    db.add_all(fake_proposals)
-    db.commit()
-    return {"message": "Test data created! Refresh your dashboard."}
 
 
 @app.get("/api/skills", tags=["Skills"])
