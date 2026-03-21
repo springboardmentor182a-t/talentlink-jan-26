@@ -1,19 +1,30 @@
-FROM node:20-alpine
+# ── Stage 1: build the React/Vite app ────────────────────────────────────────
+FROM node:20-alpine AS build
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json ./
+# Copy manifests first — npm ci layer is cached unless deps change.
+COPY package.json package-lock.json* ./
+RUN npm ci
 
-# Install dependencies
-RUN npm install
+# VITE_API_URL is baked into the JS bundle at build time by Vite.
+# Must be the URL the BROWSER uses to reach the API — not the internal Docker hostname.
+# Example: http://localhost:8000/api (local) or https://api.talentlink.com/api (prod)
+ARG VITE_API_URL=/api
+ENV VITE_API_URL=$VITE_API_URL
 
-# Copy source code (volume mount will override this in dev, but good practice)
 COPY . .
+RUN npm run build
 
-# Expose port
-EXPOSE 5173
 
-# Start Vite development server natively listening on all interfaces
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+# ── Stage 2: serve with nginx ─────────────────────────────────────────────────
+FROM nginx:1.27-alpine AS runtime
+
+RUN rm -rf /usr/share/nginx/html/*
+
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,6 +1,5 @@
-# server/src/projects/schemas.py
-from pydantic import BaseModel, Field
-from typing import Optional
+from pydantic import BaseModel, Field, ConfigDict
+from typing import Optional, List
 from datetime import datetime
 from decimal import Decimal
 
@@ -29,12 +28,11 @@ class ProjectResponse(ProjectBase):
     created_at: datetime
     updated_at: Optional[datetime] = None
 
-    class ConfigDict:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 # 5. List Response Schema (For paginated endpoints)
 class ProjectListResponse(BaseModel):
-    items: list[ProjectResponse]
+    items: List[ProjectResponse]
     total_count: int
     skip: int
     limit: int

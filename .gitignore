@@ -1,18 +1,37 @@
-# React
-client/node_modules
-client/build
+# React / Vite
+client/node_modules/
+client/build/
+client/dist/
 
 # Python
-server/venv
-server/__pycache__/
-server/**/*.pyc
+server/venv/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.so
+**/*.pyd
+server/*.egg-info/
+server/src/*.egg-info/
+
+# Databases
+*.db
+
+# Env files / Secrets
+.env
+*.pem
+*.key
+
+# Test artifacts
+**/.pytest_cache/
+**/.coverage
+**/htmlcov/
+
+# Docker
+**/.dockerignore
 
 # OS files
 .DS_Store
 Thumbs.db
 
-# Env files
-.env
-
-
-talentlink.db
+# Editor
+.vscode/
