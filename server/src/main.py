@@ -4,24 +4,29 @@ from src.projects.controller import router as projects_router
 from src.client_dashboard.controller import router as client_dashboard_router
 from src.database.core import engine, Base
 
-# Create tables if they don't exist (useful for dev)
+# Create tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="TalentLink API", version="1.0.0")
 
-# Configure CORS
+# CORS CONFIG
+origins = [
+    "http://localhost:3000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust in production
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include Routers
+# ROUTERS
 app.include_router(projects_router)
 app.include_router(client_dashboard_router)
 
+# HOME ROUTE
 @app.get("/")
 def home():
-    return {"message": "Backend working ✅", "status": "online"}
+    return {"message": "TalentLink API Running", "status": "online"}

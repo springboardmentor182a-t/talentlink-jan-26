@@ -5,18 +5,21 @@ import {
   MessageSquare,
   Settings,
   LogOut,
+  Search
 } from "lucide-react";
 
 const Sidebar = () => {
   const menuItems = [
-    { name: "Dashboard", icon: <LayoutDashboard size={20} />, active: true },
-    { name: "Projects", icon: <Briefcase size={20} />, active: false },
+    { name: "Dashboard", icon: <LayoutDashboard size={20} />, active: false },
+    { name: "Find Projects", icon: <Search size={20} />, active: true },
+    { name: "My Proposals", icon: <Briefcase size={20} />, active: false },
     { name: "Messages", icon: <MessageSquare size={20} />, active: false },
     { name: "Settings", icon: <Settings size={20} />, active: false },
   ];
 
   return (
     <div className="w-64 h-screen bg-gray-900 text-white flex flex-col p-4">
+      
       {/* Logo */}
       <div className="flex items-center gap-2 mb-10 px-2">
         <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-xl">
