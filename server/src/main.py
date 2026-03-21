@@ -133,14 +133,6 @@ class ConnectionManager:
     async def connect(self, user_id: int, websocket: WebSocket):
         await websocket.accept()
 
-        if user_id in self.active_connections:
-            try: await self.active_connections[user_id].close(code=4000)
-            except: pass
-        self.active_connections[user_id] = websocket
-
-    def disconnect(self, user_id: int, websocket: WebSocket):
-
-
         # Gracefully close an existing socket (second-tab scenario) before
         # replacing the reference so we don't leak connection objects.
         if user_id in self.active_connections:
@@ -155,17 +147,10 @@ class ConnectionManager:
     def disconnect(self, user_id: int, websocket: WebSocket):
         # Only remove if it's still THIS socket — a second tab may have already
         # replaced the reference before the first tab's disconnect fires.
-
         if self.active_connections.get(user_id) is websocket:
             del self.active_connections[user_id]
 
     async def send_to_user(self, user_id: int, payload: dict):
-
-        websocket = self.active_connections.get(user_id)
-        if websocket:
-            try: await websocket.send_json(payload)
-            except: self.active_connections.pop(user_id, None)
-
         """Push a JSON payload to a specific user. Silent no-op if offline."""
         websocket = self.active_connections.get(user_id)
         if websocket:
@@ -177,7 +162,6 @@ class ConnectionManager:
 
     def is_online(self, user_id: int) -> bool:
         return user_id in self.active_connections
-
 
     def online_user_ids(self) -> list[int]:
         return list(self.active_connections.keys())
@@ -363,7 +347,97 @@ async def websocket_endpoint(
                 "status":  "offline",
             })
 
+# ==========================================================
+# --- ENDPOINTS: Dashboard & Skills (Dynamic Data) ---
+# ==========================================================
+from sqlalchemy.sql import func
+from src.users.models import FreelancerProfile, Proposal, Skill
 
+@app.get("/dashboard/")
+def get_dashboard(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    # Dynamically fetch profile for logged-in user
+    profile = db.query(FreelancerProfile).filter(FreelancerProfile.user_id == current_user.id).first()
+    user_name = profile.full_name if profile else current_user.email.split('@')[0]
+    freelancer_id = profile.id if profile else 0
+
+    # Count pending proposals
+    pending_proposals_count = db.query(Proposal).filter(
+        Proposal.freelancer_id == freelancer_id,
+        Proposal.status == "pending"
+    ).count()
+
+    # Sum total earnings
+    earnings_sum = db.query(func.sum(Proposal.bid_amount)).filter(
+        Proposal.freelancer_id == freelancer_id,
+        Proposal.status == "accepted"
+    ).scalar() or 0.0
+    
+    return {
+        "user": user_name,
+        "stats": {
+            "active_projects": 0, 
+            "pending_proposals": pending_proposals_count,
+            "total_earnings": f"${earnings_sum:,.0f}",
+            "profile_views": getattr(profile, 'profile_views', 0) if profile else 0
+        },
+        "active_contract": {
+            "title": "No active contracts",
+            "due": "N/A",
+            "progress": 0
+        }
+    }
+
+@app.post("/dashboard/seed-test-data")
+def seed_dashboard_data(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Creates fake profile and proposals to test the dynamic dashboard math"""
+    profile = db.query(FreelancerProfile).filter(FreelancerProfile.user_id == current_user.id).first()
+    if not profile:
+        profile = FreelancerProfile(
+            user_id=current_user.id,
+            full_name="John (Dynamic)",
+            title="Full Stack Developer"
+        )
+        db.add(profile)
+        db.commit()
+        db.refresh(profile)
+
+    fake_proposals = [
+        Proposal(freelancer_id=profile.id, project_id=1, bid_amount=1500.00, status="accepted"),
+        Proposal(freelancer_id=profile.id, project_id=2, bid_amount=3000.00, status="accepted"),
+        Proposal(freelancer_id=profile.id, project_id=3, bid_amount=500.00, status="pending"),
+        Proposal(freelancer_id=profile.id, project_id=4, bid_amount=800.00, status="pending"),
+    ]
+    db.add_all(fake_proposals)
+    db.commit()
+    return {"message": "Test data created! Refresh your dashboard."}
+
+
+@app.get("/api/skills", tags=["Skills"])
+def get_all_skills(db: Session = Depends(get_db)):
+    skills = db.query(Skill).all()
+    return [{"id": skill.id, "name": skill.name} for skill in skills]
+
+
+@app.post("/api/skills/seed", tags=["Skills"])
+def seed_skills(db: Session = Depends(get_db)):
+    """A temporary endpoint to fill the database with initial skills"""
+    initial_skills = [
+        'React', 'Node.js', 'TypeScript', 'JavaScript', 'Python', 
+        'MongoDB', 'PostgreSQL', 'AWS', 'Docker', 'Git', 'REST API'
+    ]
+    for skill_name in initial_skills:
+        existing_skill = db.query(Skill).filter(Skill.name == skill_name).first()
+        if not existing_skill:
+            db.add(Skill(name=skill_name))
+            
+    db.commit()
+    return {"message": "Database seeded with default skills successfully!"}
 seed_database()
 
 @app.get("/")
