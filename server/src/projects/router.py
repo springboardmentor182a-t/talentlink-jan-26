@@ -10,18 +10,17 @@ from src.projects.service import ProjectService
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-# In a real app, this would come from a JWT dependency `get_current_user`
-# But based on instructions, we will mock the client_id for now as 1 (assuming client exists)
-def get_mock_client_id() -> int:
-    return 1
+from src.auth.dependencies import get_current_user
+from src.entities.user import User
 
 @router.post("/", response_model=schemas.ProjectResponse)
 def create_project(
     project: schemas.ProjectCreate, 
     db: Session = Depends(get_db),
-    client_id: int = Depends(get_mock_client_id)
+    current_user: User = Depends(get_current_user)
 ):
     """Post a new project to the marketplace"""
+    client_id = current_user.id
     logger.info(f"Client {client_id} attempting to post a new project: {project.title}")
     
     # Optional logic: we could verify the client_id actually exists in `profiles_client`

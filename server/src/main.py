@@ -14,7 +14,7 @@ import src.entities.user      # noqa: F401 - registers User table
 import src.entities.todo      # noqa: F401 - registers Todo table
 import src.entities.message   # noqa: F401 - registers Message table
 import src.users.models       # noqa: F401 - registers FreelancerProfile, ClientProfile tables
-import src.projects.models    # noqa: F401 - registers Project table
+import src.entities.project   # noqa: F401 - registers Project table
 
 from src.rate_limiter import rate_limit_middleware
 from src.exceptions import error_handler_middleware

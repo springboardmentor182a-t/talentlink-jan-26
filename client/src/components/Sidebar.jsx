@@ -9,12 +9,19 @@ export default function Sidebar() {
     return location.pathname === path ? "bg-orange-50 text-orange-600 border-r-4 border-orange-500" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900";
   };
 
+  const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
+  const isClient = user?.role === "client";
+
   const menuItems = [
     { path: "/", label: "Dashboard", icon: LayoutDashboard },
     { path: "/profile/freelancer", label: "Freelancer Profile", icon: User },
     { path: "/profile/client", label: "Company Profile", icon: Building2 },
-    { path: "/jobs", label: "Job Postings", icon: Briefcase }, // We will build this later
-    // 2. Added the Contracts link here
+    { 
+      path: isClient ? "/post-project" : "/projects", 
+      label: "Job Postings", 
+      icon: Briefcase 
+    },
     { path: "/contracts", label: "Contracts", icon: FileText }, 
   ];
 

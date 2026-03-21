@@ -1,4 +1,3 @@
-# server/src/projects/models.py
 from sqlalchemy import Column, Integer, String, Text, DECIMAL, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -15,7 +14,7 @@ class Project(Base):
     budget = Column(DECIMAL(10, 2), nullable=False)
     
     # Foreign Keys
-    client_id = Column(Integer, ForeignKey("profiles_client.id"), nullable=False)
+    client_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     
     # Optional / Auto
     status = Column(String(50), default="open")  # open, in_progress, completed, cancelled
@@ -23,4 +22,4 @@ class Project(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Relationships
-    client = relationship("ClientProfile", backref="posted_projects")
+    client = relationship("User", backref="posted_projects")
