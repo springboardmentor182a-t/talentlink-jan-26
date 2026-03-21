@@ -1,18 +1,15 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from src.projects.controller import router as projects_router
+from src.client_dashboard.controller import router as client_dashboard_router
+from src.database.core import engine, Base
 
-from src.database.core import engine, Base, SessionLocal
-from src.entities.project import Project
-import src.entities
-
-app = FastAPI()
-
+# Create tables
 Base.metadata.create_all(bind=engine)
 
-# -----------------------------
+app = FastAPI(title="TalentLink API", version="1.0.0")
+
 # CORS CONFIG
-# -----------------------------
 origins = [
     "http://localhost:3000",
 ]
@@ -25,81 +22,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# -----------------------------
+# ROUTERS
+app.include_router(projects_router)
+app.include_router(client_dashboard_router)
+
 # HOME ROUTE
-# -----------------------------
 @app.get("/")
 def home():
-    return {"message": "TalentLink API Running"}
-
-
-# -----------------------------
-# PROJECTS ROUTE (DATABASE + SEARCH)
-# -----------------------------
-@app.get("/projects")
-def get_projects(search: str = Query(default="")):
-
-    db = SessionLocal()
-
-    query = db.query(Project)
-
-    if search:
-        query = query.filter(Project.title.ilike(f"%{search}%"))
-
-    projects = query.all()
-
-    result = []
-
-    for p in projects:
-        result.append({
-            "id": p.id,
-            "title": p.title,
-            "description": p.description,
-            "budget": p.budget,
-            "duration": p.duration,
-            "skills_required": p.skills_required,
-            "status": p.status
-        })
-
-    db.close()
-
-    return result
-
-
-# -----------------------------
-# APPLY TO PROJECT
-# -----------------------------
-class Application(BaseModel):
-    project_id: int
-    freelancer_id: int
-
-
-@app.post("/apply")
-def apply_project(application: Application):
-
-    print("Freelancer", application.freelancer_id, "applied to project", application.project_id)
-
-    return {
-        "message": "Application submitted successfully"
-    }
-from pydantic import BaseModel
-
-# -----------------------------
-# APPLY REQUEST MODEL
-# -----------------------------
-class ApplyRequest(BaseModel):
-    project_id: int
-    freelancer_id: int
-
-
-# -----------------------------
-# APPLY ROUTE
-# -----------------------------
-@app.post("/apply")
-def apply_project(data: ApplyRequest):
-
-    print(f"Freelancer {data.freelancer_id} applied to project {data.project_id}")
-
-    return {
-        "message": "Application submitted successfully"
-    }
+    return {"message": "TalentLink API Running", "status": "online"}
