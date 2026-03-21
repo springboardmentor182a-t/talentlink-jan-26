@@ -12,7 +12,7 @@ class UserRegister(BaseModel):
     # MUST FIX (applied): was `str` with no validation — any value including
     # "admin" was silently written to the DB. Literal enforces the allowed set
     # at the Pydantic layer before the service is ever called.
-    role: Literal["freelancer", "client", "both"] = "freelancer"
+    role: Literal["freelancer", "client"] = "freelancer"
 
 
 class UserLogin(BaseModel):

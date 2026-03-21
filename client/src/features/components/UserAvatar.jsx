@@ -1,3 +1,5 @@
+import '../../assets/messages.css';
+
 const AVATAR_COLORS = [
   '#f97316', '#0ea5e9', '#10b981', '#8b5cf6',
   '#f43f5e', '#f59e0b', '#06b6d4', '#84cc16',
@@ -23,38 +25,21 @@ const UserAvatar = ({ username = '', size = 38, showOnline = false, isOnline = f
   const initials = getInitials(username);
 
   return (
-    <div style={{ position: 'relative', display: 'inline-flex', flexShrink: 0 }}>
+    <div className="user-avatar-wrap">
+      {/* width, height, fontSize, background are prop-driven — inline style is intentional */}
       <div
-        style={{
-          width: size,
-          height: size,
-          borderRadius: '50%',
-          background: bg,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#fff',
-          fontSize: size * 0.36,
-          fontWeight: 600,
-          fontFamily: 'Poppins, sans-serif',
-          letterSpacing: '0.03em',
-          flexShrink: 0,
-          userSelect: 'none',
-        }}
+        className="user-avatar"
+        style={{ width: size, height: size, fontSize: size * 0.36, background: bg }}
       >
         {initials}
       </div>
       {showOnline && (
         <span
+          className="user-avatar-status"
           style={{
-            position: 'absolute',
-            bottom: 1,
-            right: 1,
             width: size * 0.28,
             height: size * 0.28,
-            borderRadius: '50%',
             background: isOnline ? '#22c55e' : '#9ca3af',
-            border: '2px solid #fff',
           }}
         />
       )}

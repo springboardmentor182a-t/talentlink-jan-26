@@ -1,15 +1,15 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './features/hooks/useAuth';
-import Layout from "./components/Layout";
+import Layout from "./layout/PageContainer";
 import "./assets/theme.css";
+import PageContainer from './layout/PageContainer';
 
 // --- PROFILE & PROPOSAL PAGES ---
 import FreelancerProfile from "./pages/FreelancerProfile";
-import ClientProfile from "./pages/ClientProfile";
-import FreelancerView from "./pages/FreelancerView";
-import ClientView from "./pages/ClientView";
-import SubmitProposal from "./pages/SubmitProposal";
-import FreelancerContracts from "./pages/FreelancerContracts";
+import ClientProfile     from "./pages/ClientProfile";
+import FreelancerView    from "./pages/FreelancerView";
+import ClientView        from "./pages/ClientView";
+import SubmitProposal    from "./pages/SubmitProposal";
 
 // --- YOUR NEW FEATURE ---
 import FindProjects from './pages/FindProjects'; 
@@ -21,22 +21,24 @@ import SignupFreelancer from './pages/SignupFreelancer';
 import SignupClient     from './pages/SignupClient';
 import ForgotPassword   from './pages/ForgotPassword';
 import ResetPassword    from './pages/ResetPassword';
+import OAuthCallback    from './pages/OAuthCallback';
 import Dashboard        from './pages/Dashboard';
 import Messages         from './pages/Messages';
-import PageContainer    from './layout/PageContainer';
+
+// Contracts
+import ContractsClient     from './pages/ContractsClient';
+import ContractsFreelancer from './pages/ContractsFreelancer';
 
 /**
  * ProtectedRoute: Redirects unauthenticated users to /login.
  */
+
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return null;
   return user ? children : <Navigate to="/login" replace />;
 };
 
-/**
- * PublicOnlyRoute: Redirects already-authenticated users away from auth pages.
- */
 const PublicOnlyRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return null;
@@ -44,6 +46,11 @@ const PublicOnlyRoute = ({ children }) => {
   if (user.role === 'freelancer') return <Navigate to="/freelancer/dashboard" replace />;
   if (user.role === 'client')     return <Navigate to="/client/dashboard" replace />;
   return <Navigate to="/dashboard" replace />;
+};
+
+const ContractsRoute = () => {
+  const { user } = useAuth();
+  return user?.role === 'client' ? <ContractsClient /> : <ContractsFreelancer />;
 };
 
 export default function App() {
@@ -64,18 +71,17 @@ export default function App() {
           <Route path="/freelancer/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/client/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
-          {/* Your Feature Page */}
+          {/* Features and Profiles (Combined) */}
           <Route path="/find-projects" element={<ProtectedRoute><FindProjects /></ProtectedRoute>} />
-
-          {/* Your Profile Pages */}
+          
           <Route path="/profile/freelancer" element={<ProtectedRoute><FreelancerView /></ProtectedRoute>} />
           <Route path="/profile/freelancer/edit" element={<ProtectedRoute><FreelancerProfile /></ProtectedRoute>} />
           <Route path="/profile/client" element={<ProtectedRoute><ClientView /></ProtectedRoute>} />
           <Route path="/profile/client/edit" element={<ProtectedRoute><ClientProfile /></ProtectedRoute>} />
           
-          {/* Your Proposal Pages */}
+          {/* Proposals & Contracts */}
           <Route path="/projects/:projectId/apply" element={<ProtectedRoute><SubmitProposal /></ProtectedRoute>} />
-          <Route path="/contracts" element={<ProtectedRoute><FreelancerContracts /></ProtectedRoute>} />
+          <Route path="/contracts" element={<ProtectedRoute><ContractsRoute /></ProtectedRoute>} />
 
           {/* Messages */}
           <Route path="/messages" element={
