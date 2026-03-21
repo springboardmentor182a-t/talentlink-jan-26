@@ -4,11 +4,21 @@ from src.database.core import get_db
 from .model import Proposal
 from .schema import ProposalCreate, ProposalResponse
 
-router = APIRouter(prefix="/proposals", tags=["Proposals"])
+router = APIRouter(tags=["Proposals"])
 
 
 @router.post("/", response_model=ProposalResponse)
 def create_proposal(data: ProposalCreate, db: Session = Depends(get_db)):
+    # ── One proposal per freelancer per project ───────────────────────────────
+    existing = db.query(Proposal).filter(
+        Proposal.project_id    == data.project_id,
+        Proposal.freelancer_id == data.freelancer_id
+    ).first()
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail="You have already submitted a proposal for this project."
+        )
     proposal = Proposal(**data.dict())
     db.add(proposal)
     db.commit()
@@ -28,7 +38,7 @@ def get_my_proposals(freelancer_id: int, db: Session = Depends(get_db)):
 
 @router.put("/{proposal_id}/accept")
 def accept_proposal(proposal_id: int, db: Session = Depends(get_db)):
-    proposal = db.query(Proposal).filter(Proposal.id == proposal_id).first()  # ✅ fixed
+    proposal = db.query(Proposal).filter(Proposal.id == proposal_id).first()
     if not proposal:
         raise HTTPException(status_code=404, detail="Proposal not found")
     proposal.status = "accepted"
@@ -38,7 +48,7 @@ def accept_proposal(proposal_id: int, db: Session = Depends(get_db)):
 
 @router.put("/{proposal_id}/reject")
 def reject_proposal(proposal_id: int, db: Session = Depends(get_db)):
-    proposal = db.query(Proposal).filter(Proposal.id == proposal_id).first()  # ✅ fixed
+    proposal = db.query(Proposal).filter(Proposal.id == proposal_id).first()
     if not proposal:
         raise HTTPException(status_code=404, detail="Proposal not found")
     proposal.status = "rejected"

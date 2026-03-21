@@ -8,7 +8,8 @@ from src.users.router import router as users_router
 from src.auth.controller import router as auth_router
 from src.client_dashboard.router import router as client_dashboard_router
 from src.proposals.controller import router as proposals_router
-
+from src.projects.controller import router as projects_router  # ← ADD
+from src.entities.contract import Contract, Milestone  # ← ADD
 load_dotenv()
 
 # Create all database tables
@@ -29,11 +30,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(auth_router)
+# ── Routers ──────────────────────────────────
+app.include_router(auth_router, tags=["Auth"])
 app.include_router(client_dashboard_router)
 app.include_router(users_router)
 app.include_router(proposals_router, prefix="/proposals", tags=["Proposals"])
+app.include_router(projects_router)  # ← ADD
 
 @app.get("/")
 def root():

@@ -12,35 +12,36 @@ import ForgotPassword   from "./pages/auth/ForgotPassword";
 
 // Proposal pages
 import SubmitProposal   from "./pages/proposal/SubmitProposal";
-import ViewProposal     from "./pages/proposal/ViewProposal";
+import ViewProposals    from "./pages/proposal/ViewProposals";
 import ProposalTracking from "./pages/proposal/ProposalTracking";
 
-import Sidebar from "./layout/Sidebar";
-import ClientDashboard from "./pages/ClientDashboard";
-import Contracts from "./pages/Contracts";
+// Project pages
+import Projects         from "./pages/Projects";
+import PostProject      from "./pages/PostProject";
+
+// Freelancer
+import FreelancerDashboard from "./pages/freelancer/Freelancerdasboard";
+
+// Dashboard
+import Sidebar          from "./layout/Sidebar";
+import ClientDashboard  from "./pages/ClientDashboard";
+import Contracts        from "./pages/Contracts";
 
 import "./App.css";
 
 function ProtectedRoute({ children, allowedRole }) {
-  const { user, role } = useContext(AuthContext);
+  const { user, role, loading } = useContext(AuthContext);
+  if (loading) return <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh" }}>Loading...</div>;
   if (!user) return <Navigate to="/" replace />;
   if (allowedRole && role !== allowedRole) return <Navigate to="/" replace />;
   return children;
 }
 
-// Dashboard layout (NO router, NO provider here)
 const DashboardLayout = ({ children }) => {
   return (
     <div style={{ display: "flex" }}>
       <Sidebar />
-      <main
-        style={{
-          flex: 1,
-          marginLeft: "250px",
-          minHeight: "100vh",
-          backgroundColor: "var(--background)",
-        }}
-      >
+      <main style={{ flex:1, marginLeft:"250px", minHeight:"100vh", backgroundColor:"var(--background)" }}>
         {children}
       </main>
     </div>
@@ -59,38 +60,48 @@ function AppRoutes() {
         <Route path="/freelancer/signup" element={<FreelancerSignup />} />
         <Route path="/forgot-password"   element={<ForgotPassword />} />
 
-        {/* Proposal Routes */}
+        {/* Freelancer Routes */}
+        <Route path="/freelancer/dashboard" element={
+          <ProtectedRoute allowedRole="freelancer">
+            <FreelancerDashboard />
+          </ProtectedRoute>
+        } />
         <Route path="/submit-proposal/:projectId" element={
           <ProtectedRoute allowedRole="freelancer"><SubmitProposal /></ProtectedRoute>
         } />
         <Route path="/proposal-tracking" element={
           <ProtectedRoute allowedRole="freelancer"><ProposalTracking /></ProtectedRoute>
         } />
+
+        {/* Client Routes */}
         <Route path="/view-proposals/:projectId" element={
-          <ProtectedRoute allowedRole="client"><ViewProposal /></ProtectedRoute>
+          <ProtectedRoute allowedRole="client">
+            <DashboardLayout><ViewProposals /></DashboardLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/projects" element={
+          <ProtectedRoute allowedRole="client">
+            <DashboardLayout><Projects /></DashboardLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/post-project" element={
+          <ProtectedRoute allowedRole="client">
+            <DashboardLayout><PostProject /></DashboardLayout>
+          </ProtectedRoute>
         } />
 
-        {/* Dashboard routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute allowedRole="client">
-              <DashboardLayout>
-                <ClientDashboard />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/contracts"
-          element={
-            <ProtectedRoute allowedRole="client">
-              <DashboardLayout>
-                <Contracts />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
+        {/* Dashboard Routes */}
+        <Route path="/client/dashboard" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={
+          <ProtectedRoute allowedRole="client">
+            <DashboardLayout><ClientDashboard /></DashboardLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/contracts" element={
+          <ProtectedRoute allowedRole="client">
+            <DashboardLayout><Contracts /></DashboardLayout>
+          </ProtectedRoute>
+        } />
 
         {/* Catch-all */}
         <Route path="*" element={<Navigate to="/" replace />} />
