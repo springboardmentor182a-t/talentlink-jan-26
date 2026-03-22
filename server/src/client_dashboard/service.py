@@ -43,7 +43,8 @@ def get_dashboard_data(db: Session, client_id: int) -> DashboardResponse:
     for p in projects:
         # Get Freelancer Name from latest contract (if any)
         latest_contract = db.query(Contract).filter(Contract.project_id == p.id).first()
-        freelancer_name = latest_contract.freelancer.full_name if latest_contract and latest_contract.freelancer else "Not Hired Yet"
+        freelancer = latest_contract.freelancer if latest_contract else None
+        freelancer_name = f"{freelancer.first_name} {freelancer.last_name}" if freelancer else "Not Hired Yet"
         
         days = (p.deadline - datetime.now()).days if p.deadline else 0
         
@@ -123,8 +124,9 @@ def get_dashboard_data(db: Session, client_id: int) -> DashboardResponse:
     # --- 6. Profile Feed ---
     client_user = db.query(User).filter(User.id == client_id).first()
     profile_data = {
-        "full_name": client_user.full_name if client_user else "Client User",
-        "role": client_user.role if client_user else "Client"
+        "full_name": f"{client_user.first_name} {client_user.last_name}" if client_user else "Client User",
+        "role": client_user.role if client_user else "Client",
+        "account_type": client_user.role if client_user else "Client"
     }
 
     # --- Construct Final Response ---

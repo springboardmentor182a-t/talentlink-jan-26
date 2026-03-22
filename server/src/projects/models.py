@@ -7,8 +7,10 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    full_name = Column(String)
+    email = Column(String, unique=True, index=True)
+    first_name = Column(String)
+    last_name = Column(String)
+    password_hash = Column(String)
     role = Column(String, default="Client")
     rating = Column(Float, default=0.0)
     created_at = Column(DateTime, default=datetime.utcnow)
