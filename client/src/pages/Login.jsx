@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import LoginForm from '../features/components/LoginForm';
 import '../assets/auth.css';
 
 const Login = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [activeTab, setActiveTab] = useState('client');
+  const [activeTab, setActiveTab] = useState('freelancer');
 
   useEffect(() => {
     const tabParam = searchParams.get('tab');
@@ -45,6 +45,16 @@ const Login = () => {
         </div>
 
         <LoginForm userType={activeTab} />
+
+        <p style={{ textAlign: 'center', marginTop: '16px', fontSize: '14px', color: '#6b7280' }}>
+          Don't have an account?{' '}
+          <Link
+            to={activeTab === 'client' ? '/signup/client' : '/signup/freelancer'}
+            style={{ color: '#f97316', textDecoration: 'none', fontWeight: 500 }}
+          >
+            Sign up as {activeTab}
+          </Link>
+        </p>
       </div>
     </div>
   );

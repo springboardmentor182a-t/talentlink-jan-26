@@ -224,8 +224,19 @@ class MessageService:
                 last_msg_subq.c.last_ts,
                 Message.content,
             )
+            # Join Message to last_msg_id_subq on the winning message id —
+            # this anchors Message to the subquery and removes the cartesian
+            # product between last_msg_subq and Message that was producing
+            # the SAWarning.  last_msg_subq is then reachable via the join
+            # chain: Message → last_msg_id_subq already joins last_msg_subq
+            # inside its own definition, so SQLAlchemy can resolve all FROM
+            # elements without a cross join.
             .join(
                 last_msg_id_subq,
+                Message.id == last_msg_id_subq.c.last_id,
+            )
+            .join(
+                last_msg_subq,
                 Message.id == last_msg_id_subq.c.last_id,
             )
             .all()
