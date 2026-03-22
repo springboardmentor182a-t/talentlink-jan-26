@@ -7,7 +7,16 @@ import {
   LogOut,
 } from "lucide-react";
 
+import { useNavigate } from "react-router-dom";
+import authService from "../services/auth";
+
 const Sidebar = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    authService.logout();
+    navigate("/login");
+  };
   const menuItems = [
     { name: "Dashboard", icon: <LayoutDashboard size={20} />, active: true },
     { name: "Projects", icon: <Briefcase size={20} />, active: false },
@@ -43,10 +52,14 @@ const Sidebar = () => {
       </nav>
 
       {/* Logout */}
-      <button className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-red-400 transition-colors text-sm font-medium mt-auto">
+      <button 
+        onClick={handleLogout}
+        className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-red-400 transition-colors text-sm font-medium mt-auto"
+      >
         <LogOut size={20} />
         Logout
       </button>
+
     </div>
   );
 };

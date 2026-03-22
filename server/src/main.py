@@ -18,7 +18,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from src.auth.controller import router as auth_router
+
 # Include Routers
+app.include_router(auth_router)
 app.include_router(projects_router)
 app.include_router(client_dashboard_router)
 

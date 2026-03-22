@@ -7,28 +7,28 @@ const StatsCards = ({ stats }) => {
     {
       label: "Total Spent",
       value: `$${stats.total_spent.toLocaleString()}`,
-      growth: "+18.2%",
+      growth: stats.total_spent_growth > 0 ? `+${stats.total_spent_growth}%` : `${stats.total_spent_growth}%`,
       icon: <DollarSign size={24} className="text-white" />,
       bg: "bg-blue-500", // Blue icon background
     },
     {
       label: "Active Projects",
       value: stats.active_projects,
-      growth: "+4",
+      growth: stats.active_projects_growth > 0 ? `+${stats.active_projects_growth}` : `${stats.active_projects_growth}`,
       icon: <Briefcase size={24} className="text-white" />,
       bg: "bg-purple-500", // Purple icon background
     },
     {
       label: "Hired Freelancers",
       value: stats.hired_freelancers,
-      growth: "+6",
+      growth: stats.hired_freelancers_growth > 0 ? `+${stats.hired_freelancers_growth}` : `${stats.hired_freelancers_growth}`,
       icon: <Users size={24} className="text-white" />,
       bg: "bg-orange-500", // Orange icon background
     },
     {
       label: "Avg Rating",
       value: stats.avg_rating,
-      growth: "+0.3",
+      growth: stats.avg_rating_growth > 0 ? `+${stats.avg_rating_growth}` : `${stats.avg_rating_growth}`,
       icon: <Star size={24} className="text-white" />,
       bg: "bg-green-500", // Green icon background
     },

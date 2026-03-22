@@ -14,14 +14,16 @@ DROP TABLE IF EXISTS users CASCADE;
 -- 3. Users Table
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    username VARCHAR(255) UNIQUE NOT NULL,
-    full_name VARCHAR(255),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    first_name VARCHAR(100),
+    last_name VARCHAR(100),
+    password_hash VARCHAR(255) NOT NULL,
     role VARCHAR(50) DEFAULT 'Client', -- 'Client' or 'Freelancer'
     rating DOUBLE PRECISION DEFAULT 0.0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX ix_users_username ON users(username);
+CREATE INDEX ix_users_email ON users(email);
 
 -- 4. Projects Table
 CREATE TABLE projects (

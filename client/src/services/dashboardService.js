@@ -5,10 +5,12 @@ const API_URL = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
 // --- 1. Fetch Dashboard Stats (GET) ---
 export const fetchDashboardData = async () => {
   try {
+    const token = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/client/dashboard`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
       },
     });
 
@@ -26,10 +28,12 @@ export const fetchDashboardData = async () => {
 // --- 2. Create New Project (POST) ---
 export const createProject = async (projectData) => {
   try {
+    const token = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/projects/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
       },
       body: JSON.stringify(projectData),
     });
