@@ -10,6 +10,19 @@ from src.entities.user import User
 router = APIRouter(tags=["Proposals"])
 
 
+def enrich_proposal(proposal: Proposal, db: Session) -> dict:
+    """Add freelancer_name and project_title to a proposal dict."""
+    data = {c.name: getattr(proposal, c.name) for c in proposal.__table__.columns}
+
+    freelancer = db.query(User).filter(User.id == proposal.freelancer_id).first()
+    data["freelancer_name"] = freelancer.name if freelancer else f"Freelancer #{proposal.freelancer_id}"
+
+    project = db.query(Project).filter(Project.id == proposal.project_id).first()
+    data["project_title"] = project.title if project else f"Project #{proposal.project_id}"
+
+    return data
+
+
 @router.post("/", response_model=ProposalResponse)
 def create_proposal(data: ProposalCreate, db: Session = Depends(get_db)):
     existing = db.query(Proposal).filter(
@@ -22,20 +35,21 @@ def create_proposal(data: ProposalCreate, db: Session = Depends(get_db)):
     db.add(proposal)
     db.commit()
     db.refresh(proposal)
-    return proposal
+    return enrich_proposal(proposal, db)
 
 
-@router.get("/project/{project_id}", response_model=list[ProposalResponse])
+@router.get("/project/{project_id}")
 def get_proposals(project_id: int, db: Session = Depends(get_db)):
-    return db.query(Proposal).filter(Proposal.project_id == project_id).all()
+    proposals = db.query(Proposal).filter(Proposal.project_id == project_id).all()
+    return [enrich_proposal(p, db) for p in proposals]
 
 
-@router.get("/freelancer/{freelancer_id}", response_model=list[ProposalResponse])
+@router.get("/freelancer/{freelancer_id}")
 def get_my_proposals(freelancer_id: int, db: Session = Depends(get_db)):
-    return db.query(Proposal).filter(Proposal.freelancer_id == freelancer_id).all()
+    proposals = db.query(Proposal).filter(Proposal.freelancer_id == freelancer_id).all()
+    return [enrich_proposal(p, db) for p in proposals]
 
 
-# ← MUST be before /{proposal_id}/accept and /{proposal_id}/reject
 @router.put("/contracts/complete/{project_id}")
 def complete_contract(project_id: int, db: Session = Depends(get_db)):
     contract = db.query(Contract).filter(Contract.project_id == project_id).first()

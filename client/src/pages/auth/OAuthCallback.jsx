@@ -5,7 +5,7 @@ import { AuthContext } from "../../context/AuthContext";
 export default function OAuthCallback() {
   const [params] = useSearchParams();
   const { login } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
 
   useEffect(() => {
     const token = params.get("token");
@@ -17,7 +17,7 @@ export default function OAuthCallback() {
     if (token && role) {
       login({ token, role, user: { id, name, email, role } });
       if (role === "client") navigate("/dashboard");
-      else navigate("/proposal-tracking");
+      else navigate("/freelancer/dashboard");   // ✅ fixed
     } else {
       navigate("/");
     }

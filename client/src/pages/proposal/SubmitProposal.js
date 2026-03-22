@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
@@ -13,6 +13,15 @@ export default function SubmitProposal() {
   const [deliveryTime, setDeliveryTime] = useState("");
   const [errors, setErrors]             = useState({});
   const [loading, setLoading]           = useState(false);
+  const [project, setProject]           = useState(null);
+
+  useEffect(() => {
+    if (projectId) {
+      api.get(`/projects/${projectId}`)
+        .then(res => setProject(res.data))
+        .catch(() => setProject(null));
+    }
+  }, [projectId]);
 
   if (!user) {
     return (
@@ -55,6 +64,7 @@ export default function SubmitProposal() {
   };
 
   const charCount = coverLetter.length;
+  const projectLabel = project?.title || `Project #${projectId}`;
 
   return (
     <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#f8fafc", minHeight:"100vh" }}>
@@ -98,7 +108,7 @@ export default function SubmitProposal() {
           🚀 Apply Now
         </div>
         <h1 style={{ fontSize:28, fontWeight:800, color:"white", margin:"0 0 6px", letterSpacing:"-0.5px" }}>Submit a Proposal</h1>
-        <p style={{ fontSize:14, color:"rgba(255,255,255,0.75)", margin:0 }}>Project #{projectId} — Fill in your details to apply</p>
+        <p style={{ fontSize:14, color:"rgba(255,255,255,0.75)", margin:0 }}>{projectLabel} — Fill in your details to apply</p>
       </div>
 
       <div style={{ padding:32, maxWidth:800, margin:"0 auto" }}>

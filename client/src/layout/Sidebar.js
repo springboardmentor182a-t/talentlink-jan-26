@@ -1,11 +1,30 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, User, PlusCircle, Folder, FileText, MessageSquare, Star, LogOut } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
+import api from '../utils/api';
 
 const Sidebar = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    const fetchUnread = async () => {
+      try {
+        const res = await api.get(`/messages/conversations/${user.id}`);
+        const total = res.data.reduce((sum, c) => sum + (c.unread_count || 0), 0);
+        setUnreadCount(total);
+      } catch {
+        setUnreadCount(0);
+      }
+    };
+    fetchUnread();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchUnread, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard',   path: '/dashboard' },
@@ -13,7 +32,7 @@ const Sidebar = () => {
     { icon: PlusCircle,      label: 'Post Project', path: '/post-project' },
     { icon: Folder,          label: 'Projects',     path: '/projects' },
     { icon: FileText,        label: 'Contracts',    path: '/contracts' },
-    { icon: MessageSquare,   label: 'Messages',     path: '/messages', badge: 3 },
+    { icon: MessageSquare,   label: 'Messages',     path: '/messages', badge: unreadCount },
     { icon: Star,            label: 'Reviews',      path: '/reviews' },
   ];
 
@@ -51,9 +70,9 @@ const Sidebar = () => {
                 })}>
                 <item.icon size={20} />
                 <span style={{ flex:1 }}>{item.label}</span>
-                {item.badge && (
+                {item.badge > 0 && (
                   <span style={{ background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"white", borderRadius:"50%", width:20, height:20, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700 }}>
-                    {item.badge}
+                    {item.badge > 99 ? "99+" : item.badge}
                   </span>
                 )}
               </NavLink>

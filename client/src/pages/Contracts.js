@@ -33,14 +33,11 @@ export default function Contracts() {
 
   const markCompleted = async (projectId) => {
     try {
-      // Update project status to completed
       await api.put(`/projects/${projectId}`, { status: "completed" });
-      // Update contract status to completed
       await api.put(`/contracts/complete/${projectId}`);
       await fetchData();
     } catch (err) {
       console.error("Error completing:", err.message);
-      // Even if contract update fails, refresh to show updated project
       await fetchData();
     }
   };
@@ -137,6 +134,9 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
   const [completing, setCompleting] = useState(false);
   const accepted = proposals.find(pr => pr.status === "accepted");
 
+  // Use freelancer_name from enriched proposal response
+  const freelancerName = accepted?.freelancer_name || null;
+
   const statusStyle = {
     "in-progress": { bg:"linear-gradient(135deg,#f59e0b,#f97316)", color:"white", label:"In Progress" },
     "completed":   { bg:"linear-gradient(135deg,#16a34a,#22c55e)", color:"white", label:"Completed" },
@@ -159,8 +159,13 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:20 }}>
         <div>
           <h3 style={{ fontSize:18, fontWeight:700, color:"#111827", margin:"0 0 6px" }}>{p.title}</h3>
-          <p style={{ fontSize:13, color:"#64748b", margin:0 }}>
-            {accepted ? `Freelancer #${accepted.freelancer_id}` : "No freelancer assigned"}
+          <p style={{ fontSize:13, color:"#64748b", margin:0, display:"flex", alignItems:"center", gap:6 }}>
+            <span style={{ fontSize:15 }}>👤</span>
+            {freelancerName ? (
+              <span style={{ fontWeight:600, color:"#374151" }}>{freelancerName}</span>
+            ) : (
+              <span>No freelancer assigned</span>
+            )}
           </p>
         </div>
         <span style={{ padding:"6px 16px", borderRadius:20, fontSize:12, fontWeight:700, background:s.bg, color:s.color, whiteSpace:"nowrap" }}>
@@ -216,6 +221,10 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
           <div style={{ fontSize:12, fontWeight:700, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:8 }}>Accepted Proposal</div>
           <div style={{ display:"flex", gap:24 }}>
             <div>
+              <div style={{ fontSize:11, color:"#64748b" }}>Freelancer</div>
+              <div style={{ fontWeight:700, color:"#111827", fontSize:14 }}>{freelancerName || "—"}</div>
+            </div>
+            <div>
               <div style={{ fontSize:11, color:"#64748b" }}>Proposed Budget</div>
               <div style={{ fontWeight:700, color:"#111827", fontSize:14 }}>${accepted.proposed_budget}</div>
             </div>
@@ -247,7 +256,7 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
       )}
 
       {/* Actions */}
-      <div style={{ display:"flex", gap:10, paddingTop:16, borderTop:"1px solid #f1f5f9" }}>
+      <div style={{ display:"flex", gap:10, paddingTop:16, borderTop:"1px solid #f1f5f9", flexWrap:"wrap" }}>
         {onComplete && (
           <button onClick={handleComplete} disabled={completing}
             style={{ padding:"10px 20px", background: completing ? "#cbd5e1" : "linear-gradient(135deg,#16a34a,#22c55e)", color:"white", border:"none", borderRadius:8, cursor: completing ? "not-allowed" : "pointer", fontWeight:600, fontSize:13, boxShadow:"0 2px 8px rgba(22,163,74,0.3)", display:"flex", alignItems:"center", gap:6 }}>
@@ -258,6 +267,12 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
           style={{ padding:"10px 20px", background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"white", border:"none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13, boxShadow:"0 2px 8px rgba(37,99,235,0.3)" }}>
           👁 View Proposals
         </button>
+        {accepted && (
+          <button onClick={() => navigate(`/messages?freelancer=${accepted.freelancer_id}&name=${encodeURIComponent(freelancerName || "Freelancer")}`)}
+            style={{ padding:"10px 20px", background:"linear-gradient(135deg,#7c3aed,#a855f7)", color:"white", border:"none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13, boxShadow:"0 2px 8px rgba(124,58,237,0.3)", display:"flex", alignItems:"center", gap:6 }}>
+            💬 Message {freelancerName ? freelancerName.split(" ")[0] : "Freelancer"}
+          </button>
+        )}
         <button onClick={() => navigate("/projects")}
           style={{ padding:"10px 20px", backgroundColor:"white", color:"#374151", border:"1.5px solid #e2e8f0", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}>
           📁 View Project

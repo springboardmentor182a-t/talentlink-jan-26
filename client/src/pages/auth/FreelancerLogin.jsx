@@ -21,22 +21,26 @@ const GitHubIcon = () => (
 export default function FreelancerLogin() {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
-  const [email, setEmail]       = useState("");
+  const [email,    setEmail]    = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError]       = useState("");
-  const [loading, setLoading]   = useState(false);
-  const [visible, setVisible]   = useState(false);
+  const [error,    setError]    = useState("");
+  const [loading,  setLoading]  = useState(false);
+  const [visible,  setVisible]  = useState(false);
 
   useEffect(() => { setTimeout(() => setVisible(true), 50); }, []);
 
-  const fadeUp = { opacity:visible?1:0, transform:visible?"translateY(0)":"translateY(24px)", transition:"opacity 0.6s ease, transform 0.6s ease" };
+  const fadeUp = {
+    opacity:   visible ? 1 : 0,
+    transform: visible ? "translateY(0)" : "translateY(24px)",
+    transition:"opacity 0.6s ease, transform 0.6s ease"
+  };
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
         const res = await api.post("/auth/google", { token: tokenResponse.access_token, role: "freelancer" });
         login({ token: res.data.token, role: res.data.role, user: res.data.user });
-        navigate("/proposal-tracking");
+        navigate("/freelancer/dashboard");
       } catch { setError("Google login failed. Please try again."); }
     },
     onError: () => setError("Google login failed.")
@@ -53,12 +57,19 @@ export default function FreelancerLogin() {
       setLoading(true);
       const res = await api.post("/auth/login", { email, password });
       const userRole = res.data.role?.toLowerCase();
-      if (userRole !== "freelancer") { setError("This account is not a freelancer. Please use Client Login."); return; }
+      if (userRole !== "freelancer") {
+        setError("This account is not a freelancer. Please use Client Login.");
+        return;
+      }
       login({ token: res.data.token, role: userRole, user: res.data.user });
-      navigate("/proposal-tracking");
+      navigate("/freelancer/dashboard");   // ✅ fixed
     } catch (err) {
       const detail = err.response?.data?.detail;
-      setError(typeof detail === "string" ? detail : Array.isArray(detail) ? detail[0]?.msg || "Invalid email or password." : "Invalid email or password.");
+      setError(
+        typeof detail === "string" ? detail :
+        Array.isArray(detail) ? detail[0]?.msg || "Invalid email or password." :
+        "Invalid email or password."
+      );
     } finally { setLoading(false); }
   };
 
@@ -71,6 +82,7 @@ export default function FreelancerLogin() {
         .social-hover:hover { transform:translateY(-1px) !important; box-shadow:0 4px 12px rgba(0,0,0,0.15) !important; }
       `}</style>
 
+      {/* Background blobs */}
       <div style={{ position:"fixed", top:-150, left:-150, width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle, rgba(124,58,237,0.6) 0%, rgba(124,58,237,0.2) 40%, transparent 70%)", pointerEvents:"none", animation:"pulse 4s ease-in-out infinite", filter:"blur(30px)" }} />
       <div style={{ position:"fixed", bottom:-150, right:-150, width:550, height:550, borderRadius:"50%", background:"radial-gradient(circle, rgba(37,99,235,0.6) 0%, rgba(37,99,235,0.2) 40%, transparent 70%)", pointerEvents:"none", animation:"pulse 5s ease-in-out infinite reverse", filter:"blur(30px)" }} />
       <div style={{ position:"fixed", top:50, right:-100, width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle, rgba(168,85,247,0.5) 0%, transparent 70%)", pointerEvents:"none", animation:"pulse 6s ease-in-out infinite 1s", filter:"blur(25px)" }} />
@@ -91,6 +103,7 @@ export default function FreelancerLogin() {
         <h2 style={{ fontSize:24, fontWeight:800, color:"#111827", marginBottom:6, textAlign:"center", letterSpacing:"-0.5px" }}>Freelancer Login</h2>
         <p style={{ fontSize:14, color:"#6b7280", marginBottom:28, textAlign:"center" }}>Access your dashboard to browse projects and manage proposals</p>
 
+        {/* Social buttons */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:20 }}>
           <button className="social-hover" onClick={() => googleLogin()}
             style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:12, border:"1.5px solid #e5e7eb", borderRadius:10, cursor:"pointer", backgroundColor:"white", fontSize:14, fontWeight:600, color:"#374151", transition:"all 0.2s" }}>
@@ -115,11 +128,14 @@ export default function FreelancerLogin() {
         )}
 
         <label style={{ display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 }}>Email</label>
-        <input className="inp-focus-p" type="email" placeholder="freelancer@example.com" value={email} onChange={e => setEmail(e.target.value)}
+        <input className="inp-focus-p" type="email" placeholder="freelancer@example.com"
+          value={email} onChange={e => setEmail(e.target.value)}
           style={{ width:"100%", padding:"12px 16px", border:"1.5px solid #e5e7eb", borderRadius:10, fontSize:14, backgroundColor:"#f9fafb", outline:"none", boxSizing:"border-box", marginBottom:16, transition:"all 0.2s", color:"#111827" }} />
 
         <label style={{ display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 }}>Password</label>
-        <input className="inp-focus-p" type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSubmit()}
+        <input className="inp-focus-p" type="password" placeholder="••••••••"
+          value={password} onChange={e => setPassword(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && handleSubmit()}
           style={{ width:"100%", padding:"12px 16px", border:"1.5px solid #e5e7eb", borderRadius:10, fontSize:14, backgroundColor:"#f9fafb", outline:"none", boxSizing:"border-box", marginBottom:24, transition:"all 0.2s", color:"#111827" }} />
 
         <button className="btn-hover-p" onClick={handleSubmit} disabled={loading}

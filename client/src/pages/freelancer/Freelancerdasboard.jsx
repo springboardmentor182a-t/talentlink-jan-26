@@ -1,8 +1,14 @@
-import { useState, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import api from "../../utils/api";
 import BrowseProjects from "./BrowseProjects";
 import ProposalTracking from "../proposal/ProposalTracking";
+import Messages from "../messages/Messages";
+import FreelancerHome from "./FreelancerHome";
+import FreelancerContracts from "./Freelancercontracts";
+import Profile from "../Profile/profile";
+import Reviews from "../Reviews/Reviews";
 
 const DashboardIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -54,10 +60,28 @@ const LogoutIcon = () => (
   </svg>
 );
 
-export default function FreelancerDashboard({ defaultPage = "browse" }) {
+export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
   const { user, logout } = useContext(AuthContext);
   const navigate         = useNavigate();
   const [activePage, setActivePage] = useState(defaultPage);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Fetch real unread message count
+  useEffect(() => {
+    if (!user) return;
+    const fetchUnread = async () => {
+      try {
+        const res = await api.get(`/messages/conversations/${user.id}`);
+        const total = res.data.reduce((sum, c) => sum + (c.unread_count || 0), 0);
+        setUnreadCount(total);
+      } catch {
+        setUnreadCount(0);
+      }
+    };
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   const handleLogout = () => { logout(); navigate("/"); };
 
@@ -67,24 +91,19 @@ export default function FreelancerDashboard({ defaultPage = "browse" }) {
     { key:"browse",    label:"Browse Projects", icon:<BrowseIcon />    },
     { key:"proposals", label:"My Proposals",    icon:<ProposalIcon />  },
     { key:"contracts", label:"Contracts",       icon:<ContractIcon />  },
-    { key:"messages",  label:"Messages",        icon:<MessageIcon />,  badge:3 },
+    { key:"messages",  label:"Messages",        icon:<MessageIcon />,  badge: unreadCount },
     { key:"reviews",   label:"Reviews",         icon:<ReviewIcon />    },
   ];
 
   const renderPage = () => {
+    if (activePage === "dashboard") return <FreelancerHome      onNavigate={setActivePage} />;
+    if (activePage === "profile")   return <Profile             onNavigate={setActivePage} />;
     if (activePage === "browse")    return <BrowseProjects />;
     if (activePage === "proposals") return <ProposalTracking />;
-    return (
-      <div style={{ padding:32 }}>
-        <div style={{ background:"linear-gradient(135deg,#2d1b69 0%,#7c3aed 50%,#a855f7 100%)", borderRadius:16, padding:"32px", marginBottom:24, position:"relative", overflow:"hidden" }}>
-          <div style={{ position:"absolute", top:-30, right:-30, width:120, height:120, borderRadius:"50%", background:"rgba(255,255,255,0.05)" }} />
-          <h2 style={{ fontSize:24, fontWeight:800, color:"white", margin:"0 0 6px", letterSpacing:"-0.5px" }}>
-            {navItems.find(n => n.key === activePage)?.label}
-          </h2>
-          <p style={{ color:"rgba(255,255,255,0.75)", fontSize:14, margin:0 }}>This section is coming soon.</p>
-        </div>
-      </div>
-    );
+    if (activePage === "contracts") return <FreelancerContracts onNavigate={setActivePage} />;
+    if (activePage === "messages")  return <Messages            onNavigate={setActivePage} />;
+    if (activePage === "reviews")   return <Reviews             onNavigate={setActivePage} />;
+    return null;
   };
 
   return (
@@ -92,8 +111,6 @@ export default function FreelancerDashboard({ defaultPage = "browse" }) {
 
       {/* Sidebar */}
       <aside style={{ width:250, minHeight:"100vh", position:"fixed", left:0, top:0, backgroundColor:"#fff", borderRight:"1px solid #e5e7eb", display:"flex", flexDirection:"column" }}>
-
-        {/* Logo */}
         <div style={{ padding:"20px", borderBottom:"1px solid #e5e7eb", display:"flex", alignItems:"center", gap:10 }}>
           <div style={{ width:36, height:36, background:"linear-gradient(135deg,#7c3aed,#a855f7)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", boxShadow:"0 4px 12px rgba(124,58,237,0.3)" }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
@@ -101,7 +118,6 @@ export default function FreelancerDashboard({ defaultPage = "browse" }) {
           <span style={{ fontWeight:700, fontSize:18, color:"#7c3aed" }}>TalentLink</span>
         </div>
 
-        {/* Nav */}
         <nav style={{ flex:1, padding:"16px 12px" }}>
           {navItems.map(item => (
             <button key={item.key} onClick={() => setActivePage(item.key)}
@@ -120,16 +136,15 @@ export default function FreelancerDashboard({ defaultPage = "browse" }) {
               onMouseLeave={e => { if (activePage !== item.key) e.currentTarget.style.backgroundColor="transparent"; }}>
               {item.icon}
               <span style={{ flex:1 }}>{item.label}</span>
-              {item.badge && (
-                <span style={{ background:"linear-gradient(135deg,#7c3aed,#a855f7)", color:"#fff", borderRadius:"50%", width:20, height:20, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700 }}>
-                  {item.badge}
+              {item.badge > 0 && (
+                <span style={{ background:"linear-gradient(135deg,#7c3aed,#a855f7)", color:"white", borderRadius:"50%", width:20, height:20, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700 }}>
+                  {item.badge > 99 ? "99+" : item.badge}
                 </span>
               )}
             </button>
           ))}
         </nav>
 
-        {/* User */}
         <div style={{ padding:"16px 20px", borderTop:"1px solid #e5e7eb", display:"flex", alignItems:"center", gap:10 }}>
           <div style={{ width:36, height:36, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:700, fontSize:15, flexShrink:0, boxShadow:"0 4px 12px rgba(124,58,237,0.3)" }}>
             {user?.full_name?.[0]?.toUpperCase() || user?.name?.[0]?.toUpperCase() || "F"}
@@ -151,7 +166,6 @@ export default function FreelancerDashboard({ defaultPage = "browse" }) {
 
       {/* Main */}
       <main style={{ marginLeft:250, flex:1, backgroundColor:"#f8fafc", minHeight:"100vh" }}>
-        {/* Topbar */}
         <div style={{ backgroundColor:"#fff", borderBottom:"1px solid #e5e7eb", padding:"0 32px", height:64, display:"flex", justifyContent:"space-between", alignItems:"center", position:"sticky", top:0, zIndex:100, boxShadow:"0 1px 3px rgba(0,0,0,0.05)" }}>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <div style={{ width:8, height:8, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)" }} />
@@ -161,7 +175,7 @@ export default function FreelancerDashboard({ defaultPage = "browse" }) {
           </div>
           <div style={{ display:"flex", alignItems:"center", gap:16 }}>
             <div style={{ display:"flex", alignItems:"center", gap:10, backgroundColor:"#f8fafc", padding:"6px 14px", borderRadius:20, border:"1px solid #e2e8f0" }}>
-              <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:13, boxShadow:"0 2px 8px rgba(124,58,237,0.3)" }}>
+              <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:13 }}>
                 {user?.full_name?.[0]?.toUpperCase() || user?.name?.[0]?.toUpperCase() || "F"}
               </div>
               <div>
@@ -175,7 +189,6 @@ export default function FreelancerDashboard({ defaultPage = "browse" }) {
             </button>
           </div>
         </div>
-
         {renderPage()}
       </main>
     </div>
