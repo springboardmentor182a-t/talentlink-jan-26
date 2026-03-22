@@ -14,6 +14,7 @@ import src.entities.user     # noqa: F401
 import src.entities.todo     # noqa: F401
 import src.entities.message  # noqa: F401
 import src.users.models      # noqa: F401
+import src.reviews.models
 
 from src.rate_limiter import rate_limit_middleware
 from src.exceptions import error_handler_middleware
@@ -21,6 +22,7 @@ from src.auth.controller import router as auth_router
 from src.users.router import router as users_router
 from src.todos.controller import router as todos_router
 from src.messages.controller import router as messages_router
+from src.reviews.router import router as reviews_router
 
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 
@@ -84,6 +86,7 @@ app.include_router(auth_router,     prefix="/api/auth",     tags=["Authenticatio
 app.include_router(users_router,    prefix="/api/users",    tags=["Users"])
 app.include_router(todos_router,    prefix="/api/todos",    tags=["Todos"])
 app.include_router(messages_router, prefix="/api/messages", tags=["Messages"])
+app.include_router(reviews_router)
 
 
 # ── WebSocket Connection Manager ──────────────────────────────────────────────
