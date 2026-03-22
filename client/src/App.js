@@ -9,6 +9,8 @@ import ClientSignup     from "./pages/auth/ClientSignup";
 import FreelancerLogin  from "./pages/auth/FreelancerLogin";
 import FreelancerSignup from "./pages/auth/FreelancerSignup";
 import ForgotPassword   from "./pages/auth/ForgotPassword";
+import OAuthCallback    from "./pages/auth/OAuthCallback";
+import ResetPassword    from "./pages/auth/ResetPassword";
 
 // Proposal pages
 import SubmitProposal   from "./pages/proposal/SubmitProposal";
@@ -59,7 +61,8 @@ function AppRoutes() {
         <Route path="/freelancer/login"  element={<FreelancerLogin />} />
         <Route path="/freelancer/signup" element={<FreelancerSignup />} />
         <Route path="/forgot-password"   element={<ForgotPassword />} />
-
+        <Route path="/reset-password"   element={<ResetPassword />} />
+        <Route path="/oauth/callback" element={<OAuthCallback />} />
         {/* Freelancer Routes */}
         <Route path="/freelancer/dashboard" element={
           <ProtectedRoute allowedRole="freelancer">
@@ -70,8 +73,11 @@ function AppRoutes() {
           <ProtectedRoute allowedRole="freelancer"><SubmitProposal /></ProtectedRoute>
         } />
         <Route path="/proposal-tracking" element={
-          <ProtectedRoute allowedRole="freelancer"><ProposalTracking /></ProtectedRoute>
-        } />
+  <ProtectedRoute allowedRole="freelancer"><FreelancerDashboard defaultPage="proposals" /></ProtectedRoute>
+} />
+<Route path="/freelancer/browse" element={
+  <ProtectedRoute allowedRole="freelancer"><FreelancerDashboard defaultPage="browse" /></ProtectedRoute>
+} />
 
         {/* Client Routes */}
         <Route path="/view-proposals/:projectId" element={
