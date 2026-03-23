@@ -1,17 +1,26 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, User, PlusCircle, Folder, FileText, MessageSquare, Star } from 'lucide-react';
+import React, { useContext } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, User, PlusCircle, Folder, FileText, MessageSquare, Star, LogOut } from 'lucide-react';
+import { AuthContext } from '../context/AuthContext';
 
 const Sidebar = () => {
+    const { user, logout } = useContext(AuthContext);
+    const navigate = useNavigate();
+
     const navItems = [
-        { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-        { icon: User, label: 'Profile', path: '/profile' },
-        { icon: PlusCircle, label: 'Post Project', path: '/post-project' },
-        { icon: Folder, label: 'Projects', path: '/projects' },
-        { icon: FileText, label: 'Contracts', path: '/contracts' },
-        { icon: MessageSquare, label: 'Messages', path: '/messages', badge: 3 },
-        { icon: Star, label: 'Reviews', path: '/reviews' },
+        { icon: LayoutDashboard, label: 'Dashboard',    path: '/dashboard' },
+        { icon: User,            label: 'Profile',       path: '/profile' },
+        { icon: PlusCircle,      label: 'Post Project',  path: '/post-project' },
+        { icon: Folder,          label: 'Projects',      path: '/projects' },
+        { icon: FileText,        label: 'Contracts',     path: '/contracts' },
+        { icon: MessageSquare,   label: 'Messages',      path: '/messages', badge: 3 },
+        { icon: Star,            label: 'Reviews',       path: '/reviews' },
     ];
+
+    const handleLogout = () => {
+        logout();
+        navigate('/');
+    };
 
     return (
         <aside className="sidebar" style={{
@@ -25,12 +34,14 @@ const Sidebar = () => {
             backgroundColor: 'var(--card)',
             borderRight: '1px solid var(--border)'
         }}>
+            {/* Logo */}
             <div style={{ padding: '24px', borderBottom: '1px solid var(--border)' }}>
                 <h2 style={{ margin: 0, color: '#2563eb', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <BriefcaseIcon /> TalentLink
                 </h2>
             </div>
 
+            {/* Nav */}
             <nav style={{ flex: 1, padding: '24px 16px' }}>
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {navItems.map((item) => (
@@ -48,7 +59,6 @@ const Sidebar = () => {
                                     backgroundColor: isActive ? '#EFF6FF' : 'transparent',
                                     fontWeight: isActive ? 600 : 400,
                                     transition: 'all 0.2s ease',
-                                    borderLeft: 'none' // Removed border to match rounded pill design better
                                 })}
                             >
                                 <item.icon size={20} />
@@ -75,12 +85,40 @@ const Sidebar = () => {
                 </ul>
             </nav>
 
-
+            {/* User + Logout — same style as FreelancerDashboard */}
+            <div style={{
+                padding: '16px 20px',
+                borderTop: '1px solid var(--border)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+            }}>
+                <div style={{
+                    width: 36, height: 36, borderRadius: '50%',
+                    background: '#2563eb',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: '#fff', fontWeight: 700, fontSize: 15, flexShrink: 0
+                }}>
+                    {user?.full_name?.[0]?.toUpperCase() || user?.name?.[0]?.toUpperCase() || 'C'}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {user?.full_name || user?.name || 'Client'}
+                    </div>
+                    <div style={{ fontSize: 11, color: '#9ca3af' }}>Client</div>
+                </div>
+                <button
+                    onClick={handleLogout}
+                    title="Logout"
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 4, display: 'flex', alignItems: 'center' }}
+                >
+                    <LogOut size={18} />
+                </button>
+            </div>
         </aside>
     );
 };
 
-// Simple Icon component for Logo
 const BriefcaseIcon = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M20 7H4C2.89543 7 2 7.89543 2 9V19C2 20.1046 2.89543 21 4 21H20C21.1046 21 22 20.1046 22 19V9C22 7.89543 21.1046 7 20 7Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

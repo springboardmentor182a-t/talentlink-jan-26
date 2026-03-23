@@ -4,10 +4,10 @@ from datetime import datetime
 
 class Project(Base):
     __tablename__ = "projects"
-
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
+    __table_args__ = {"extend_existing": True}
+    id = Column(Integer, primary_key=True)  # ← removed index=True
+    title = Column(String)                   # ← removed index=True
     category = Column(String)
     budget = Column(String)
-    status = Column(String) # 'open', 'in progress', 'completed'
+    status = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
