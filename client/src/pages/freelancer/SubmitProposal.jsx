@@ -8,7 +8,7 @@ import {
     ChevronDown,
     Check
 } from 'lucide-react';
-import { allProjects } from '../../data/mockProjects';
+import api from '../../utils/api';
 import { useProposals } from '../../context/ProposalContext';
 import './Dashboard.css';
 
@@ -64,14 +64,44 @@ const SubmitProposal = () => {
     const navigate = useNavigate();
     const { addProposal } = useProposals();
 
-    // Find project by ID
-    const project = allProjects.find(p => p.id === parseInt(projectId));
+    const [project, setProject] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const [proposalData, setProposalData] = useState({
-        proposedBudget: project ? project.numericBudget.toString() : "",
+        proposedBudget: "",
         deliveryTime: "",
         coverLetter: ""
     });
+
+    useEffect(() => {
+        const fetchProject = async () => {
+            try {
+                const res = await api.get(`/jobs/${projectId}`);
+                const job = res.data;
+                const mappedProject = {
+                    id: job.id,
+                    title: job.title,
+                    description: job.description,
+                    skills: [],
+                    budget: `$${job.budget.toLocaleString()}`,
+                    numericBudget: job.budget,
+                    duration: "Not specified",
+                    proposals: 0,
+                    postedDate: new Date(job.created_at).toLocaleDateString()
+                };
+                setProject(mappedProject);
+                setProposalData(prev => ({
+                    ...prev,
+                    proposedBudget: mappedProject.numericBudget.toString()
+                }));
+            } catch (err) {
+                console.error("Error fetching job:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProject();
+    }, [projectId]);
 
     const [error, setError] = useState("");
 
@@ -119,7 +149,11 @@ const SubmitProposal = () => {
             <div className="dashboard-container">
                 <Sidebar />
                 <div className="main-content scrollable">
-                    {!project ? (
+                    {loading ? (
+                        <div className="loading-container" style={{ padding: '2rem', textAlign: 'center' }}>
+                            <h2 style={{ color: '#6b7280' }}>Loading project details...</h2>
+                        </div>
+                    ) : !project ? (
                         <div className="error-container">
                             <h2 className="project-not-found">Project not found</h2>
                             <Link to="/freelancer/browse" className="back-link">Return to Browse Projects</Link>

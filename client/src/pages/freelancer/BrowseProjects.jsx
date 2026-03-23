@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../layout/Sidebar';
 import Navbar from '../../layout/Navbar';
 import { Search, Clock, DollarSign, ChevronDown, Check } from 'lucide-react';
-import { allProjects } from '../../data/mockProjects';
+import api from '../../utils/api';
 import './Dashboard.css';
 
 const CustomDropdown = ({ label, options, value, onChange }) => {
@@ -55,12 +55,40 @@ const CustomDropdown = ({ label, options, value, onChange }) => {
 
 const BrowseProjects = () => {
     const navigate = useNavigate();
+    const [projects, setProjects] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [filters, setFilters] = useState({
         search: '',
         budgetRange: 'All Budgets',
         duration: 'All Durations',
         skill: 'All Skills'
     });
+
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                const res = await api.get('/jobs/');
+                const mappedProjects = res.data.map(job => ({
+                    id: job.id,
+                    title: job.title,
+                    description: job.description,
+                    skills: [],
+                    budget: `$${job.budget.toLocaleString()}`,
+                    numericBudget: job.budget,
+                    duration: "Not specified",
+                    proposals: 0,
+                    postedDate: new Date(job.created_at).toLocaleDateString()
+                }));
+                mappedProjects.sort((a, b) => new Date(b.postedDate) - new Date(a.postedDate));
+                setProjects(mappedProjects);
+            } catch (err) {
+                console.error("Error fetching jobs:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProjects();
+    }, []);
 
     const budgetOptions = ['All Budgets', 'Under $2,000', '$2,000 - $5,000', '$5,000+'];
     const durationOptions = [
@@ -74,7 +102,7 @@ const BrowseProjects = () => {
     ];
 
     const filteredProjects = useMemo(() => {
-        return allProjects.filter(project => {
+        return projects.filter(project => {
             // Search filter
             const matchesSearch = project.title.toLowerCase().includes(filters.search.toLowerCase()) ||
                 project.description.toLowerCase().includes(filters.search.toLowerCase());
@@ -99,7 +127,7 @@ const BrowseProjects = () => {
 
             return matchesSearch && matchesSkill && matchesDuration && matchesBudget;
         });
-    }, [filters]);
+    }, [filters, projects]);
 
     const handleFilterChange = (key, value) => {
         setFilters(prev => ({ ...prev, [key]: value }));
@@ -164,11 +192,15 @@ const BrowseProjects = () => {
                     </div>
 
                     <div className="projects-found-count">
-                        {filteredProjects.length} projects found
+                        {loading ? "Loading projects..." : `${filteredProjects.length} projects found`}
                     </div>
 
                     <div className="projects-list">
-                        {filteredProjects.length > 0 ? (
+                        {loading ? (
+                            <div className="loading-projects">
+                                <p>Loading projects from backend...</p>
+                            </div>
+                        ) : filteredProjects.length > 0 ? (
                             filteredProjects.map(project => (
                                 <ProjectCard
                                     key={project.id}
