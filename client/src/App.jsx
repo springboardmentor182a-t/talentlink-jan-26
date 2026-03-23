@@ -68,10 +68,11 @@ export default function App() {
 
         {/* ── Protected routes — require login ──────────────────────── */}
         <Route element={<Layout />}>
-
           <Route path="/dashboard"            element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/freelancer/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/client/dashboard"     element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          
+          {/* YOUR CLIENT DASHBOARD FIX */}
+          <Route path="/client/dashboard"     element={<ProtectedRoute><ClientView /></ProtectedRoute>} />
 
           {/* FindProjects */}
           <Route path="/find-projects" element={<ProtectedRoute><FindProjects /></ProtectedRoute>} />

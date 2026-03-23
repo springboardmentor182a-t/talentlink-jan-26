@@ -1,150 +1,163 @@
-// client/src/pages/ClientView.jsx
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Briefcase, MapPin, Mail, Phone, Globe } from "lucide-react";
-import { getClientProfile } from "../services/api";
+import React, { useState, useEffect } from 'react';
+import { Bell, UserCircle, Briefcase, Users, DollarSign, CheckCircle, Plus } from 'lucide-react';
+import { getClientDashboardData } from '../services/api';
 
-export default function ClientView() {
-  const [profile, setProfile] = useState(null);
+const StatCard = ({ icon: Icon, value, label }) => (
+  <div className="bg-white p-6 rounded-lg border border-gray-100 shadow-sm flex flex-col justify-center">
+    <div className="w-10 h-10 bg-gray-50 rounded-md flex items-center justify-center mb-4">
+      <Icon className="text-gray-500 w-5 h-5" />
+    </div>
+    <h3 className="text-2xl font-semibold text-gray-900">{value}</h3>
+    <p className="text-sm text-gray-500">{label}</p>
+  </div>
+);
+
+const ProjectCard = ({ title, postedTime, proposals, budget, duration, status }) => (
+  <div className="bg-white p-5 rounded-lg border border-gray-200 mb-4 flex flex-col md:flex-row justify-between md:items-center">
+    <div>
+      <h4 className="font-semibold text-gray-900">{title}</h4>
+      <p className="text-xs text-gray-500 mb-3">Posted {postedTime}</p>
+      <div className="flex flex-wrap gap-4 text-xs text-gray-600">
+        <span className="flex items-center gap-1"><Users className="w-4 h-4 text-orange-500" /> {proposals} Proposals</span>
+        <span className="flex items-center gap-1"><DollarSign className="w-4 h-4 text-yellow-500" /> {budget}</span>
+        <span className="flex items-center gap-1"><Briefcase className="w-4 h-4 text-gray-400" /> {duration}</span>
+      </div>
+    </div>
+    <span className="mt-3 md:mt-0 px-3 py-1 bg-orange-50 text-orange-600 text-xs font-medium rounded-full border border-orange-100 self-start md:self-auto">
+      {status}
+    </span>
+  </div>
+);
+
+const ActivityItem = ({ icon: Icon, text, time, iconColor }) => (
+  <div className="flex items-start gap-4 p-4 border-b border-gray-100 last:border-0">
+     <div className={`mt-1 ${iconColor}`}><Icon className="w-4 h-4" /></div>
+     <div>
+       <p className="text-sm text-gray-800">{text}</p>
+       <p className="text-xs text-gray-500 mt-1">{time}</p>
+     </div>
+  </div>
+);
+
+const ClientView = () => {
+  const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Hardcoded for testing. In reality, get this from your AuthContext.
+  const testUserId = 1; 
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchDashboard = async () => {
       try {
-        // 1. Get the real user ID from local storage
-        const storedUser = localStorage.getItem("user");
-        if (!storedUser) {
-          setLoading(false);
-          return;
-        }
-        const user = JSON.parse(storedUser);
-        const userId = user.id;
-
-        // 2. Fetch the client profile using dynamic ID
-        const data = await getClientProfile(userId);
-        setProfile(data);
-      } catch (error) {
-        console.error("Failed to fetch client profile", error);
+        setLoading(true);
+        const data = await getClientDashboardData(testUserId);
+        setDashboardData(data);
+      } catch (err) {
+        console.error("Dashboard Fetch Error:", err);
+        setError("Failed to load dashboard data. Ensure the backend is running.");
       } finally {
         setLoading(false);
       }
     };
-    fetchProfile();
+
+    fetchDashboard();
   }, []);
 
-  if (loading) return <div className="p-10 text-center text-gray-500">Loading Company Profile...</div>;
+  if (loading) return <div className="p-8 text-gray-500">Loading dashboard data from server...</div>;
+  if (error) return <div className="p-8 text-red-500 bg-red-50 rounded-md border border-red-200">{error}</div>;
+  if (!dashboardData) return null;
 
-  if (!profile) return (
-    <div className="p-10 text-center">
-      <p className="text-gray-500 mb-4">No company profile found.</p>
-      <Link to="/profile/client/edit" className="text-orange-500 font-bold hover:underline">
-        Create your company profile here
-      </Link>
-    </div>
-  );
+  const { stats, active_projects, recent_activity } = dashboardData;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-5xl mx-auto space-y-6">
-        
-        {/* HEADER CARD */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="h-32 bg-orange-500 w-full"></div>
-          <div className="px-8 pb-8">
-            <div className="relative flex justify-between items-end -mt-12 mb-6">
-              <div className="flex items-end gap-5">
-                <div className="w-24 h-24 bg-white rounded-full p-1 shadow-md">
-                  <div className="w-full h-full bg-orange-100 rounded-full flex items-center justify-center text-orange-600 text-2xl font-bold">
-                    {profile.company_name?.charAt(0) || "C"}
-                  </div>
-                </div>
-                <div className="mb-1">
-                  <h1 className="text-2xl font-bold text-gray-900">{profile.company_name}</h1>
-                  <p className="text-orange-600 font-medium">{profile.contact_title || "Company Representative"}</p>
-                  <div className="flex items-center text-gray-500 text-sm mt-1">
-                    <MapPin className="w-4 h-4 mr-1" />
-                    {profile.location || "Remote / Global"}
-                  </div>
-                </div>
-              </div>
-              <Link to="/profile/client/edit" className="px-4 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition shadow-sm">
-                Edit Profile
-              </Link>
-            </div>
-          </div>
+    <div className="p-8 w-full bg-gray-50 min-h-screen font-sans">
+      
+      {/* Top Header */}
+      <div className="flex justify-between items-center mb-8 border-b border-gray-200 pb-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-sm text-gray-500">Home / Dashboard</p>
         </div>
-
-        {/* CONTENT GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
-          {/* MAIN CONTENT */}
-          <div className="md:col-span-2 space-y-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">About the Company</h2>
-              <p className="text-gray-600 leading-relaxed whitespace-pre-line">
-                {profile.company_description || profile.company_bio || "No description added yet."}
-              </p>
-            </div>
-
-            {/* STATS (Static for now, but ready for future) */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 text-center">
-                <div className="text-2xl font-bold text-gray-900">0</div>
-                <div className="text-xs text-gray-500 uppercase tracking-wide mt-1">Projects Posted</div>
-              </div>
-              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 text-center">
-                <div className="text-2xl font-bold text-gray-900">$0</div>
-                <div className="text-xs text-gray-500 uppercase tracking-wide mt-1">Total Spent</div>
-              </div>
-              <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-200 text-center">
-                <div className="text-2xl font-bold text-gray-900">0.0</div>
-                <div className="text-xs text-gray-500 uppercase tracking-wide mt-1">Rating</div>
-              </div>
-            </div>
-          </div>
-
-          {/* SIDEBAR */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h3 className="font-bold text-gray-900 mb-4">Contact Information</h3>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-orange-50 text-orange-600 rounded-lg">
-                    <Briefcase className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Industry</p>
-                    <p className="text-sm font-medium text-gray-900">{profile.industry || "N/A"}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-orange-50 text-orange-600 rounded-lg">
-                    <Globe className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Website</p>
-                    <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-orange-600 hover:underline break-all">
-                      {profile.website || "N/A"}
-                    </a>
-                  </div>
-                </div>
-
-                 <div className="flex items-start gap-3">
-                  <div className="p-2 bg-orange-50 text-orange-600 rounded-lg">
-                    <Phone className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Phone</p>
-                    <p className="text-sm font-medium text-gray-900">{profile.contact_phone || "N/A"}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
+        <div className="flex items-center gap-4">
+          <button className="p-2 text-gray-400 hover:text-gray-600"><Bell className="w-5 h-5" /></button>
+          <button className="p-2 text-gray-400 hover:text-gray-600"><UserCircle className="w-6 h-6" /></button>
         </div>
       </div>
+
+      {/* Welcome Section */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold text-gray-900">Welcome back, Sarah! 👋</h2>
+        <p className="text-sm text-gray-500">Here's what's happening with your projects today</p>
+      </div>
+
+      {/* Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <StatCard icon={Briefcase} value={stats.active_projects} label="Active Projects" />
+        <StatCard icon={Users} value={stats.pending_proposals} label="Pending Proposals" />
+        <StatCard icon={DollarSign} value={`$${stats.total_spent.toLocaleString()}`} label="Total Spent" />
+        <StatCard icon={CheckCircle} value={stats.completed_projects} label="Completed Projects" />
+      </div>
+
+      {/* Quick Actions */}
+      <div className="mb-8">
+        <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+          <span className="w-1.5 h-1.5 bg-orange-500 rounded-full"></span> Quick Actions
+        </h3>
+        <div className="flex flex-wrap gap-3">
+          <button className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white text-sm font-medium rounded-md hover:bg-orange-600 transition-colors">
+            <Plus className="w-4 h-4" /> Post New Project
+          </button>
+          <button className="px-4 py-2 bg-white text-gray-700 text-sm font-medium rounded-md border border-gray-200 hover:bg-gray-50">View All Proposals</button>
+          <button className="px-4 py-2 bg-white text-gray-700 text-sm font-medium rounded-md border border-gray-200 hover:bg-gray-50">Active Contracts</button>
+          <button className="px-4 py-2 bg-white text-gray-700 text-sm font-medium rounded-md border border-gray-200 hover:bg-gray-50">Messages</button>
+        </div>
+      </div>
+
+      {/* Active Projects List */}
+      <div className="mb-8">
+        <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+           <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Active Projects
+        </h3>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-2">
+          {active_projects.length > 0 ? (
+            active_projects.map((project) => (
+              <ProjectCard 
+                key={project.id}
+                title={project.title} 
+                postedTime={project.posted_time} 
+                proposals={project.proposals_count} 
+                budget={project.budget} 
+                duration={project.duration} 
+                status={project.status} 
+              />
+            ))
+          ) : (
+            <p className="p-4 text-sm text-gray-500">No active projects found.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Recent Activity List */}
+      <div>
+        <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+           <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></span> Recent Activity
+        </h3>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100">
+          {recent_activity.map((activity) => (
+            <ActivityItem 
+              key={activity.id}
+              icon={activity.type === 'proposal' ? UserCircle : CheckCircle} 
+              text={activity.text} 
+              time={activity.time} 
+              iconColor={activity.type === 'proposal' ? "text-red-400" : "text-green-500"} 
+            />
+          ))}
+        </div>
+      </div>
+
     </div>
   );
-}
+};
+
+export default ClientView;
