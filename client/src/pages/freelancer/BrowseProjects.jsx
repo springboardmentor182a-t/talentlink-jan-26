@@ -72,6 +72,7 @@ const BrowseProjects = () => {
                     id: job.id,
                     title: job.title,
                     description: job.description,
+                    clientId: job.client_id,
                     skills: [],
                     budget: `$${job.budget.toLocaleString()}`,
                     numericBudget: job.budget,
@@ -135,6 +136,10 @@ const BrowseProjects = () => {
 
     const handleSubmitProposal = (projectId) => {
         navigate(`/freelancer/submit-proposal/${projectId}`);
+    };
+
+    const handleMessageClient = (clientId) => {
+        navigate(`/freelancer/messages?userId=${clientId}`);
     };
 
     return (
@@ -206,6 +211,7 @@ const BrowseProjects = () => {
                                     key={project.id}
                                     project={project}
                                     onApply={() => handleSubmitProposal(project.id)}
+                                    onMessage={() => handleMessageClient(project.clientId)}
                                 />
                             ))
                         ) : (
@@ -220,7 +226,7 @@ const BrowseProjects = () => {
     );
 };
 
-const ProjectCard = ({ project, onApply }) => (
+const ProjectCard = ({ project, onApply, onMessage }) => (
     <div className="section-card project-browse-card">
         <div className="project-header">
             <div className="project-title-row">
@@ -264,7 +270,7 @@ const ProjectCard = ({ project, onApply }) => (
         </div>
         <div className="project-actions-browse">
             <button className="submit-proposal-btn" onClick={onApply}>Submit Proposal</button>
-            <button className="view-details-btn-outline">View Details</button>
+            <button className="view-details-btn-outline" onClick={onMessage}>Message Client</button>
         </div>
     </div>
 );

@@ -2,28 +2,39 @@ import React, { useState } from 'react';
 import Sidebar from '../../layout/Sidebar';
 import Navbar from '../../layout/Navbar';
 import { Star, Briefcase, Edit2, X, Plus, Save } from 'lucide-react';
+import api from '../../utils/api';
 import './Dashboard.css';
 
 const FreelancerProfile = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [newSkill, setNewSkill] = useState('');
+    const [loading, setLoading] = useState(true);
     const [profileData, setProfileData] = useState({
-        fullName: 'Alex Morgan',
-        professionalTitle: 'Full Stack Developer',
-        hourlyRate: '75',
-        location: 'New York, NY',
-        experience: '5+ years',
-        email: 'demo-google@talentlink.com',
-        bio: 'Experienced full-stack developer with 5+ years building modern web applications using React, Node.js, and cloud technologies.',
-        skills: ['React', 'TypeScript', 'Node.js', 'Python', 'AWS', 'PostgreSQL']
+        fullName: '',
+        email: '',
+        professionalTitle: '',
+        hourlyRate: '',
+        location: '',
+        experience: '',
+        bio: '',
+        skills: []
     });
 
-    const portfolio = [
-        {
-            title: 'E-commerce Platform',
-            description: 'Built a scalable e-commerce platform handling 10k+ daily users'
-        }
-    ];
+    React.useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const res = await api.get('/users/profile');
+                setProfileData(res.data);
+            } catch (err) {
+                console.error("Failed to fetch profile:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProfile();
+    }, []);
+
+    const portfolio = profileData.portfolio || [];
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -47,13 +58,33 @@ const FreelancerProfile = () => {
         }));
     };
 
-    const handleSave = () => {
-        setIsEditing(false);
+    const handleSave = async () => {
+        try {
+            await api.put('/users/profile', profileData);
+            setIsEditing(false);
+        } catch (err) {
+            console.error("Failed to save profile:", err);
+            alert("Failed to save profile.");
+        }
     };
 
     const handleCancel = () => {
         setIsEditing(false);
     };
+
+    if (loading) return (
+        <div className="dashboard-layout">
+            <Navbar />
+            <div className="dashboard-container">
+                <Sidebar />
+                <div className="main-content">
+                    <div className="loading-state">
+                        <div className="spinner">Loading profile...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 
     return (
         <div className="dashboard-layout">
@@ -63,7 +94,7 @@ const FreelancerProfile = () => {
                 <div className={`main-content scrollable ${isEditing ? 'with-footer' : ''}`}>
                     <div className="profile-content-wrapper">
 
-                        {/* Alex Morgan Header Card */}
+                        {/* Profile Header Card */}
                         <div className="section-card profile-header-card">
                             <div className="profile-avatar-circle">
                                 <span>{profileData.fullName.charAt(0)}</span>
@@ -75,14 +106,14 @@ const FreelancerProfile = () => {
                                     <div className="profile-stats-row">
                                         <div className="stat-item">
                                             <Star size={16} fill="#fbbf24" color="#fbbf24" />
-                                            <span>4.8</span>
+                                            <span>0.0</span>
                                         </div>
                                         <div className="stat-item">
                                             <Briefcase size={16} />
-                                            <span>15 projects</span>
+                                            <span>0 projects</span>
                                         </div>
                                         <div className="stat-item">
-                                            <span>${profileData.hourlyRate}/hr</span>
+                                            <span>${profileData.hourlyRate || 0}/hr</span>
                                         </div>
                                     </div>
                                 </div>
@@ -214,7 +245,7 @@ const FreelancerProfile = () => {
                             )}
 
                             <div className="skills-grid">
-                                {profileData.skills.map((skill, index) => (
+                                {profileData.skills?.map((skill, index) => (
                                     <span key={index} className={`skill-tag ${isEditing ? 'editing' : ''}`}>
                                         {skill}
                                         {isEditing && (
@@ -242,12 +273,16 @@ const FreelancerProfile = () => {
                                 )}
                             </div>
                             <div className="portfolio-wrapper">
-                                {portfolio.map((project, index) => (
-                                    <div key={index} className="portfolio-project-card">
-                                        <h3>{project.title}</h3>
-                                        <p>{project.description}</p>
-                                    </div>
-                                ))}
+                                {portfolio && portfolio.length > 0 ? (
+                                    portfolio.map((project, index) => (
+                                        <div key={index} className="portfolio-project-card">
+                                            <h3>{project.title}</h3>
+                                            <p>{project.description}</p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="empty-portfolio-text">No portfolio projects added yet.</p>
+                                )}
                             </div>
                         </div>
 

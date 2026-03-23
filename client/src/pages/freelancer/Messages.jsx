@@ -1,61 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Sidebar from '../../layout/Sidebar';
 import Navbar from '../../layout/Navbar';
 import { MessageSquare, Send } from 'lucide-react';
+import api from '../../utils/api';
 import './Dashboard.css';
 
 const Messages = () => {
+    const { search } = useLocation();
+    const queryParams = new URLSearchParams(search);
+    const userIdFromQuery = queryParams.get('userId');
+
     const [selectedChat, setSelectedChat] = useState(null);
     const [newMessage, setNewMessage] = useState("");
+    const [conversations, setConversations] = useState([]);
 
-    const [conversations, setConversations] = useState([
-        {
-            id: 1,
-            name: "Tech Solutions Inc.",
-            project: "Build a React E-commerce Platform",
-            lastMessage: "I have started working on the initial setup.",
-            initial: "T",
-            timestamp: "2h ago",
-            unread: false,
-            messages: [
-                { id: 1, sender: 'client', text: "Hello Alex, glad to have you on board.", time: "08:30" },
-                { id: 2, sender: 'me', text: "I have started working on the initial setup.", time: "09:00" }
-            ]
+    useEffect(() => {
+        fetchConversations();
+    }, []);
+
+    useEffect(() => {
+        if (userIdFromQuery && conversations.length > 0) {
+            const userId = parseInt(userIdFromQuery);
+            if (conversations.find(c => c.id === userId)) {
+                setSelectedChat(userId);
+            }
         }
-    ]);
+    }, [userIdFromQuery, conversations]);
+
+    const fetchConversations = async () => {
+        try {
+            const res = await api.get('/messages/conversations');
+            setConversations(res.data);
+        } catch (error) {
+            console.error("Error fetching conversations:", error);
+        }
+    };
 
     const activeChat = conversations.find(c => c.id === selectedChat);
 
-    const handleSendMessage = (e) => {
+    useEffect(() => {
+        if (selectedChat) {
+            markRead(selectedChat);
+        }
+    }, [selectedChat]);
+
+    const markRead = async (otherUserId) => {
+        try {
+            await api.post(`/messages/read/${otherUserId}`);
+            // Optionally refresh conversations if we want the unread dot to disappear immediately
+            // but it's often better to just update the local state if it's already selected.
+            setConversations(prev => prev.map(c => 
+                c.id === otherUserId ? { ...c, unread: false } : c
+            ));
+        } catch (error) {
+            console.error("Error marking messages as read:", error);
+        }
+    };
+
+    const handleSendMessage = async (e) => {
         if (e) e.preventDefault();
         if (!newMessage.trim() || !selectedChat) return;
 
-        const now = new Date();
-        const currentTime = now.getHours().toString().padStart(2, '0') + ":" +
-            now.getMinutes().toString().padStart(2, '0');
-
-        const updatedConversations = conversations.map(chat => {
-            if (chat.id === selectedChat) {
-                return {
-                    ...chat,
-                    lastMessage: newMessage,
-                    timestamp: "Just now",
-                    messages: [
-                        ...chat.messages,
-                        {
-                            id: Date.now(),
-                            sender: 'me',
-                            text: newMessage,
-                            time: currentTime
-                        }
-                    ]
-                };
-            }
-            return chat;
-        });
-
-        setConversations(updatedConversations);
+        const textToSend = newMessage;
         setNewMessage("");
+
+        try {
+            await api.post('/messages', {
+                receiver_id: selectedChat,
+                content: textToSend
+            });
+            fetchConversations();
+        } catch (error) {
+            console.error("Error sending message:", error);
+        }
     };
 
     return (

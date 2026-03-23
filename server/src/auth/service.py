@@ -12,6 +12,7 @@ import os
 
 from src.database.core import SessionLocal, get_db
 from src.entities.user import User
+from src.entities.freelancer_profile import FreelancerProfile
 
 # Load environment variables
 load_dotenv()
@@ -84,6 +85,12 @@ def register_user(db, name: str, email: str, password: str, role: str):
     db.add(user)
     db.commit()
     db.refresh(user)
+
+    if role.lower() == "freelancer":
+        profile = FreelancerProfile(user_id=user.id, professional_title="Freelancer")
+        db.add(profile)
+        db.commit()
+
     return user
 
 

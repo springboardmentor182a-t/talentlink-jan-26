@@ -19,14 +19,14 @@ import Reviews from "./pages/freelancer/Reviews";
 import { ProposalProvider } from "./context/ProposalContext";
 import ForgotPassword   from "./pages/auth/ForgotPassword";
 
-// Proposal pages
-import SubmitProposal   from "./pages/proposal/SubmitProposal";
+// Proposal pages (alternate flow)
+import ProposalSubmit   from "./pages/proposal/SubmitProposal";
 import ViewProposal     from "./pages/proposal/ViewProposal";
 import ProposalTracking from "./pages/proposal/ProposalTracking";
 
-import Sidebar from "./layout/Sidebar";
 import ClientDashboard from "./pages/ClientDashboard";
 import Contracts from "./pages/Contracts";
+import Sidebar from "./layout/Sidebar";
 
 import "./App.css";
 
@@ -37,100 +37,56 @@ function ProtectedRoute({ children, allowedRole }) {
   return children;
 }
 
-// Dashboard layout (NO router, NO provider here)
-const DashboardLayout = ({ children }) => {
-  return (
-    <div style={{ display: "flex" }}>
-      <Sidebar />
-      <main
-        style={{
-          flex: 1,
-          marginLeft: "250px",
-          minHeight: "100vh",
-          backgroundColor: "var(--background)",
-        }}
-      >
-        {children}
-      </main>
-    </div>
-  );
-};
-
-function AppRoutes() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        {/* Auth Routes */}
-        <Route path="/"                  element={<ChooseRole />} />
-        <Route path="/client/login"      element={<ClientLogin />} />
-        <Route path="/client/signup"     element={<ClientSignup />} />
-        <Route path="/freelancer/login"  element={<FreelancerLogin />} />
-        <Route path="/freelancer/signup" element={<FreelancerSignup />} />
-        <Route path="/forgot-password"   element={<ForgotPassword />} />
-
-        {/* Proposal Routes */}
-        <Route path="/submit-proposal/:projectId" element={
-          <ProtectedRoute allowedRole="freelancer"><SubmitProposal /></ProtectedRoute>
-        } />
-        <Route path="/proposal-tracking" element={
-          <ProtectedRoute allowedRole="freelancer"><ProposalTracking /></ProtectedRoute>
-        } />
-        <Route path="/view-proposals/:projectId" element={
-          <ProtectedRoute allowedRole="client"><ViewProposal /></ProtectedRoute>
-        } />
-
-        {/* Dashboard routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute allowedRole="client">
-              <DashboardLayout>
-                <ClientDashboard />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/contracts"
-          element={
-            <ProtectedRoute allowedRole="client">
-              <DashboardLayout>
-                <Contracts />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Catch-all */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
-
 export default function App() {
   return (
     <AuthProvider>
       <ProposalProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<FreelancerDashboard />} />
-            <Route path="/client/login" element={<ClientLogin />} />
-            <Route path="/client/signup" element={<ClientSignup />} />
-            <Route path="/freelancer/login" element={<FreelancerLogin />} />
+            {/* Default */}
+            <Route path="/" element={<ChooseRole />} />
+
+            {/* Auth */}
+            <Route path="/client/login"      element={<ClientLogin />} />
+            <Route path="/client/signup"     element={<ClientSignup />} />
+            <Route path="/freelancer/login"  element={<FreelancerLogin />} />
             <Route path="/freelancer/signup" element={<FreelancerSignup />} />
-            <Route path="/freelancer/dashboard" element={<FreelancerDashboard />} />
-            <Route path="/freelancer/profile" element={<FreelancerProfile />} />
-            <Route path="/freelancer/browse" element={<BrowseProjects />} />
-            <Route path="/freelancer/submit-proposal/:projectId" element={<SubmitProposal />} />
-            <Route path="/freelancer/proposals" element={<MyProposals />} />
-            <Route path="/freelancer/contracts" element={<MyContracts />} />
-            <Route path="/freelancer/messages" element={<Messages />} />
-            <Route path="/freelancer/reviews" element={<Reviews />} />
+            <Route path="/forgot-password"   element={<ForgotPassword />} />
+
+            {/* Freelancer */}
+            <Route path="/freelancer/dashboard"                    element={<FreelancerDashboard />} />
+            <Route path="/freelancer/profile"                      element={<FreelancerProfile />} />
+            <Route path="/freelancer/browse"                       element={<BrowseProjects />} />
+            <Route path="/freelancer/submit-proposal/:projectId"   element={<SubmitProposal />} />
+            <Route path="/freelancer/proposals"                    element={<MyProposals />} />
+            <Route path="/freelancer/contracts"                    element={<MyContracts />} />
+            <Route path="/freelancer/messages"                     element={<Messages />} />
+            <Route path="/freelancer/reviews"                      element={<Reviews />} />
+
+            {/* Client */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute allowedRole="client"><div style={{display:"flex"}}><Sidebar /><main style={{flex:1,marginLeft:"250px",minHeight:"100vh"}}><ClientDashboard /></main></div></ProtectedRoute>
+            } />
+            <Route path="/contracts" element={
+              <ProtectedRoute allowedRole="client"><div style={{display:"flex"}}><Sidebar /><main style={{flex:1,marginLeft:"250px",minHeight:"100vh"}}><Contracts /></main></div></ProtectedRoute>
+            } />
+
+            {/* Proposal alternate routes */}
+            <Route path="/submit-proposal/:projectId" element={
+              <ProtectedRoute allowedRole="freelancer"><ProposalSubmit /></ProtectedRoute>
+            } />
+            <Route path="/proposal-tracking" element={
+              <ProtectedRoute allowedRole="freelancer"><ProposalTracking /></ProtectedRoute>
+            } />
+            <Route path="/view-proposals/:projectId" element={
+              <ProtectedRoute allowedRole="client"><ViewProposal /></ProtectedRoute>
+            } />
+
+            {/* Catch-all */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
       </ProposalProvider>
-      <AppRoutes />
     </AuthProvider>
   );
 }

@@ -10,12 +10,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.entities.user import User
 from src.entities.job import Job
 from src.entities.proposal import Proposal
+from src.entities.freelancer_profile import FreelancerProfile
+from src.entities.message import Message
+
 from src.auth.controller import router as auth_router
 from src.jobs.controller import router as jobs_router
 from src.users.router import router as users_router
-from src.auth.controller import router as auth_router
 from src.client_dashboard.router import router as client_dashboard_router
 from src.proposals.controller import router as proposals_router
+from src.messages.router import router as messages_router
 
 load_dotenv()
 
@@ -37,16 +40,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth_router)
-app.include_router(jobs_router)
-app.include_router(proposals_router)
-# ── Routers ──────────────────────────────────
-app.include_router(auth_router,      prefix="/auth",      tags=["Auth"])
 # Include routers
 app.include_router(auth_router)
 app.include_router(client_dashboard_router)
 app.include_router(users_router)
+app.include_router(jobs_router)
 app.include_router(proposals_router, prefix="/proposals", tags=["Proposals"])
+app.include_router(messages_router)
 
 @app.get("/")
 def root():
