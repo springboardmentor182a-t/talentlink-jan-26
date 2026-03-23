@@ -4,7 +4,6 @@ import os
 from dotenv import load_dotenv
 
 from src.database.core import Base, engine
-from fastapi.middleware.cors import CORSMiddleware
 
 # Import all entities to ensure they are registered with Base metadata
 from src.entities.user import User
@@ -12,6 +11,7 @@ from src.entities.job import Job
 from src.entities.proposal import Proposal
 from src.entities.freelancer_profile import FreelancerProfile
 from src.entities.message import Message
+from src.entities.contract import Contract, Milestone
 
 from src.auth.controller import router as auth_router
 from src.jobs.controller import router as jobs_router
@@ -19,6 +19,7 @@ from src.users.router import router as users_router
 from src.client_dashboard.router import router as client_dashboard_router
 from src.proposals.controller import router as proposals_router
 from src.messages.router import router as messages_router
+from src.projects.controller import router as projects_router
 
 load_dotenv()
 
@@ -40,14 +41,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(auth_router)
+# ── Routers ──────────────────────────────────
+app.include_router(auth_router, prefix="/auth", tags=["Auth"])
 app.include_router(client_dashboard_router)
 app.include_router(users_router)
 app.include_router(jobs_router)
 app.include_router(proposals_router, prefix="/proposals", tags=["Proposals"])
 app.include_router(messages_router)
+app.include_router(projects_router)
 
 @app.get("/")
 def root():
-    return {"message": "TalentLink API is running ✅"}
+    return {"message": "TalentLink API is running ✅"}

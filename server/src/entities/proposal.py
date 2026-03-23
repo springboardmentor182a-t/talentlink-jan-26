@@ -8,6 +8,7 @@ from datetime import datetime
 
 class Proposal(Base):
     __tablename__ = "proposals"
+    __table_args__ = {"extend_existing": True}  # ← add this
 
     id = Column(Integer, primary_key=True, index=True)
     job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False)
@@ -22,7 +23,5 @@ class Proposal(Base):
     freelancer_name = Column(String)
     amount = Column(String)
     cover_letter = Column(Text)
-    status = Column(String, default="pending")  # 'pending', 'accepted', 'rejected'
+    status = Column(String, default="pending")
     created_at = Column(DateTime, default=datetime.utcnow)
-
-    # project = relationship("Project", back_populates="proposals")

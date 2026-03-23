@@ -9,7 +9,7 @@ from src.auth.service import get_current_user
 from src.entities.user import User
 from src.entities.proposal import Proposal
 
-router = APIRouter(prefix="/proposals", tags=["Proposals"])
+router = APIRouter(tags=["Proposals"])
 
 
 @router.post("/", response_model=ProposalResponse)
@@ -20,6 +20,18 @@ def submit_proposal(
 ):
     if current_user.role != "freelancer":
         raise HTTPException(status_code=403, detail="Only freelancers can submit proposals")
+    
+    # ── Check for existing proposal ───────────────────────────────
+    existing = db.query(Proposal).filter(
+        Proposal.project_id    == proposal.project_id,
+        Proposal.freelancer_id == current_user.id
+    ).first()
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail="You have already submitted a proposal for this project."
+        )
+    
     return create_proposal(db, proposal, current_user.id)
 
 
@@ -33,7 +45,12 @@ def read_my_proposals(
 
 @router.get("/project/{project_id}", response_model=List[ProposalResponse])
 def get_proposals_by_project(project_id: int, db: Session = Depends(get_db)):
-    return db.query(Proposal).filter(Proposal.job_id == project_id).all()
+    return db.query(Proposal).filter(Proposal.project_id == project_id).all()
+
+
+@router.get("/freelancer/{freelancer_id}", response_model=List[ProposalResponse])
+def get_my_proposals_by_id(freelancer_id: int, db: Session = Depends(get_db)):
+    return db.query(Proposal).filter(Proposal.freelancer_id == freelancer_id).all()
 
 
 @router.put("/{proposal_id}/accept")
@@ -54,3 +71,4 @@ def reject_proposal(proposal_id: int, db: Session = Depends(get_db)):
     proposal.status = "rejected"
     db.commit()
     return {"message": "Rejected"}
+

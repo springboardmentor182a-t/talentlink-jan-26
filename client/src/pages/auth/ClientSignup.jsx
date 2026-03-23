@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../../utils/api";
+import { AuthContext } from "../../context/AuthContext";
 
 const GoogleIcon = () => (
   <svg width="18" height="18" viewBox="0 0 48 48">
@@ -16,9 +17,10 @@ const GitHubIcon = () => (
   </svg>
 );
 
-export default function ClientSignup() {
+export default function FreelancerSignup() {
   const navigate = useNavigate();
-  const [company, setCompany]   = useState("");
+  const { login } = useContext(AuthContext);
+  const [name, setName]         = useState("");
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [error, setError]       = useState("");
@@ -26,14 +28,23 @@ export default function ClientSignup() {
 
   const handleSubmit = async () => {
     setError("");
-    if (!company || !email || !password) { setError("All fields are required."); return; }
+    if (!name || !email || !password) { setError("All fields are required."); return; }
     if (password.length < 6) { setError("Password must be at least 6 characters."); return; }
     try {
       setLoading(true);
-      await api.post("/auth/register", { name: company, email, password, role: "client" });
-      navigate("/client/login");
+      await api.post("/auth/register", { name, email, password, role: "freelancer" });
+      const loginRes = await api.post("/auth/login", { email, password });
+      login({ token: loginRes.data.token, role: loginRes.data.role, user: loginRes.data.user });
+      setTimeout(() => navigate("/dashboard"), 500);
     } catch (err) {
-      setError(err.response?.data?.detail || "Registration failed. Please try again.");
+      const detail = err.response?.data?.detail;
+      setError(
+        typeof detail === "string"
+          ? detail
+          : Array.isArray(detail)
+            ? detail[0]?.msg || "Registration failed. Please try again."
+            : "Registration failed. Please try again."
+      );
     } finally { setLoading(false); }
   };
 
@@ -41,16 +52,21 @@ export default function ClientSignup() {
   const lbl = { display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 };
 
   return (
-    <div style={{ minHeight:"100vh", backgroundColor:"#eff6ff", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Segoe UI',sans-serif" }}>
+    <div style={{ minHeight:"100vh", backgroundColor:"#f5f3ff", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Segoe UI',sans-serif" }}>
       <div style={{ backgroundColor:"#fff", borderRadius:16, padding:"40px 36px", width:"100%", maxWidth:420, boxShadow:"0 4px 24px rgba(0,0,0,0.09)" }}>
 
+        <button onClick={() => navigate("/")}
+          style={{ background:"none", border:"none", fontSize:14, color:"#7c3aed", cursor:"pointer", padding:0, marginBottom:16, display:"flex", alignItems:"center", gap:6 }}>
+          ← Back
+        </button>
+
         <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:24 }}>
-          <div style={{ width:40, height:40, background:"linear-gradient(135deg,#2563eb,#3b82f6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontSize:20 }}>💼</div>
-          <span style={{ fontWeight:700, fontSize:20, color:"#2563eb" }}>TalentLink</span>
+          <div style={{ width:40, height:40, background:"linear-gradient(135deg,#7c3aed,#a855f7)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontSize:20 }}>👤</div>
+          <span style={{ fontWeight:700, fontSize:20, color:"#7c3aed" }}>TalentLink</span>
         </div>
 
-        <h2 style={{ fontSize:22, fontWeight:700, color:"#111827", marginBottom:4, textAlign:"center" }}>Create Client Account</h2>
-        <p style={{ fontSize:14, color:"#6b7280", marginBottom:24, textAlign:"center" }}>Sign up to post projects and hire top freelancers</p>
+        <h2 style={{ fontSize:22, fontWeight:700, color:"#111827", marginBottom:4, textAlign:"center" }}>Create Freelancer Account</h2>
+        <p style={{ fontSize:14, color:"#6b7280", marginBottom:24, textAlign:"center" }}>Join TalentLink and start finding amazing projects</p>
 
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:20 }}>
           <button onClick={() => alert("Google signup coming soon!")}
@@ -75,11 +91,11 @@ export default function ClientSignup() {
           </div>
         )}
 
-        <label style={lbl}>Company Name</label>
-        <input style={inp} type="text" placeholder="Acme Inc." value={company} onChange={e => setCompany(e.target.value)} />
+        <label style={lbl}>Full Name</label>
+        <input style={inp} type="text" placeholder="John Doe" value={name} onChange={e => setName(e.target.value)} />
 
         <label style={lbl}>Email Address</label>
-        <input style={inp} type="email" placeholder="client@company.com" value={email} onChange={e => setEmail(e.target.value)} />
+        <input style={inp} type="email" placeholder="freelancer@example.com" value={email} onChange={e => setEmail(e.target.value)} />
 
         <label style={lbl}>Password</label>
         <input
@@ -90,7 +106,7 @@ export default function ClientSignup() {
 
         <button
           onClick={handleSubmit} disabled={loading}
-          style={{ width:"100%", padding:13, background: loading ? undefined : "linear-gradient(135deg,#2563eb,#3b82f6)", backgroundColor: loading ? "#9ca3af" : undefined, color:"white", border:"none", borderRadius:8, cursor: loading ? "not-allowed" : "pointer", fontWeight:700, fontSize:15 }}>
+          style={{ width:"100%", padding:13, background: loading ? undefined : "linear-gradient(135deg,#7c3aed,#a855f7)", backgroundColor: loading ? "#9ca3af" : undefined, color:"white", border:"none", borderRadius:8, cursor: loading ? "not-allowed" : "pointer", fontWeight:700, fontSize:15 }}>
           {loading ? "Creating Account..." : "Create Account →"}
         </button>
 
@@ -99,7 +115,7 @@ export default function ClientSignup() {
         </p>
         <div style={{ textAlign:"center", marginTop:10, fontSize:13, color:"#6b7280" }}>
           Already have an account?{" "}
-          <Link to="/client/login" style={{ color:"#2563eb", fontWeight:600, textDecoration:"none" }}>Sign in</Link>
+          <Link to="/freelancer/login" style={{ color:"#7c3aed", fontWeight:600, textDecoration:"none" }}>Sign in</Link>
         </div>
       </div>
     </div>
