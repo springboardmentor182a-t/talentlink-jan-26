@@ -5,7 +5,6 @@ import Navbar from '../../layout/Navbar';
 import StatsCard from '../../components/dashboard/StatsCard';
 import RecentProposals from '../../components/dashboard/RecentProposals';
 import NewProjects from '../../components/dashboard/NewProjects';
-import api from '../../utils/api';
 import './Dashboard.css';
 
 const FreelancerDashboard = () => {
@@ -16,8 +15,13 @@ const FreelancerDashboard = () => {
 
     const fetchJobs = useCallback(async () => {
         try {
-            const response = await api.get('/jobs/');
-            setJobs(response.data);
+            const response = await fetch('http://localhost:8000/jobs/', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setJobs(data);
+            }
         } catch (err) {
             console.error('Failed to fetch jobs', err);
         }
@@ -25,8 +29,13 @@ const FreelancerDashboard = () => {
 
     const fetchMyProposals = useCallback(async () => {
         try {
-            const response = await api.get('/proposals/me');
-            setProposals(response.data);
+            const response = await fetch('http://localhost:8000/proposals/me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setProposals(data);
+            }
         } catch (err) {
             console.error("Failed to fetch proposals", err);
         }
@@ -71,38 +80,25 @@ const FreelancerDashboard = () => {
                     <div className="stats-grid">
                         <StatsCard
                             title="Active Contracts"
-                            value={proposals
-                                .filter(p => p.status?.toUpperCase() === 'ACCEPTED')
-                                .filter(p => {
-                                    const job = jobs.find(j => j.id === p.job_id);
-                                    return !job || (job.status?.toUpperCase() !== 'CLOSED' && job.status?.toUpperCase() !== 'COMPLETED');
-                                }).length.toString()}
+                            value="0"
                             icon="💼"
                             colorClass="icon-blue"
                         />
                         <StatsCard
                             title="Pending Proposals"
-                            value={proposals.filter(p => p.status.toUpperCase() === 'PENDING').length.toString()}
+                            value={proposals.length}
                             icon="📄"
                             colorClass="icon-orange"
                         />
                         <StatsCard
                             title="Total Earnings"
-                            value={`$${proposals
-                                .filter(p => p.status.toUpperCase() === 'ACCEPTED')
-                                .reduce((sum, p) => sum + (p.bid_amount || 0), 0)
-                                .toLocaleString()}`}
+                            value="$0"
                             icon="USD"
                             colorClass="icon-green"
                         />
                         <StatsCard
                             title="Completed Projects"
-                            value={proposals
-                                .filter(p => p.status?.toUpperCase() === 'ACCEPTED')
-                                .filter(p => {
-                                    const job = jobs.find(j => j.id === p.job_id);
-                                    return job && (job.status?.toUpperCase() === 'CLOSED' || job.status?.toUpperCase() === 'COMPLETED');
-                                }).length.toString()}
+                            value="0"
                             icon="⭐"
                             colorClass="icon-purple"
                         />

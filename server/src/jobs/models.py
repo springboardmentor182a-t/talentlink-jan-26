@@ -6,8 +6,6 @@ class JobBase(BaseModel):
     title: str
     description: str
     budget: int
-    skills: Optional[str] = None
-    duration: Optional[str] = None
 
 class JobCreate(JobBase):
     pass
@@ -19,4 +17,4 @@ class JobResponse(JobBase):
     created_at: datetime
 
     class Config:
-        from_attributes = True
+        orm_mode = True

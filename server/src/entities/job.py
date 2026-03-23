@@ -10,11 +10,10 @@ class Job(Base):
     title = Column(String, nullable=False)
     description = Column(Text, nullable=False)
     budget = Column(Integer, nullable=False)
-    skills = Column(Text, nullable=True)  # Comma-separated skills
-    duration = Column(String, nullable=True)
     client_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     status = Column(String, default="OPEN")  # OPEN, CLOSED
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # Relationship to User (client)
+    # Relationship to User (client) - need to ensure User has back_populates if we want to access jobs from user
+    # For now, just defining the foreign key relationship here
     client = relationship("User", backref="posted_jobs")

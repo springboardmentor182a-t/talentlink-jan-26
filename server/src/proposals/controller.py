@@ -19,19 +19,49 @@ def submit_proposal(proposal: ProposalCreate, db: Session = Depends(get_db), cur
 @router.get("/me", response_model=List[ProposalResponse])
 def read_my_proposals(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return get_proposals_by_user(db, current_user.id)
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from src.database.core import get_db
+from .model import Proposal
+from .schema import ProposalCreate, ProposalResponse
 
-@router.get("/job/{job_id}", response_model=List[ProposalResponse])
-def read_proposals_by_job(job_id: int, db: Session = Depends(get_db)):
-    from src.proposals.service import get_proposals_for_job
-    return get_proposals_for_job(db, job_id)
+router = APIRouter(prefix="/proposals", tags=["Proposals"])
 
-@router.patch("/{proposal_id}/status", response_model=ProposalResponse)
-def update_proposal(proposal_id: int, status: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    from src.proposals.service import update_proposal_status
-    if current_user.role != "client":
-        raise HTTPException(status_code=403, detail="Only clients can update proposal status")
-    
-    proposal = update_proposal_status(db, proposal_id, status)
+
+@router.post("/", response_model=ProposalResponse)
+def create_proposal(data: ProposalCreate, db: Session = Depends(get_db)):
+    proposal = Proposal(**data.dict())
+    db.add(proposal)
+    db.commit()
+    db.refresh(proposal)
+    return proposal
+
+
+@router.get("/project/{project_id}", response_model=list[ProposalResponse])
+def get_proposals(project_id: int, db: Session = Depends(get_db)):
+    return db.query(Proposal).filter(Proposal.project_id == project_id).all()
+
+
+@router.get("/freelancer/{freelancer_id}", response_model=list[ProposalResponse])
+def get_my_proposals(freelancer_id: int, db: Session = Depends(get_db)):
+    return db.query(Proposal).filter(Proposal.freelancer_id == freelancer_id).all()
+
+
+@router.put("/{proposal_id}/accept")
+def accept_proposal(proposal_id: int, db: Session = Depends(get_db)):
+    proposal = db.query(Proposal).filter(Proposal.id == proposal_id).first()  # ✅ fixed
     if not proposal:
         raise HTTPException(status_code=404, detail="Proposal not found")
-    return proposal
+    proposal.status = "accepted"
+    db.commit()
+    return {"message": "Accepted"}
+
+
+@router.put("/{proposal_id}/reject")
+def reject_proposal(proposal_id: int, db: Session = Depends(get_db)):
+    proposal = db.query(Proposal).filter(Proposal.id == proposal_id).first()  # ✅ fixed
+    if not proposal:
+        raise HTTPException(status_code=404, detail="Proposal not found")
+    proposal.status = "rejected"
+    db.commit()
+    return {"message": "Rejected"}

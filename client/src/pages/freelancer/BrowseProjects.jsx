@@ -1,10 +1,9 @@
-import React, { useState, useRef, useEffect, useMemo, useContext } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../layout/Sidebar';
 import Navbar from '../../layout/Navbar';
 import { Search, Clock, DollarSign, ChevronDown, Check } from 'lucide-react';
-import { AuthContext } from '../../context/AuthContext';
-import api from '../../utils/api';
+import { allProjects } from '../../data/mockProjects';
 import './Dashboard.css';
 
 const CustomDropdown = ({ label, options, value, onChange }) => {
@@ -56,36 +55,6 @@ const CustomDropdown = ({ label, options, value, onChange }) => {
 
 const BrowseProjects = () => {
     const navigate = useNavigate();
-    const { token } = useContext(AuthContext);
-    const [allProjects, setAllProjects] = useState([]);
-    
-    useEffect(() => {
-        const fetchJobs = async () => {
-            try {
-                const response = await api.get('/jobs/');
-                const data = response.data;
-                const formattedData = data.map(job => ({
-                        id: job.id,
-                        title: job.title,
-                        description: job.description,
-                        budget: `$${job.budget.toLocaleString()}`,
-                        numericBudget: job.budget,
-                        duration: job.duration || 'Flexible',
-                        skills: job.skills ? job.skills.split(',') : [],
-                        proposals: 0,
-                        postedDate: new Date(job.created_at).toLocaleDateString(),
-                        status: job.status
-                    }));
-                    setAllProjects(formattedData);
-            } catch (err) {
-                console.error('Failed to fetch jobs', err);
-            }
-        };
-        if (token) {
-            fetchJobs();
-        }
-    }, [token]);
-
     const [filters, setFilters] = useState({
         search: '',
         budgetRange: 'All Budgets',
@@ -118,7 +87,7 @@ const BrowseProjects = () => {
 
             // Budget filter
             let matchesBudget = true;
-            const numericBudget = project.numericBudget || (project.budget ? parseInt(String(project.budget).replace(/[$,]/g, '')) : 0);
+            const numericBudget = project.numericBudget || parseInt(project.budget.replace(/[$,]/g, ''));
 
             if (filters.budgetRange === 'Under $2,000') {
                 matchesBudget = numericBudget < 2000;
@@ -130,7 +99,7 @@ const BrowseProjects = () => {
 
             return matchesSearch && matchesSkill && matchesDuration && matchesBudget;
         });
-    }, [allProjects, filters]);
+    }, [filters]);
 
     const handleFilterChange = (key, value) => {
         setFilters(prev => ({ ...prev, [key]: value }));

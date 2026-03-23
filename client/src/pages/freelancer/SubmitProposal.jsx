@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Sidebar from '../../layout/Sidebar';
 import Navbar from '../../layout/Navbar';
@@ -8,8 +8,8 @@ import {
     ChevronDown,
     Check
 } from 'lucide-react';
-import { AuthContext } from '../../context/AuthContext';
-import api from '../../utils/api';
+import { allProjects } from '../../data/mockProjects';
+import { useProposals } from '../../context/ProposalContext';
 import './Dashboard.css';
 
 const CustomDropdown = ({ label, options, value, onChange, placeholder = "Select option" }) => {
@@ -62,51 +62,18 @@ const CustomDropdown = ({ label, options, value, onChange, placeholder = "Select
 const SubmitProposal = () => {
     const { projectId } = useParams();
     const navigate = useNavigate();
-    const { token } = useContext(AuthContext);
+    const { addProposal } = useProposals();
 
-    const [project, setProject] = useState(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchJob = async () => {
-            try {
-                const response = await api.get(`/jobs/${projectId}`);
-                const data = response.data;
-                setProject({
-                        ...data,
-                        budgetFormatted: `$${data.budget.toLocaleString()}`,
-                        duration: 'Flexible',
-                        skills: [],
-                        proposalsCount: 0
-                    });
-            } catch (err) {
-                console.error("Failed to fetch job", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        if (token && projectId) {
-            fetchJob();
-        }
-    }, [token, projectId]);
+    // Find project by ID
+    const project = allProjects.find(p => p.id === parseInt(projectId));
 
     const [proposalData, setProposalData] = useState({
-        proposedBudget: "",
+        proposedBudget: project ? project.numericBudget.toString() : "",
         deliveryTime: "",
         coverLetter: ""
     });
 
-    useEffect(() => {
-        if (project) {
-            setProposalData(prev => ({
-                ...prev,
-                proposedBudget: project.budget.toString()
-            }));
-        }
-    }, [project]);
-
     const [error, setError] = useState("");
-    const [submitting, setSubmitting] = useState(false);
 
     const deliveryOptions = [
         'Less than 1 week',
@@ -117,32 +84,33 @@ const SubmitProposal = () => {
         '3+ months'
     ];
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
 
+        // Validation check
         if (!proposalData.proposedBudget || !proposalData.deliveryTime || !proposalData.coverLetter.trim()) {
             setError("All fields marked with * are required. Please fill them in before submitting.");
             return;
         }
 
-        setSubmitting(true);
+        const fullProposal = {
+            projectId: parseInt(projectId),
+            title: project.title,
+            description: project.description,
+            skills: project.skills,
+            yourBid: `$${proposalData.proposedBudget}`,
+            delivery: proposalData.deliveryTime,
+            clientBudget: project.budget,
+            coverLetter: proposalData.coverLetter
+        };
+
         setError("");
+        addProposal(fullProposal);
 
-        try {
-            await api.post('/proposals/', {
-                job_id: parseInt(projectId),
-                cover_letter: proposalData.coverLetter,
-                bid_amount: parseInt(proposalData.proposedBudget),
-                delivery_time: proposalData.deliveryTime
-            });
-
+        // Simulation of submission success
+        setTimeout(() => {
             navigate('/freelancer/proposals');
-        } catch (err) {
-            setError(err.response?.data?.detail || "An error occurred. Please try again.");
-            console.error("Proposal submission error", err);
-        } finally {
-            setSubmitting(false);
-        }
+        }, 500);
     };
 
     return (
@@ -151,11 +119,7 @@ const SubmitProposal = () => {
             <div className="dashboard-container">
                 <Sidebar />
                 <div className="main-content scrollable">
-                    {loading ? (
-                        <div className="loading-state">
-                            <div className="spinner">Loading project details...</div>
-                        </div>
-                    ) : !project ? (
+                    {!project ? (
                         <div className="error-container">
                             <h2 className="project-not-found">Project not found</h2>
                             <Link to="/freelancer/browse" className="back-link">Return to Browse Projects</Link>
@@ -182,7 +146,7 @@ const SubmitProposal = () => {
                                 <div className="project-metrics-row-flex">
                                     <div className="metric-context-item">
                                         <span className="metric-label">Client Budget</span>
-                                        <span className="metric-context-value">{project.budgetFormatted}</span>
+                                        <span className="metric-context-value">{project.budget}</span>
                                     </div>
                                     <div className="metric-context-item">
                                         <span className="metric-label">Duration</span>
@@ -201,7 +165,7 @@ const SubmitProposal = () => {
                                     </div>
                                     <div className="metric-context-item">
                                         <span className="metric-label">Proposals</span>
-                                        <span className="metric-context-value">{project.proposalsCount}</span>
+                                        <span className="metric-context-value">{project.proposals}</span>
                                     </div>
                                 </div>
                             </div>
@@ -226,7 +190,7 @@ const SubmitProposal = () => {
                                                     if (error) setError("");
                                                 }}
                                             />
-                                            <span className="field-helper-text">Client's budget: {project.budgetFormatted}</span>
+                                            <span className="field-helper-text">Client's budget: {project.budget}</span>
                                         </div>
                                         <div className="form-group">
                                             <CustomDropdown
@@ -278,9 +242,9 @@ const SubmitProposal = () => {
                                     )}
 
                                     <div className="proposal-form-actions">
-                                        <button type="submit" className="btn-black-submit" disabled={submitting}>
+                                        <button type="submit" className="btn-black-submit">
                                             <Send size={18} />
-                                            <span>{submitting ? "Submitting..." : "Submit Proposal"}</span>
+                                            <span>Submit Proposal</span>
                                         </button>
                                         <button
                                             type="button"

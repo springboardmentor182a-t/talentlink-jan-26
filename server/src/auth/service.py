@@ -4,36 +4,73 @@ from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
+from passlib.context import CryptContext
+from jose import jwt, JWTError
+from datetime import datetime, timedelta, timezone
+from dotenv import load_dotenv
+import os
 
 from src.database.core import SessionLocal, get_db
 from src.entities.user import User
-from src.entities.profile import Profile
-from src.auth.models import ProfileUpdate
 
-SECRET_KEY = "talentlink-secret"
+# Load environment variables
+load_dotenv()
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY not set in .env file!")
+
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 
+# Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 
 
-def hash_password(password: str):
-    return pwd_context.hash(password)
+# ----------------------
+# Password Utilities
+# ----------------------
+def hash_password(password: str) -> str:
+    """Hash password for storage (truncate to 72 bytes for bcrypt safety)."""
+    return pwd_context.hash(password[:72])
 
 
-def verify_password(password, hashed):
-    return pwd_context.verify(password, hashed)
+def verify_password(plain: str, hashed: str) -> bool:
+    """Verify a plain password against the stored hash."""
+    return pwd_context.verify(plain[:72], hashed)
 
 
-def create_token(data: dict):
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    data.update({"exp": expire})
-    return jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
+# ----------------------
+# JWT Token Utilities
+# ----------------------
+def create_token(data: dict, expire_minutes: int = ACCESS_TOKEN_EXPIRE_MINUTES) -> str:
+    """Create a JWT token with expiration."""
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(minutes=expire_minutes)
+    to_encode.update({"exp": expire})
+
+    try:
+        token = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+        return token
+    except JWTError as e:
+        raise RuntimeError(f"Failed to create JWT token: {e}")
 
 
-def register_user(db: Session, name, email, password, role):
+def decode_token(token: str) -> dict:
+    """Decode a JWT token and return payload, raises error if invalid/expired."""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except JWTError as e:
+        raise RuntimeError(f"Invalid or expired token: {e}")
+
+
+# ----------------------
+# User Utilities
+# ----------------------
+def register_user(db, name: str, email: str, password: str, role: str):
+    """Register a new user if email does not exist."""
     existing = db.query(User).filter(User.email == email).first()
     if existing:
         return None
@@ -42,34 +79,19 @@ def register_user(db: Session, name, email, password, role):
         name=name,
         email=email,
         password=hash_password(password),
-        role=role
+        role=role,
     )
     db.add(user)
     db.commit()
     db.refresh(user)
-
-    if role == "freelancer":
-        profile = Profile(
-            user_id=user.id,
-            professional_title="",
-            hourly_rate="0",
-            experience="Less than 1 year",
-            skills=""
-        )
-        db.add(profile)
-        db.commit()
-
     return user
 
 
-def authenticate_user(db: Session, email, password):
+def authenticate_user(db, email: str, password: str):
+    """Authenticate user by email and password."""
     user = db.query(User).filter(User.email == email).first()
-    if not user:
+    if not user or not verify_password(password, user.password):
         return None
-
-    if not verify_password(password, user.password):
-        return None
-
     return user
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
@@ -90,65 +112,3 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     if user is None:
         raise credentials_exception
     return user
-
-
-def get_user_profile(db: Session, user_id: int):
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        return None
-
-    profile = db.query(Profile).filter(Profile.user_id == user_id).first()
-    
-    # If no profile exists yet, return default data based on user account
-    if not profile:
-        return {
-            "fullName": user.name,
-            "professionalTitle": None,
-            "hourlyRate": "0",
-            "location": None,
-            "experience": "Less than 1 year",
-            "email": user.email,
-            "bio": None,
-            "skills": []
-        }
-
-    return {
-        "fullName": user.name,
-        "professionalTitle": profile.professional_title,
-        "hourlyRate": profile.hourly_rate,
-        "location": profile.location,
-        "experience": profile.experience,
-        "email": user.email,
-        "bio": profile.bio,
-        "skills": profile.skills.split(",") if profile.skills else []
-    }
-
-
-def update_user_profile(db: Session, user_id: int, data: ProfileUpdate):
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        return None
-
-    if data.fullName:
-        user.name = data.fullName
-
-    profile = db.query(Profile).filter(Profile.user_id == user_id).first()
-    if not profile:
-        profile = Profile(user_id=user_id)
-        db.add(profile)
-
-    if data.professionalTitle is not None:
-        profile.professional_title = data.professionalTitle
-    if data.hourlyRate is not None:
-        profile.hourly_rate = data.hourlyRate
-    if data.location is not None:
-        profile.location = data.location
-    if data.experience is not None:
-        profile.experience = data.experience
-    if data.bio is not None:
-        profile.bio = data.bio
-    if data.skills is not None:
-        profile.skills = ",".join(data.skills)
-
-    db.commit()
-    return get_user_profile(db, user_id)

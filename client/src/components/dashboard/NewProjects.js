@@ -2,7 +2,13 @@ import React from 'react';
 
 const NewProjects = ({ jobs }) => {
     // Demo data to match the image if no real data
-    const displayJobs = jobs;
+    const demoJobs = [
+        { id: 101, title: 'Build a React E-commerce Platform', budget: '8,000', duration: '2-3 months' },
+        { id: 102, title: 'Python Data Analysis Tool', budget: '4,500', duration: '1-2 months' },
+        { id: 103, title: 'Mobile App Development (iOS & Android)', budget: '12,000', duration: '3-6 months' },
+    ];
+
+    const displayJobs = jobs.length > 0 ? jobs : demoJobs;
 
     return (
         <div className="section-card">

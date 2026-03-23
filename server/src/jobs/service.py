@@ -7,8 +7,6 @@ def create_job(db: Session, job: JobCreate, client_id: int):
         title=job.title,
         description=job.description,
         budget=job.budget,
-        skills=job.skills,
-        duration=job.duration,
         client_id=client_id,
         status="OPEN"
     )

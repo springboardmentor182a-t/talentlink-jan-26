@@ -8,6 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Restore session on page refresh
   useEffect(() => {
     try {
       const savedToken = localStorage.getItem("token");
@@ -43,8 +44,10 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("role");
   };
 
+  if (loading) return null;
+
   return (
-    <AuthContext.Provider value={{ user, role, token, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, role, token, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
