@@ -14,5 +14,9 @@ class ProposalResponse(ProposalCreate):
     status: str
     created_at: Optional[datetime] = None
 
+    # Enriched fields — populated by enrich_proposal() in controller
+    freelancer_name: Optional[str] = None
+    project_title: Optional[str] = None
+
     class Config:
         from_attributes = True

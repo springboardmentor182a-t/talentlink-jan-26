@@ -1,229 +1,238 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import StatsCard from '../components/dashboard/StatsCard';
-import AnalyticsChart from '../components/dashboard/AnalyticsChart';
-import RecentProjects from '../components/dashboard/RecentProjects';
-import { Briefcase, FileText, CheckCircle, Star, LogOut } from 'lucide-react';
+import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import api from "../utils/api";
 
-const ClientDashboard = () => {
-    const { user, logout } = useContext(AuthContext);
-    const navigate = useNavigate();
-    const [stats, setStats] = useState(null);
-    const [projects, setProjects] = useState([]);
-    const [chartData, setChartData] = useState([]);
-    const [loading, setLoading] = useState(true);
+export default function ClientDashboard() {
+  const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const [projects, setProjects]   = useState([]);
+  const [proposals, setProposals] = useState({});
+  const [loading, setLoading]     = useState(true);
 
-    const handleLogout = () => {
-        logout();
-        // navigate('/client/login');
+  useEffect(() => {
+    if (!user) return;
+    const fetchData = async () => {
+      try {
+        const projRes = await api.get(`/projects/client/${user.id}`);
+        const projs = projRes.data;
+        setProjects(projs);
+        const counts = {};
+        await Promise.all(projs.map(async p => {
+          try {
+            const r = await api.get(`/proposals/project/${p.id}`);
+            counts[p.id] = r.data;
+          } catch { counts[p.id] = []; }
+        }));
+        setProposals(counts);
+      } catch (err) {
+        console.error("Dashboard error:", err.message);
+      } finally { setLoading(false); }
     };
+    fetchData();
+  }, [user]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [statsRes, projectsRes, chartRes] = await Promise.all([
-                    fetch(`${process.env.REACT_APP_BASE_URL}/api/client/dashboard/stats`),
-                    fetch(`${process.env.REACT_APP_BASE_URL}/api/client/dashboard/recent-projects`),
-                    fetch(`${process.env.REACT_APP_BASE_URL}/api/client/dashboard/charts`)
-                ]);
+  const open        = projects.filter(p => p.status === "open");
+  const inProgress  = projects.filter(p => p.status === "in-progress");
+  const completed   = projects.filter(p => p.status === "completed");
+  const closed      = projects.filter(p => p.status === "closed");
+  const totalProposals   = Object.values(proposals).reduce((a, b) => a + b.length, 0);
+  const pendingProposals = Object.values(proposals).flat().filter(p => p.status === "pending").length;
 
-                let statsData = await statsRes.json();
-                let projectsData = await projectsRes.json();
-                let chartDataResponse = await chartRes.json();
+  if (loading) return (
+    <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh" }}>
+      <p style={{ color:"#64748b" }}>Loading dashboard...</p>
+    </div>
+  );
 
-                // Mock data if API returns empty or error
-                if (!statsData || Object.keys(statsData).length === 0) {
-                    statsData = {
-                        active_projects: 3,
-                        active_contracts: 2,
-                        proposals_received: 12,
-                        total_spent: '$25,000'
-                    };
-                }
-                if (!projectsData || projectsData.length === 0) {
-                    projectsData = [
-                        {
-                            id: 1,
-                            title: 'Mobile App Development',
-                            budget: '$5,000',
-                            status: 'In Progress',
-                            progress: 60,
-                            freelancer: 'John Dev',
-                            deadline: '2024-03-15'
-                        },
-                        {
-                            id: 2,
-                            title: 'Website Redesign',
-                            budget: '$3,500',
-                            status: 'Completed',
-                            progress: 100,
-                            freelancer: 'Jane Designer',
-                            deadline: '2023-12-31'
-                        },
-                        {
-                            id: 3,
-                            title: 'API Integration',
-                            budget: '$2,000',
-                            status: 'In Progress',
-                            progress: 45,
-                            freelancer: 'Bob Backend',
-                            deadline: '2024-02-28'
-                        }
-                    ];
-                }
-                if (!chartDataResponse || !chartDataResponse.data || chartDataResponse.data.length === 0) {
-                    chartDataResponse = {
-                        data: [
-                            { month: 'Jan', value: 400 },
-                            { month: 'Feb', value: 600 },
-                            { month: 'Mar', value: 800 },
-                            { month: 'Apr', value: 1200 },
-                            { month: 'May', value: 1400 },
-                            { month: 'Jun', value: 1800 }
-                        ]
-                    };
-                }
+  return (
+    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#f8fafc", minHeight:"100vh" }}>
 
-                setStats(statsData);
-                setProjects(projectsData);
-                setChartData(chartDataResponse.data);
-            } catch (error) {
-                console.error("Error fetching dashboard data:", error);
-                // Set mock data on error
-                setStats({
-                    active_projects: 3,
-                    active_contracts: 2,
-                    proposals_received: 12,
-                    total_spent: '$25,000'
-                });
-                setProjects([
-                    {
-                        id: 1,
-                        title: 'Mobile App Development',
-                        budget: '$5,000',
-                        status: 'In Progress',
-                        progress: 60,
-                        freelancer: 'John Dev',
-                        deadline: '2024-03-15'
-                    },
-                    {
-                        id: 2,
-                        title: 'Website Redesign',
-                        budget: '$3,500',
-                        status: 'Completed',
-                        progress: 100,
-                        freelancer: 'Jane Designer',
-                        deadline: '2023-12-31'
-                    },
-                    {
-                        id: 3,
-                        title: 'API Integration',
-                        budget: '$2,000',
-                        status: 'In Progress',
-                        progress: 45,
-                        freelancer: 'Bob Backend',
-                        deadline: '2024-02-28'
-                    }
-                ]);
-                setChartData([
-                    { month: 'Jan', value: 400 },
-                    { month: 'Feb', value: 600 },
-                    { month: 'Mar', value: 800 },
-                    { month: 'Apr', value: 1200 },
-                    { month: 'May', value: 1400 },
-                    { month: 'Jun', value: 1800 }
-                ]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, []);
-
-    if (loading) {
-        return <div style={{ padding: '20px' }}>Loading...</div>;
-    }
-
-    return (
-        <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-            {/* Top Navigation Bar */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '40px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-                    <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontWeight: 600 }}>{user?.name || "Client"}</div>
-                        <div style={{ fontSize: '0.875rem', color: 'var(--muted-foreground)' }}>Client</div>
-                    </div>
-                    <button
-                        onClick={handleLogout}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            backgroundColor: 'transparent',
-                            border: '1px solid var(--border)',
-                            color: 'var(--foreground)',
-                            padding: '8px 16px',
-                            cursor: 'pointer',
-                            borderRadius: 'var(--radius)'
-                        }}>
-                        <LogOut size={16} /> Logout
-                    </button>
-                </div>
-            </div>
-
-            <header style={{ marginBottom: '32px' }}>
-                <h1 style={{ marginBottom: '8px', fontSize: '2rem' }}>Dashboard</h1>
-                <p style={{ color: 'var(--muted-foreground)', margin: 0 }}>
-                    Welcome back! Here's an overview of your projects and activities.
-                </p>
-            </header>
-
-            {/* Stats Grid */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-                gap: '24px',
-                marginBottom: '32px'
-            }}>
-                <StatsCard
-                    title="Active Projects"
-                    value={stats.active_projects}
-                    icon={Briefcase}
-                    color="#2563eb"
-                    bgColor="#EFF6FF"
-                />
-                <StatsCard
-                    title="Pending Proposals"
-                    value={stats.pending_proposals}
-                    icon={FileText}
-                    color="#f97316"
-                    bgColor="#FFF7ED"
-                />
-                <StatsCard
-                    title="Active Contracts"
-                    value={stats.active_contracts}
-                    icon={CheckCircle}
-                    color="#16a34a"
-                    bgColor="#F0FDF4"
-                />
-                <StatsCard
-                    title="Completed Projects"
-                    value={stats.completed_projects}
-                    icon={Star}
-                    color="#9333ea"
-                    bgColor="#FAF5FF"
-                />
-            </div>
-
-            {/* Main Content Grid */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-                <RecentProjects projects={projects} />
-                <AnalyticsChart data={chartData} />
-            </div>
+      {/* Hero */}
+      <div style={{ background:"linear-gradient(135deg,#1e3a5f 0%,#2563eb 50%,#3b82f6 100%)", padding:"32px 32px", position:"relative", overflow:"hidden" }}>
+        <div style={{ position:"absolute", top:-40, right:-40, width:200, height:200, borderRadius:"50%", background:"rgba(255,255,255,0.05)" }} />
+        <div style={{ position:"absolute", bottom:-30, left:300, width:150, height:150, borderRadius:"50%", background:"rgba(255,255,255,0.05)" }} />
+        <div style={{ display:"inline-flex", alignItems:"center", gap:8, backgroundColor:"rgba(255,255,255,0.15)", borderRadius:20, padding:"4px 14px", fontSize:12, color:"white", fontWeight:600, marginBottom:10 }}>
+          👋 Welcome back
         </div>
-    );
-};
+        <h1 style={{ fontSize:28, fontWeight:800, color:"white", margin:"0 0 6px", letterSpacing:"-0.5px" }}>
+          Hello, {user?.name || "Client"} 👋
+        </h1>
+        <p style={{ fontSize:14, color:"rgba(255,255,255,0.75)", margin:0 }}>
+          Here's an overview of your projects and activities
+        </p>
+      </div>
 
-export default ClientDashboard;
+      <div style={{ padding:32 }}>
+
+        {/* Stats Cards */}
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:16, marginBottom:32 }}>
+          {[
+            { label:"Total Projects",    val:projects.length,  icon:"📁", color:"#2563eb", bg:"#eff6ff" },
+            { label:"Open Projects",     val:open.length,      icon:"🟢", color:"#16a34a", bg:"#f0fdf4" },
+            { label:"Total Proposals",   val:totalProposals,   icon:"📋", color:"#7c3aed", bg:"#f5f3ff" },
+            { label:"Pending Proposals", val:pendingProposals, icon:"⏳", color:"#d97706", bg:"#fffbeb" },
+          ].map(s => (
+            <div key={s.label} style={{ backgroundColor:"#fff", borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <div>
+                <div style={{ fontSize:12, color:"#64748b", marginBottom:6, textTransform:"uppercase", letterSpacing:"0.5px" }}>{s.label}</div>
+                <div style={{ fontSize:32, fontWeight:800, color:s.color }}>{s.val}</div>
+              </div>
+              <div style={{ width:48, height:48, borderRadius:14, backgroundColor:s.bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24 }}>{s.icon}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Quick Actions */}
+        <div style={{ backgroundColor:"#fff", borderRadius:16, padding:"20px 24px", marginBottom:28, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <div>
+            <div style={{ fontWeight:700, fontSize:15, color:"#111827" }}>Ready to find talent?</div>
+            <div style={{ fontSize:13, color:"#64748b", marginTop:2 }}>Post a new project and start receiving proposals</div>
+          </div>
+          <div style={{ display:"flex", gap:12 }}>
+            <button onClick={() => navigate("/projects")}
+              style={{ padding:"10px 20px", backgroundColor:"white", color:"#374151", border:"1.5px solid #e2e8f0", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}>
+              View All Projects
+            </button>
+            <button onClick={() => navigate("/post-project")}
+              style={{ padding:"10px 20px", background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"white", border:"none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13, boxShadow:"0 2px 8px rgba(37,99,235,0.3)" }}>
+              + Post New Project
+            </button>
+          </div>
+        </div>
+
+        {/* Open Projects */}
+        {open.length > 0 && (
+          <Section title="Open Projects" count={open.length} dotColor="#16a34a" badgeBg="#dcfce7" badgeColor="#16a34a">
+            {open.map(p => <ProjectCard key={p.id} p={p} proposals={proposals[p.id] || []} navigate={navigate} />)}
+          </Section>
+        )}
+
+        {/* In Progress */}
+        {inProgress.length > 0 && (
+          <Section title="In Progress" count={inProgress.length} dotColor="#f59e0b" badgeBg="#fef3c7" badgeColor="#d97706">
+            {inProgress.map(p => <ProjectCard key={p.id} p={p} proposals={proposals[p.id] || []} navigate={navigate} />)}
+          </Section>
+        )}
+
+        {/* Completed */}
+        {completed.length > 0 && (
+          <Section title="Completed" count={completed.length} dotColor="#7c3aed" badgeBg="#f5f3ff" badgeColor="#7c3aed">
+            {completed.map(p => <ProjectCard key={p.id} p={p} proposals={proposals[p.id] || []} navigate={navigate} />)}
+          </Section>
+        )}
+
+        {/* Closed */}
+        {closed.length > 0 && (
+          <Section title="Closed" count={closed.length} dotColor="#94a3b8" badgeBg="#f1f5f9" badgeColor="#64748b">
+            {closed.map(p => <ProjectCard key={p.id} p={p} proposals={proposals[p.id] || []} navigate={navigate} />)}
+          </Section>
+        )}
+
+        {/* Empty State */}
+        {projects.length === 0 && (
+          <div style={{ backgroundColor:"#fff", borderRadius:16, padding:"60px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+            <div style={{ fontSize:56, marginBottom:16 }}>📁</div>
+            <h3 style={{ fontSize:18, fontWeight:700, color:"#111827", marginBottom:8 }}>No projects yet</h3>
+            <p style={{ color:"#64748b", fontSize:14, marginBottom:20 }}>Post your first project and start receiving proposals from top freelancers.</p>
+            <button onClick={() => navigate("/post-project")}
+              style={{ padding:"12px 28px", background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"white", border:"none", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14, boxShadow:"0 4px 12px rgba(37,99,235,0.3)" }}>
+              Post Your First Project →
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Section({ title, count, dotColor, badgeBg, badgeColor, children }) {
+  return (
+    <div style={{ marginBottom:28 }}>
+      <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
+        <div style={{ width:10, height:10, borderRadius:"50%", backgroundColor:dotColor }} />
+        <h2 style={{ fontSize:18, fontWeight:700, color:"#111827", margin:0 }}>{title}</h2>
+        <span style={{ backgroundColor:badgeBg, color:badgeColor, borderRadius:20, padding:"2px 10px", fontSize:12, fontWeight:600 }}>{count}</span>
+      </div>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:16 }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function ProjectCard({ p, proposals, navigate }) {
+  const pending  = proposals.filter(pr => pr.status === "pending").length;
+  const accepted = proposals.filter(pr => pr.status === "accepted").length;
+
+  const statusStyle = {
+    "open":        { bg:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"white" },
+    "in-progress": { bg:"linear-gradient(135deg,#f59e0b,#f97316)", color:"white" },
+    "completed":   { bg:"linear-gradient(135deg,#16a34a,#22c55e)", color:"white" },
+    "closed":      { bg:"linear-gradient(135deg,#64748b,#94a3b8)", color:"white" },
+  };
+  const s = statusStyle[p.status] || statusStyle["closed"];
+
+  return (
+    <div style={{ backgroundColor:"#fff", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0", display:"flex", flexDirection:"column", gap:12 }}
+      onMouseEnter={e => e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.1)"}
+      onMouseLeave={e => e.currentTarget.style.boxShadow="0 1px 3px rgba(0,0,0,0.06)"}>
+
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+        <h3 style={{ fontSize:16, fontWeight:700, color:"#111827", margin:0, flex:1, marginRight:8 }}>{p.title}</h3>
+        <span style={{ padding:"4px 12px", borderRadius:20, fontSize:11, fontWeight:700, background:s.bg, color:s.color, whiteSpace:"nowrap" }}>
+          {p.status}
+        </span>
+      </div>
+
+      <p style={{ fontSize:13, color:"#64748b", margin:0, lineHeight:1.6 }}>
+        {p.description?.length > 100 ? p.description.slice(0,100) + "..." : p.description}
+      </p>
+
+      {p.skills && (
+        <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
+          {p.skills.split(",").slice(0,3).map(sk => (
+            <span key={sk} style={{ padding:"3px 10px", background:"linear-gradient(135deg,#eff6ff,#dbeafe)", color:"#1d4ed8", borderRadius:20, fontSize:11, fontWeight:600, border:"1px solid #bfdbfe" }}>
+              {sk.trim()}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div style={{ display:"flex", gap:16, paddingTop:12, borderTop:"1px solid #f1f5f9" }}>
+        <div>
+          <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px" }}>Budget</div>
+          <div style={{ fontWeight:700, color:"#111827", fontSize:14 }}>${p.budget}</div>
+        </div>
+        <div>
+          <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px" }}>Deadline</div>
+          <div style={{ fontWeight:700, color:"#111827", fontSize:14 }}>{p.deadline || "—"}</div>
+        </div>
+        <div>
+          <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px" }}>Proposals</div>
+          <div style={{ fontWeight:700, color: proposals.length > 0 ? "#7c3aed" : "#111827", fontSize:14 }}>{proposals.length}</div>
+        </div>
+      </div>
+
+      {proposals.length > 0 && (
+        <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+          {pending > 0 && (
+            <span style={{ padding:"3px 10px", backgroundColor:"#fffbeb", color:"#d97706", borderRadius:20, fontSize:11, fontWeight:600, border:"1px solid #fde68a" }}>
+              ⏳ {pending} pending
+            </span>
+          )}
+          {accepted > 0 && (
+            <span style={{ padding:"3px 10px", backgroundColor:"#f0fdf4", color:"#16a34a", borderRadius:20, fontSize:11, fontWeight:600, border:"1px solid #86efac" }}>
+              ✅ {accepted} accepted
+            </span>
+          )}
+        </div>
+      )}
+
+      <button onClick={() => navigate(`/view-proposals/${p.id}`)}
+        style={{ width:"100%", padding:"10px", background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"white", border:"none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13, boxShadow:"0 2px 8px rgba(37,99,235,0.3)", marginTop:4 }}>
+        👁 View Proposals {proposals.length > 0 && `(${proposals.length})`}
+      </button>
+    </div>
+  );
+}
