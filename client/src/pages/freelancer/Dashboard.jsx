@@ -6,6 +6,7 @@ import StatsCard from '../../components/dashboard/StatsCard';
 import RecentProposals from '../../components/dashboard/RecentProposals';
 import NewProjects from '../../components/dashboard/NewProjects';
 import './Dashboard.css';
+import api from '../../utils/api';
 
 const FreelancerDashboard = () => {
     const { token } = useContext(AuthContext);
@@ -15,31 +16,21 @@ const FreelancerDashboard = () => {
 
     const fetchJobs = useCallback(async () => {
         try {
-            const response = await fetch('http://localhost:8000/jobs/', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setJobs(data);
-            }
+            const response = await api.get('/jobs/');
+            setJobs(response.data);
         } catch (err) {
             console.error('Failed to fetch jobs', err);
         }
-    }, [token]);
+    }, []);
 
     const fetchMyProposals = useCallback(async () => {
         try {
-            const response = await fetch('http://localhost:8000/proposals/me', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setProposals(data);
-            }
+            const response = await api.get('/proposals/me');
+            setProposals(response.data);
         } catch (err) {
             console.error("Failed to fetch proposals", err);
         }
-    }, [token]);
+    }, []);
 
     const fetchDashboardData = useCallback(async () => {
         setLoading(true);
