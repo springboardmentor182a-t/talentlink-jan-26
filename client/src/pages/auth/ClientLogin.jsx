@@ -1,5 +1,6 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
 import api from "../../utils/api";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -24,6 +25,30 @@ export default function ClientLogin() {
   const [password, setPassword] = useState("");
   const [error, setError]       = useState("");
   const [loading, setLoading]   = useState(false);
+  const [visible, setVisible]   = useState(false);
+
+  useEffect(() => { setTimeout(() => setVisible(true), 50); }, []);
+
+  const fadeUp = {
+    opacity: visible ? 1 : 0,
+    transform: visible ? "translateY(0)" : "translateY(24px)",
+    transition: "opacity 0.6s ease, transform 0.6s ease",
+  };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const res = await api.post("/auth/google", { token: tokenResponse.access_token, role: "client" });
+        login({ token: res.data.token, role: res.data.role, user: res.data.user });
+        navigate("/dashboard");
+      } catch { setError("Google login failed. Please try again."); }
+    },
+    onError: () => setError("Google login failed.")
+  });
+
+  const handleGitHub = () => {
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=Ov23lil8Mv6gmI3t7Ecd&scope=user:email`;
+  };
 
   const handleSubmit = async () => {
     const res = await api.post("/auth/login", {
@@ -41,88 +66,96 @@ export default function ClientLogin() {
       setLoading(true);
       const res = await api.post("/auth/login", { email, password });
       const userRole = res.data.role?.toLowerCase();
-      if (userRole !== "client") {
-        setError("This account is not a client. Please use Freelancer Login.");
-        return;
-      }
+      if (userRole !== "client") { setError("This account is not a client. Please use Freelancer Login."); return; }
       login({ token: res.data.token, role: userRole, user: res.data.user });
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.detail || "Invalid email or password. Please try again.");
+      const detail = err.response?.data?.detail;
+      setError(typeof detail === "string" ? detail : Array.isArray(detail) ? detail[0]?.msg || "Invalid email or password." : "Invalid email or password.");
     } finally { setLoading(false); }
   };
 
   return (
-    <div style={{ minHeight:"100vh", backgroundColor:"#eff6ff", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Segoe UI',sans-serif" }}>
-      <div style={{ backgroundColor:"#fff", borderRadius:16, padding:"40px 36px", width:"100%", maxWidth:420, boxShadow:"0 4px 24px rgba(0,0,0,0.09)" }}>
-        
-        {/* Logo */}
+    <div style={{ minHeight:"100vh", background:"linear-gradient(135deg,#0a0520 0%,#0f0c29 30%,#1a0845 60%,#0d1b3e 100%)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Segoe UI',sans-serif", position:"relative", overflow:"hidden" }}>
+      <style>{`
+        @keyframes pulse { 0%,100%{transform:scale(1);opacity:0.8} 50%{transform:scale(1.15);opacity:1} }
+        .inp-focus:focus { border-color:#2563eb !important; box-shadow:0 0 0 3px rgba(37,99,235,0.1) !important; }
+        .btn-hover:hover { transform:translateY(-2px) !important; box-shadow:0 8px 25px rgba(37,99,235,0.6) !important; }
+        .social-hover:hover { transform:translateY(-1px) !important; box-shadow:0 4px 12px rgba(0,0,0,0.15) !important; }
+      `}</style>
+
+      {/* Blobs */}
+      <div style={{ position:"fixed", top:-150, left:-150, width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle, rgba(37,99,235,0.6) 0%, rgba(37,99,235,0.2) 40%, transparent 70%)", pointerEvents:"none", animation:"pulse 4s ease-in-out infinite", filter:"blur(30px)" }} />
+      <div style={{ position:"fixed", bottom:-150, right:-150, width:550, height:550, borderRadius:"50%", background:"radial-gradient(circle, rgba(124,58,237,0.6) 0%, rgba(124,58,237,0.2) 40%, transparent 70%)", pointerEvents:"none", animation:"pulse 5s ease-in-out infinite reverse", filter:"blur(30px)" }} />
+      <div style={{ position:"fixed", top:50, right:-100, width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle, rgba(59,130,246,0.5) 0%, transparent 70%)", pointerEvents:"none", animation:"pulse 6s ease-in-out infinite 1s", filter:"blur(25px)" }} />
+      <div style={{ position:"fixed", top:"40%", left:-80, width:350, height:350, borderRadius:"50%", background:"radial-gradient(circle, rgba(168,85,247,0.5) 0%, transparent 70%)", pointerEvents:"none", animation:"pulse 5s ease-in-out infinite 2s", filter:"blur(25px)" }} />
+
+      {/* White Card */}
+      <div style={{ ...fadeUp, position:"relative", zIndex:10, backgroundColor:"#ffffff", borderRadius:24, padding:"44px 40px", width:"100%", maxWidth:440, boxShadow:"0 20px 60px rgba(0,0,0,0.4)", border:"1px solid rgba(255,255,255,0.2)" }}>
+
         <button onClick={() => navigate("/")}
-  style={{ background:"none", border:"none", fontSize:14, color:"#2563eb", cursor:"pointer", padding:0, marginBottom:16, display:"flex", alignItems:"center", gap:6 }}>
-  ← Back
-</button>
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:24 }}>
-          <div style={{ width:40, height:40, background:"linear-gradient(135deg,#2563eb,#3b82f6)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontSize:20 }}>💼</div>
-          <span style={{ fontWeight:700, fontSize:20, color:"#2563eb" }}>TalentLink</span>
+          style={{ background:"none", border:"none", fontSize:14, color:"#2563eb", cursor:"pointer", padding:"4px 0", marginBottom:20, display:"flex", alignItems:"center", gap:6, fontWeight:500 }}>
+          ← Back
+        </button>
+
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:28 }}>
+          <div style={{ width:44, height:44, background:"linear-gradient(135deg,#2563eb,#7c3aed)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontSize:22, boxShadow:"0 4px 15px rgba(37,99,235,0.4)" }}>💼</div>
+          <span style={{ fontWeight:800, fontSize:22, background:"linear-gradient(135deg,#2563eb,#7c3aed)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>TalentLink</span>
         </div>
 
-        <h2 style={{ fontSize:22, fontWeight:700, color:"#111827", marginBottom:4, textAlign:"center" }}>Client Login</h2>
-        <p style={{ fontSize:14, color:"#6b7280", marginBottom:24, textAlign:"center" }}>Access your dashboard to manage projects and freelancers</p>
+        <h2 style={{ fontSize:24, fontWeight:800, color:"#111827", marginBottom:6, textAlign:"center", letterSpacing:"-0.5px" }}>Client Login</h2>
+        <p style={{ fontSize:14, color:"#6b7280", marginBottom:28, textAlign:"center" }}>Access your dashboard to manage projects and freelancers</p>
 
-        {/* Social Buttons */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:20 }}>
-          <button onClick={() => alert("Google login coming soon!")}
-            style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:11, border:"1.5px solid #e5e7eb", borderRadius:8, cursor:"pointer", backgroundColor:"white", fontSize:14, fontWeight:600, color:"#374151" }}>
+          <button className="social-hover" onClick={() => googleLogin()}
+            style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:12, border:"1.5px solid #e5e7eb", borderRadius:10, cursor:"pointer", backgroundColor:"white", fontSize:14, fontWeight:600, color:"#374151", transition:"all 0.2s" }}>
             <GoogleIcon /> Google
           </button>
-          <button onClick={() => alert("GitHub login coming soon!")}
-            style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:11, border:"1.5px solid #24292e", borderRadius:8, cursor:"pointer", backgroundColor:"#24292e", fontSize:14, fontWeight:600, color:"white" }}>
+          <button className="social-hover" onClick={handleGitHub}
+            style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:12, border:"1.5px solid #24292e", borderRadius:10, cursor:"pointer", backgroundColor:"#24292e", fontSize:14, fontWeight:600, color:"white", transition:"all 0.2s" }}>
             <GitHubIcon /> GitHub
           </button>
         </div>
 
-        {/* Divider */}
         <div style={{ display:"flex", alignItems:"center", gap:12, margin:"20px 0", color:"#9ca3af", fontSize:12 }}>
           <div style={{ flex:1, height:1, backgroundColor:"#e5e7eb" }} />
           or continue with email
           <div style={{ flex:1, height:1, backgroundColor:"#e5e7eb" }} />
         </div>
 
-        {/* Error */}
         {error && (
-          <div style={{ backgroundColor:"#fef2f2", border:"1.5px solid #fecaca", borderRadius:8, padding:"10px 14px", fontSize:13, color:"#dc2626", marginBottom:16 }}>
+          <div style={{ backgroundColor:"#fef2f2", border:"1.5px solid #fecaca", borderRadius:10, padding:"12px 16px", fontSize:13, color:"#dc2626", marginBottom:16 }}>
             ⚠️ {error}
           </div>
         )}
 
-        {/* Form */}
         <label style={{ display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 }}>Email</label>
-        <input
+        <input className="inp-focus"
           type="email" placeholder="client@company.com" value={email}
           onChange={e => setEmail(e.target.value)}
-          style={{ width:"100%", padding:"11px 14px", border:"1.5px solid #e5e7eb", borderRadius:8, fontSize:14, backgroundColor:"#f9fafb", outline:"none", boxSizing:"border-box", marginBottom:16 }}
+          style={{ width:"100%", padding:"12px 16px", border:"1.5px solid #e5e7eb", borderRadius:10, fontSize:14, backgroundColor:"#f9fafb", outline:"none", boxSizing:"border-box", marginBottom:16, transition:"all 0.2s", color:"#111827" }}
         />
 
         <label style={{ display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 }}>Password</label>
-        <input
+        <input className="inp-focus"
           type="password" placeholder="••••••••" value={password}
           onChange={e => setPassword(e.target.value)}
           onKeyDown={e => e.key === "Enter" && handleSubmit()}
-          style={{ width:"100%", padding:"11px 14px", border:"1.5px solid #e5e7eb", borderRadius:8, fontSize:14, backgroundColor:"#f9fafb", outline:"none", boxSizing:"border-box", marginBottom:20 }}
+          style={{ width:"100%", padding:"12px 16px", border:"1.5px solid #e5e7eb", borderRadius:10, fontSize:14, backgroundColor:"#f9fafb", outline:"none", boxSizing:"border-box", marginBottom:24, transition:"all 0.2s", color:"#111827" }}
         />
 
-        <button
+        <button className="btn-hover"
           onClick={handleSubmit} disabled={loading}
-          style={{ width:"100%", padding:13, background: loading ? undefined : "linear-gradient(135deg,#2563eb,#3b82f6)", backgroundColor: loading ? "#9ca3af" : undefined, color:"white", border:"none", borderRadius:8, cursor: loading ? "not-allowed" : "pointer", fontWeight:700, fontSize:15 }}>
+          style={{ width:"100%", padding:14, background: loading ? "#cbd5e1" : "linear-gradient(135deg,#2563eb,#7c3aed)", color:"white", border:"none", borderRadius:10, cursor: loading ? "not-allowed" : "pointer", fontWeight:700, fontSize:15, boxShadow:"0 4px 15px rgba(37,99,235,0.4)", transition:"all 0.2s" }}>
           {loading ? "Signing in..." : "Sign In →"}
         </button>
 
-        <div style={{ textAlign:"center", marginTop:14, fontSize:13, color:"#6b7280" }}>
+        <div style={{ textAlign:"center", marginTop:16, fontSize:13, color:"#6b7280" }}>
           <Link to="/forgot-password" style={{ color:"#2563eb", fontWeight:600, textDecoration:"none" }}>Forgot Password?</Link>
         </div>
         <div style={{ textAlign:"center", marginTop:10, fontSize:13, color:"#6b7280" }}>
           Don't have an account?{" "}
-          <Link to="/client/signup" style={{ color:"#2563eb", fontWeight:600, textDecoration:"none" }}>Sign up</Link>
+          <Link to="/client/signup" style={{ color:"#2563eb", fontWeight:700, textDecoration:"none" }}>Sign up</Link>
         </div>
       </div>
     </div>
