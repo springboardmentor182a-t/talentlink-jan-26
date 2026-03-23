@@ -20,3 +20,9 @@ body {
 #root {
   min-height: 100vh;
 }
+
+/* ── Loading dots animation for ChatArea ── */
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-6px); }
+}

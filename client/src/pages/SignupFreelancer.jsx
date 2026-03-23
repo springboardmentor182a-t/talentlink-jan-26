@@ -8,7 +8,7 @@ const SignupFreelancer = () => {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <Link to="/signup" className="back-nav">
+        <Link to="/" className="back-nav">
           <ArrowLeft size={16} /> Back
         </Link>
 
