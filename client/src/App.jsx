@@ -3,7 +3,7 @@ import { useAuth } from './features/hooks/useAuth';
 import Layout from "./layout/PageContainer";
 import "./assets/theme.css";
 
-// Profile & Proposal Pages (Your features)
+// --- PROFILE & PROPOSAL PAGES ---
 import FreelancerProfile from "./pages/FreelancerProfile";
 import ClientProfile from "./pages/ClientProfile";
 import FreelancerView from "./pages/FreelancerView";
@@ -11,11 +11,9 @@ import ClientView from "./pages/ClientView";
 import SubmitProposal from "./pages/SubmitProposal";
 import PostProject from "./pages/PostProject";
 import ProjectFeed from "./pages/ProjectFeed";
-
-// FindProjects — findproject teammate
 import FindProjects from './pages/FindProjects';
 
-// Auth & Dashboard pages
+// --- AUTH & TEAM PAGES ---
 import RoleSelection from './pages/RoleSelection';
 import Login from './pages/Login';
 import SignupFreelancer from './pages/SignupFreelancer';
@@ -26,10 +24,13 @@ import OAuthCallback from './pages/OAuthCallback';
 import Dashboard from './pages/Dashboard';
 import Messages from './pages/Messages';
 
-// Contracts
+// --- CONTRACTS ---
 import ContractsClient from './pages/ContractsClient';
 import ContractsFreelancer from './pages/ContractsFreelancer';
 
+/**
+ * ProtectedRoute: Redirects unauthenticated users to /login.
+ */
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return null;
@@ -54,7 +55,6 @@ export default function App() {
   return (
     <Router>
       <Routes>
-
         {/* ── Public auth flow ───────────────────────────────────────── */}
         <Route path="/" element={<PublicOnlyRoute><RoleSelection /></PublicOnlyRoute>} />
         <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
@@ -62,18 +62,15 @@ export default function App() {
         <Route path="/signup/client" element={<PublicOnlyRoute><SignupClient /></PublicOnlyRoute>} />
         <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-
-        {/* ── OAuth callback — public, no auth required ─────────────── */}
         <Route path="/auth/callback" element={<OAuthCallback />} />
 
         {/* ── Protected routes — require login ──────────────────────── */}
         <Route element={<Layout />}>
-
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/freelancer/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/client/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
-          {/* Marketplace Core (Your Routes + Teammate's FindProjects) */}
+          {/* Marketplace Core */}
           <Route path="/projects" element={<ProtectedRoute><ProjectFeed /></ProtectedRoute>} />
           <Route path="/post-project" element={<ProtectedRoute><PostProject /></ProtectedRoute>} />
           <Route path="/find-projects" element={<ProtectedRoute><FindProjects /></ProtectedRoute>} />
@@ -84,17 +81,13 @@ export default function App() {
           <Route path="/profile/client" element={<ProtectedRoute><ClientView /></ProtectedRoute>} />
           <Route path="/profile/client/edit" element={<ProtectedRoute><ClientProfile /></ProtectedRoute>} />
 
-          {/* Proposals */}
+          {/* Proposals & Contracts */}
           <Route path="/projects/:projectId/apply" element={<ProtectedRoute><SubmitProposal /></ProtectedRoute>} />
+          <Route path="/contracts" element={<ProtectedRoute><ContractsRoute /></ProtectedRoute>} />
 
           {/* Messages */}
           <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
-
-          {/* Contracts — role-based split */}
-          <Route path="/contracts" element={<ProtectedRoute><ContractsRoute /></ProtectedRoute>} />
-
         </Route>
-
       </Routes>
     </Router>
   );

@@ -91,24 +91,32 @@ class ConnectionManager:
 
     async def connect(self, user_id: int, websocket: WebSocket):
         await websocket.accept()
+
+        # Gracefully close an existing socket (second-tab scenario) before
+        # replacing the reference so we don't leak connection objects.
         if user_id in self.active_connections:
             old_ws = self.active_connections[user_id]
             try:
                 await old_ws.close(code=4000)
             except Exception:
-                pass
+                pass  # already dead — that's fine
+
         self.active_connections[user_id] = websocket
 
     def disconnect(self, user_id: int, websocket: WebSocket):
+        # Only remove if it's still THIS socket — a second tab may have already
+        # replaced the reference before the first tab's disconnect fires.
         if self.active_connections.get(user_id) is websocket:
             del self.active_connections[user_id]
 
     async def send_to_user(self, user_id: int, payload: dict):
+        """Push a JSON payload to a specific user. Silent no-op if offline."""
         websocket = self.active_connections.get(user_id)
         if websocket:
             try:
                 await websocket.send_json(payload)
             except Exception:
+                # Socket died between the lookup and the send — remove stale entry.
                 self.active_connections.pop(user_id, None)
 
     def is_online(self, user_id: int) -> bool:
@@ -116,7 +124,6 @@ class ConnectionManager:
 
     def online_user_ids(self) -> list[int]:
         return list(self.active_connections.keys())
-
 
 manager = ConnectionManager()
 
@@ -200,7 +207,34 @@ async def websocket_endpoint(
                 "status":  "offline",
             })
 
+# ==========================================================
+# --- ENDPOINTS: Dashboard & Skills (Dynamic Data) ---
+# ==========================================================
+from sqlalchemy.sql import func
+from src.users.models import FreelancerProfile, Proposal, Skill
+
+@app.get("/api/skills", tags=["Skills"])
+def get_all_skills(db: Session = Depends(get_db)):
+    skills = db.query(Skill).all()
+    return [{"id": skill.id, "name": skill.name} for skill in skills]
+
+@app.post("/api/skills/seed", tags=["Skills"])
+def seed_skills(db: Session = Depends(get_db)):
+    """A temporary endpoint to fill the database with initial skills"""
+    initial_skills = [
+        'React', 'Node.js', 'TypeScript', 'JavaScript', 'Python', 
+        'MongoDB', 'PostgreSQL', 'AWS', 'Docker', 'Git', 'REST API'
+    ]
+    for skill_name in initial_skills:
+        existing_skill = db.query(Skill).filter(Skill.name == skill_name).first()
+        if not existing_skill:
+            db.add(Skill(name=skill_name))
+            
+    db.commit()
+    return {"message": "Database seeded with default skills successfully!"}
+
 
 @app.get("/")
 async def root():
-    return {"message": "TalentLink API", "version": "1.0.0"}
+    return {"message": "TalentLink API is running", "status": "online"}
+
