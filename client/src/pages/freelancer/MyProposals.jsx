@@ -1,13 +1,63 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Sidebar from '../../layout/Sidebar';
 import Navbar from '../../layout/Navbar';
 import { FileText, CheckCircle, XCircle } from 'lucide-react';
-import { useProposals } from '../../context/ProposalContext';
+import { AuthContext } from '../../context/AuthContext';
 import { DollarSign, Clock, Calendar } from 'lucide-react';
+import api from '../../utils/api';
 import './Dashboard.css';
 
 const MyProposals = () => {
-    const { proposals, getStats } = useProposals();
+    const { token } = useContext(AuthContext);
+    const [proposals, setProposals] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [proposalsRes, jobsRes] = await Promise.all([
+                    api.get('/proposals/me'),
+                    api.get('/jobs/')
+                ]);
+                
+                const proposalsData = proposalsRes.data;
+                const jobsData = jobsRes.data;
+                    
+                    const enrichedProposals = proposalsData.map(p => {
+                        const job = jobsData.find(j => j.id === p.job_id);
+                        return {
+                            id: p.id,
+                            status: p.status.toLowerCase(),
+                            title: job ? job.title : "Unknown Project",
+                            description: job ? job.description : "",
+                            yourBid: `$${p.bid_amount.toLocaleString()}`,
+                            delivery: p.delivery_time || "Flexible",
+                            clientBudget: job ? `$${job.budget.toLocaleString()}` : "$0",
+                            skills: job && job.skills ? job.skills.split(',') : [],
+                            submittedDate: new Date(p.created_at || Date.now()).toLocaleDateString(),
+                            coverLetter: p.cover_letter
+                        };
+                    });
+                    setProposals(enrichedProposals);
+            } catch (error) {
+                console.error("Error fetching data", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        if (token) {
+            fetchData();
+        }
+    }, [token]);
+
+    const getStats = () => {
+        return {
+            pending: proposals.filter(p => p.status === 'pending').length,
+            accepted: proposals.filter(p => p.status === 'accepted').length,
+            rejected: proposals.filter(p => p.status === 'rejected').length
+        };
+    };
+    
     const stats = getStats();
 
     return (
@@ -21,6 +71,12 @@ const MyProposals = () => {
                         <p className="page-subtitle">Monitor the status of all your submitted proposals</p>
                     </div>
 
+                    {loading ? (
+                        <div className="loading-state" style={{ padding: '40px', textAlign: 'center' }}>
+                            <div className="spinner">Fetching proposals...</div>
+                        </div>
+                    ) : (
+                        <>
                     <div className="stats-row-grid">
                         <div className="stat-card-white">
                             <div className="stat-card-content">
@@ -70,6 +126,8 @@ const MyProposals = () => {
                             </>
                         )}
                     </div>
+                        </>
+                    )}
                 </div>
             </div>
         </div>

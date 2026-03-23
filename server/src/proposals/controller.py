@@ -19,3 +19,19 @@ def submit_proposal(proposal: ProposalCreate, db: Session = Depends(get_db), cur
 @router.get("/me", response_model=List[ProposalResponse])
 def read_my_proposals(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return get_proposals_by_user(db, current_user.id)
+
+@router.get("/job/{job_id}", response_model=List[ProposalResponse])
+def read_proposals_by_job(job_id: int, db: Session = Depends(get_db)):
+    from src.proposals.service import get_proposals_for_job
+    return get_proposals_for_job(db, job_id)
+
+@router.patch("/{proposal_id}/status", response_model=ProposalResponse)
+def update_proposal(proposal_id: int, status: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    from src.proposals.service import update_proposal_status
+    if current_user.role != "client":
+        raise HTTPException(status_code=403, detail="Only clients can update proposal status")
+    
+    proposal = update_proposal_status(db, proposal_id, status)
+    if not proposal:
+        raise HTTPException(status_code=404, detail="Proposal not found")
+    return proposal

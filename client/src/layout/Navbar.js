@@ -27,8 +27,8 @@ const Navbar = () => {
             <div className="top-right-section">
                 <div className="user-profile">
                     <div className="user-info">
-                        <div className="user-name">{user?.name || 'Alex Morgan'}</div>
-                        <div className="user-role">{user?.role || 'Freelancer'}</div>
+                        <div className="user-name">{user?.name || ''}</div>
+                        <div className="user-role">{user?.role || ''}</div>
                     </div>
                 </div>
                 <button className="logout-btn" onClick={handleLogout}>
