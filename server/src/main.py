@@ -81,7 +81,7 @@ app.include_router(users_router,     prefix="/api/users",     tags=["Users"])
 app.include_router(todos_router,     prefix="/api/todos",     tags=["Todos"])
 app.include_router(messages_router,  prefix="/api/messages",  tags=["Messages"])
 app.include_router(contracts_router, prefix="/api/contracts", tags=["Contracts"])
-app.include_router(projects_router,                           tags=["Projects"])
+app.include_router(projects_router, prefix="/api",            tags=["Projects"])
 
 
 # ── WebSocket Connection Manager ──────────────────────────────────────────────

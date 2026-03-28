@@ -1,7 +1,7 @@
 // client/src/pages/FreelancerView.jsx
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Star, Plus } from "lucide-react";
+
 import { getFreelancerProfile } from "../services/api";
 
 export default function FreelancerView() {
@@ -59,11 +59,6 @@ export default function FreelancerView() {
             {/* DYNAMIC DATA IS HERE */}
             <h1 className="text-xl font-bold text-gray-900">{profile.full_name}</h1>
             <p className="text-gray-500 text-sm mb-2">{profile.title}</p>
-            
-            <div className="flex items-center justify-center gap-1 mb-6 text-orange-500 font-bold">
-              <Star className="h-4 w-4 fill-current" /> {profile.rating || "0.0"} <span className="text-gray-400 font-normal text-sm">(0 reviews)</span>
-            </div>
-
             <Link to="/profile/freelancer/edit" className="block w-full py-2.5 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition">
               Edit Profile
             </Link>
@@ -78,7 +73,7 @@ export default function FreelancerView() {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Experience</span>
-                <span className="font-medium text-gray-900">{profile.years_experience} Years</span>
+                <span className="font-medium text-gray-900">{profile.years_experience ?? '—'}</span>
               </div>
             </div>
           </div>

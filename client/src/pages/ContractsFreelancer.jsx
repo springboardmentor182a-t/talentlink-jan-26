@@ -347,6 +347,7 @@ const ContractsFreelancer = () => {
   const [activeFilter, setActiveFilter]       = useState('all');
   const [editingContract, setEditingContract] = useState(null);
   const [detailContract, setDetailContract]   = useState(null);
+  const [actionError, setActionError]         = useState(null);
 
   useEffect(() => {
     const fetchContracts = async () => {
@@ -371,7 +372,7 @@ const ContractsFreelancer = () => {
       const res = await ContractsService.sign(id);
       setContracts(prev => prev.map(c => c.id === id ? res.data : c));
     } catch (err) {
-      alert(err.response?.data?.detail ?? 'Failed to sign contract');
+      setActionError(err.response?.data?.detail ?? 'Failed to sign contract.');
     }
   };
 
@@ -381,7 +382,7 @@ const ContractsFreelancer = () => {
       setContracts(prev => prev.map(c => c.id === id ? res.data : c));
       setEditingContract(null);
     } catch (err) {
-      alert(err.response?.data?.detail ?? 'Failed to submit edits');
+      setActionError(err.response?.data?.detail ?? 'Failed to submit edits.');
     }
   };
 
@@ -397,7 +398,7 @@ const ContractsFreelancer = () => {
       setDetailContract(updated);
       return updated;
     } catch (err) {
-      alert(err.response?.data?.detail ?? 'Failed to update milestone');
+      setActionError(err.response?.data?.detail ?? 'Failed to update milestone.');
       return null;
     }
   };
@@ -408,6 +409,12 @@ const ContractsFreelancer = () => {
 
   return (
     <div className="contracts-page">
+      {actionError && (
+        <div style={{ margin: '0 0 16px', padding: '12px 16px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, color: '#dc2626', fontSize: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>⚠️ {actionError}</span>
+          <button onClick={() => setActionError(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontWeight: 'bold', fontSize: 16, lineHeight: 1 }}>✕</button>
+        </div>
+      )}
       <div className="contracts-header">
         <h1 className="contracts-header__title">My Contracts</h1>
       </div>

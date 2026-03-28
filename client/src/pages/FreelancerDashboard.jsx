@@ -1,85 +1,68 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axiosInstance from "../services/axios";
 
 const FreelancerDashboard = () => {
-  const [data, setData] = useState(null);
+  const [contracts, setContracts] = useState([]);
+  const [proposals, setProposals] = useState([]);
+  const [loading, setLoading]     = useState(true);
 
-  // --- 1. DEFINE THE API URL ---
-  // Checks for the environment variable first. If missing, uses localhost.
-  const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
+  // Pull real user from localStorage — same pattern as rest of the app
+  const storedUser  = JSON.parse(localStorage.getItem("user") || "{}");
+  const username    = storedUser.username || storedUser.email || "there";
 
-  // --- 2. FETCH DATA (Using the Variable) ---
   useEffect(() => {
-    console.log(`Connecting to backend at: ${API_URL}`);
-    axios.get(`${API_URL}/dashboard/`)
-      .then(res => setData(res.data))
-      .catch(err => console.error("Connection Error:", err));
+    const userId = storedUser.id;
+    Promise.all([
+      axiosInstance.get("/contracts/").catch(() => ({ data: [] })),
+      userId
+        ? axiosInstance.get(`/users/${userId}/proposals`).catch(() => ({ data: [] }))
+        : Promise.resolve({ data: [] }),
+    ]).then(([contractsRes, proposalsRes]) => {
+      setContracts(contractsRes.data);
+      setProposals(proposalsRes.data);
+    }).finally(() => setLoading(false));
   }, []);
 
-  // --- 3. APPLY FUNCTION (Using the Variable) ---
-  const handleApplyNow = async (projectId) => {
-    try {
-      const response = await axios.post(`${API_URL}/proposals/`, {
-        project_id: projectId,
-        cover_letter: "I am interested in this project!",
-        bid_amount: 500.0
-      });
+  const activeProjects  = contracts.filter(c => c.status === "active").length;
+  const proposalsSent   = proposals.length;
 
-      if (response.status === 200 || response.status === 201) {
-        alert("Success! Proposal sent to backend.");
-      }
-    } catch (error) {
-      console.error(error);
-      alert(`Error: Could not reach ${API_URL}/proposals/`);
-    }
-  };
-
-  if (!data) return <div style={{ padding: '40px' }}>Connecting to {API_URL}...</div>;
+  const stats = [
+    { label: "Active Projects",  value: loading ? "—" : activeProjects },
+    { label: "Proposals Sent",   value: loading ? "—" : proposalsSent  },
+    { label: "Profile Views",    value: "—" },
+  ];
 
   return (
-    <div style={{ padding: '40px', backgroundColor: '#F8F9FA', minHeight: '100vh', fontFamily: 'sans-serif' }}>
-      <h1>{data.welcome_msg}</h1>
-      <p style={{ color: '#6C757D', marginBottom: '30px' }}>Ready to find your next project?</p>
+    <div style={{ padding: "40px", backgroundColor: "#F8F9FA", minHeight: "100vh", fontFamily: "sans-serif" }}>
 
-      {/* Stats Cards Section */}
-      <div style={{ display: 'flex', gap: '20px', marginBottom: '40px' }}>
-        {Object.entries(data.stats).map(([key, val], i) => (
-          <div key={i} style={{ flex: 1, padding: '20px', backgroundColor: 'white', borderRadius: '15px', border: '1px solid #E9ECEF' }}>
-            <h2 style={{ margin: 0 }}>{val}</h2>
-            <p style={{ margin: 0, color: '#6C757D', fontSize: '14px' }}>{key.replace('_', ' ')}</p>
+      {/* Welcome card */}
+      <div style={{ backgroundColor: "white", borderRadius: "15px", padding: "30px", border: "1px solid #E9ECEF", marginBottom: "30px" }}>
+        <h1 style={{ margin: "0 0 6px 0" }}>Welcome back 👋</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <span style={{ color: "#6C757D", fontSize: "15px" }}>{username}</span>
+          <span style={{
+            backgroundColor: "#FFF5EE",
+            color: "#FF7A1A",
+            padding: "2px 10px",
+            borderRadius: "999px",
+            fontSize: "12px",
+            fontWeight: 600,
+          }}>
+            freelancer
+          </span>
+        </div>
+      </div>
+
+      {/* Stat cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px" }}>
+        {stats.map((stat, i) => (
+          <div key={i} style={{ backgroundColor: "white", borderRadius: "15px", padding: "25px", border: "1px solid #E9ECEF" }}>
+            <p style={{ margin: "0 0 8px 0", color: "#6C757D", fontSize: "14px" }}>{stat.label}</p>
+            <h2 style={{ margin: 0, fontSize: "28px", fontWeight: 700 }}>{stat.value}</h2>
           </div>
         ))}
       </div>
 
-      <div style={{ display: 'flex', gap: '30px' }}>
-        {/* Recommended Projects List */}
-        <div style={{ flex: 2 }}>
-          <h3>🎯 Recommended Projects</h3>
-          {data.recommended_projects.map((project) => (
-            <div key={project.id} style={{ backgroundColor: 'white', padding: '25px', borderRadius: '15px', border: '1px solid #E9ECEF', marginBottom: '15px' }}>
-              <h4>{project.title}</h4>
-              <p style={{ color: '#6C757D' }}>{project.client} • {project.budget}</p>
-              <button 
-                onClick={() => handleApplyNow(project.id)}
-                style={{ backgroundColor: '#FF7A1A', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', cursor: 'pointer' }}
-              >
-                Apply Now
-              </button>
-            </div>
-          ))}
-        </div>
-
-        {/* Active Contracts Column */}
-        <div style={{ flex: 1 }}>
-          <h3>📋 Active Contracts</h3>
-          <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '15px', border: '1px solid #E9ECEF' }}>
-            <p style={{ fontWeight: 'bold' }}>{data.active_contract.title}</p>
-            <div style={{ height: '8px', backgroundColor: '#E9ECEF', borderRadius: '4px', marginTop: '10px' }}>
-              <div style={{ width: `${data.active_contract.progress}%`, height: '100%', backgroundColor: '#FF7A1A', borderRadius: '4px' }}></div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

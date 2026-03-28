@@ -501,6 +501,7 @@ const ContractsClient = () => {
   const [search, setSearch]             = useState('');
   const [showNewModal, setShowNewModal] = useState(false);
   const [renegotiateContract, setRenegotiateContract] = useState(null);
+  const [actionError, setActionError]                  = useState(null);
 
   useEffect(() => {
     const fetchContracts = async () => {
@@ -528,17 +529,20 @@ const ContractsClient = () => {
       const res = await ContractsService.send(id);
       setContracts(prev => prev.map(c => c.id === id ? res.data : c));
     } catch (err) {
-      alert(err.response?.data?.detail ?? 'Failed to send contract');
+      setActionError(err.response?.data?.detail ?? 'Failed to send contract.');
     }
   };
 
+  const [cancelTarget, setCancelTarget] = useState(null);
+
   const handleCancel = async (id) => {
-    if (!window.confirm('Are you sure you want to cancel this contract?')) return;
     try {
       const res = await ContractsService.cancel(id);
       setContracts(prev => prev.map(c => c.id === id ? res.data : c));
     } catch (err) {
-      alert(err.response?.data?.detail ?? 'Failed to cancel contract');
+      setActionError(err.response?.data?.detail ?? 'Failed to cancel contract.');
+    } finally {
+      setCancelTarget(null);
     }
   };
 
@@ -562,6 +566,24 @@ const ContractsClient = () => {
 
   return (
     <div className="contracts-page">
+      {actionError && (
+        <div style={{ margin: '0 0 16px', padding: '12px 16px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, color: '#dc2626', fontSize: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>⚠️ {actionError}</span>
+          <button onClick={() => setActionError(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontWeight: 'bold', fontSize: 16, lineHeight: 1 }}>✕</button>
+        </div>
+      )}
+      {cancelTarget && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 200 }}>
+          <div style={{ background: '#fff', borderRadius: 12, padding: '32px', maxWidth: 400, width: '90%', textAlign: 'center' }}>
+            <p style={{ fontWeight: 600, fontSize: 16, marginBottom: 8 }}>Cancel contract?</p>
+            <p style={{ color: '#6b7280', fontSize: 14, marginBottom: 24 }}>This cannot be undone. The contract will be marked as cancelled.</p>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+              <button onClick={() => setCancelTarget(null)} style={{ padding: '8px 20px', border: '1px solid #e5e7eb', borderRadius: 8, background: '#fff', cursor: 'pointer', fontWeight: 500 }}>Keep it</button>
+              <button onClick={() => handleCancel(cancelTarget)} style={{ padding: '8px 20px', border: 'none', borderRadius: 8, background: '#ef4444', color: '#fff', cursor: 'pointer', fontWeight: 600 }}>Yes, cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="contracts-header">
         <h1 className="contracts-header__title">Contracts</h1>
         <div className="contracts-header__actions">
@@ -638,7 +660,7 @@ const ContractsClient = () => {
               contract={contract}
               onSend={handleSend}
               onView={handleView}
-              onCancel={handleCancel}
+              onCancel={(id) => setCancelTarget(id)}
               onRenegotiate={(c) => setRenegotiateContract(c)}
             />
           ))}

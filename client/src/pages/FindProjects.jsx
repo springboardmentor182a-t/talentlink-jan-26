@@ -1,66 +1,131 @@
-// client/src/pages/FindProjects.jsx
-import { useEffect, useState } from "react";
-import ProjectCard from "../components/ProjectCard";
-import ProjectFilters from "../components/ProjectFilters";
-import "./findProjects.css";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../services/axios';
+import ProjectCard from '../components/ProjectCard';
+import ProjectFilters from '../components/ProjectFilters';
+import '../assets/findProjects.css';
 
-const FindProjects = () => {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const BUDGET_RANGES = [
+  { label: 'Any Budget',       min: 0,     max: Infinity },
+  { label: 'Under $1,000',     min: 0,     max: 1000     },
+  { label: '$1,000 – $5,000',  min: 1000,  max: 5000     },
+  { label: '$5,000 – $20,000', min: 5000,  max: 20000    },
+  { label: '$20,000+',         min: 20000, max: Infinity  },
+];
+
+export default function FindProjects() {
+  const navigate = useNavigate();
+
+  const [allProjects, setAllProjects]     = useState([]);
+  const [loading, setLoading]             = useState(true);
+  const [error, setError]                 = useState(null);
+  const [searchInput, setSearchInput]     = useState('');
+  const [appliedSearch, setAppliedSearch] = useState('');
+  const [category, setCategory]           = useState('All Categories');
+  const [budgetIdx, setBudgetIdx]         = useState(0);
+  const [categories, setCategories]       = useState(['All Categories']);
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/projects/`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch projects");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setProjects(data);
+    const fetchProjects = async () => {
+      try {
+        const res = await axiosInstance.get('/projects/');
+        const projects = res.data;
+        setAllProjects(projects);
+
+        // Auto-populate category filter from skills in real project data
+        const skillSet = new Set();
+        projects.forEach(p => {
+          if (p.skills) {
+            p.skills.split(',').forEach(s => {
+              const trimmed = s.trim();
+              if (trimmed) skillSet.add(trimmed);
+            });
+          }
+        });
+        setCategories(['All Categories', ...Array.from(skillSet).sort()]);
+      } catch (err) {
+        setError('Failed to load projects. Please try again.');
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching projects:", err);
-        setError("Unable to load projects.");
-        setLoading(false);
-      });
+      }
+    };
+    fetchProjects();
   }, []);
 
-  return (
-    <div style={{ padding: '40px', maxWidth: '1200px', margin: '0 auto' }} className="find-projects-container">
+  const handleSearch  = () => setAppliedSearch(searchInput.trim());
+  const handleKeyDown = (e) => { if (e.key === 'Enter') handleSearch(); };
 
-      {/* Header */}
+  const filtered = allProjects.filter(p => {
+    if (appliedSearch) {
+      const q = appliedSearch.toLowerCase();
+      if (
+        !p.title?.toLowerCase().includes(q) &&
+        !p.description?.toLowerCase().includes(q) &&
+        !p.skills?.toLowerCase().includes(q)
+      ) return false;
+    }
+    if (category !== 'All Categories') {
+      if (!p.skills?.toLowerCase().includes(category.toLowerCase())) return false;
+    }
+    const range = BUDGET_RANGES[budgetIdx];
+    if (range.min > 0 || range.max !== Infinity) {
+      const pMax = p.budget_max ?? p.budget_min ?? 0;
+      const pMin = p.budget_min ?? p.budget_max ?? 0;
+      if (range.max !== Infinity && pMax > range.max) return false;
+      if (pMin < range.min) return false;
+    }
+    return true;
+  });
+
+  return (
+    <div className="find-projects-container">
       <div className="find-projects-header">
-        <h1>Browse Projects</h1>
-        <p>Find your next opportunity</p>
+        <h1>Find Projects</h1>
+        <p>
+          {loading
+            ? 'Loading projects\u2026'
+            : `${filtered.length} project${filtered.length !== 1 ? 's' : ''} found`}
+        </p>
       </div>
 
-      {/* Filters */}
-      <ProjectFilters />
+      <ProjectFilters
+        searchInput={searchInput}
+        onSearchChange={setSearchInput}
+        onKeyDown={handleKeyDown}
+        categories={categories}
+        category={category}
+        onCategoryChange={setCategory}
+        budgetIdx={budgetIdx}
+        onBudgetChange={setBudgetIdx}
+        budgetLabels={BUDGET_RANGES.map(r => r.label)}
+        onSearch={handleSearch}
+      />
 
-      {/* Loading */}
-      {loading && <p>Loading projects...</p>}
-
-      {/* Error */}
-      {error && <p className="error-text">{error}</p>}
-
-      {/* Project List */}
-      {!loading && !error && (
-        <div className="projects-list">
-          {projects.length === 0 ? (
-            <p>No projects available.</p>
-          ) : (
-            projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))
-          )}
-        </div>
+      {loading && (
+        <p style={{ color: '#6b7280', padding: '20px 0' }}>Loading projects...</p>
       )}
 
+      {!loading && error && (
+        <p style={{ color: '#dc2626', background: '#fef2f2', padding: '12px', borderRadius: '8px' }}>
+          {error}
+        </p>
+      )}
+
+      {!loading && !error && filtered.length === 0 && (
+        <p style={{ color: '#6b7280', padding: '40px 0', textAlign: 'center' }}>
+          No projects match your search. Try adjusting your filters.
+        </p>
+      )}
+
+      <div className="projects-grid">
+        {filtered.map(project => (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            onApply={() => navigate(`/projects/${project.id}/apply`)}
+          />
+        ))}
+      </div>
     </div>
   );
-};
-
-export default FindProjects;
+}

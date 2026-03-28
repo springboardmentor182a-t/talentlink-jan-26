@@ -1,28 +1,39 @@
-const ProjectFilters = () => {
+const ProjectFilters = ({
+  searchInput,
+  onSearchChange,
+  onKeyDown,
+  categories,
+  category,
+  onCategoryChange,
+  budgetIdx,
+  onBudgetChange,
+  budgetLabels,
+  onSearch,
+}) => {
   return (
     <div className="filters-bar">
 
       <input
         type="text"
         placeholder="Search projects..."
+        value={searchInput}
+        onChange={e => onSearchChange(e.target.value)}
+        onKeyDown={onKeyDown}
       />
 
-      <select>
-        <option>All Categories</option>
-        <option>Web Development</option>
-        <option>Design</option>
-        <option>Mobile Apps</option>
-        <option>AI / ML</option>
+      <select value={category} onChange={e => onCategoryChange(e.target.value)}>
+        {categories.map(c => (
+          <option key={c}>{c}</option>
+        ))}
       </select>
 
-      <select>
-        <option>Budget Range</option>
-        <option>$1,000 – $3,000</option>
-        <option>$3,000 – $6,000</option>
-        <option>$6,000+</option>
+      <select value={budgetIdx} onChange={e => onBudgetChange(Number(e.target.value))}>
+        {budgetLabels.map((label, i) => (
+          <option key={i} value={i}>{label}</option>
+        ))}
       </select>
 
-      <button className="search-btn">Search</button>
+      <button className="search-btn" onClick={onSearch}>Search</button>
 
     </div>
   );

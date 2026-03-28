@@ -124,8 +124,8 @@ export default function ClientView() {
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Website</p>
-                    <a href={profile.website} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-orange-600 hover:underline break-all">
-                      {profile.website || "N/A"}
+                    <a href={profile.website_url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-orange-600 hover:underline break-all">
+                      {profile.website_url || "N/A"}
                     </a>
                   </div>
                 </div>
