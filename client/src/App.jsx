@@ -3,32 +3,18 @@ import { useAuth } from './features/hooks/useAuth';
 import Layout from "./layout/PageContainer";
 import "./assets/theme.css";
 
-// Profile & Proposal Pages
-import FreelancerProfile from "./pages/FreelancerProfile";
-import ClientProfile     from "./pages/ClientProfile";
-import FreelancerView    from "./pages/FreelancerView";
-import ClientView        from "./pages/ClientView";
-import SubmitProposal    from "./pages/SubmitProposal";
-
-// FindProjects — findproject teammate
-import FindProjects from './pages/FindProjects';
-
-// Auth pages
-import RoleSelection    from './pages/RoleSelection';
-import Login            from './pages/Login';
-import SignupFreelancer from './pages/SignupFreelancer';
-import SignupClient     from './pages/SignupClient';
-import ForgotPassword   from './pages/ForgotPassword';
-import ResetPassword    from './pages/ResetPassword';
-import OAuthCallback    from './pages/OAuthCallback';
-import Dashboard        from './pages/Dashboard';
-import Messages         from './pages/Messages';
-
-// Contracts
-import ContractsClient     from './pages/ContractsClient';
+// Pages
+import RoleSelection     from './pages/RoleSelection';
+import Login             from './pages/Login';
+import SignupFreelancer  from './pages/SignupFreelancer';
+import SignupClient      from './pages/SignupClient';
+import Dashboard         from './pages/Dashboard';
+import FindProjects      from './pages/FindProjects';
+import Messages          from './pages/Messages';
 import ContractsFreelancer from './pages/ContractsFreelancer';
+import ReviewPage         from './pages/ReviewPage'; 
 
-
+// Auth Guards
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return null;
@@ -38,61 +24,31 @@ const ProtectedRoute = ({ children }) => {
 const PublicOnlyRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return null;
-  if (!user) return children;
-  if (user.role === 'freelancer') return <Navigate to="/freelancer/dashboard" replace />;
-  if (user.role === 'client')     return <Navigate to="/client/dashboard" replace />;
-  return <Navigate to="/dashboard" replace />;
+  return !user ? children : <Navigate to="/dashboard" replace />;
 };
-
-const ContractsRoute = () => {
-  const { user } = useAuth();
-  return user?.role === 'client' ? <ContractsClient /> : <ContractsFreelancer />;
-};
-
 
 export default function App() {
   return (
     <Router>
       <Routes>
-
-        {/* ── Public auth flow ───────────────────────────────────────── */}
-        <Route path="/"                      element={<PublicOnlyRoute><RoleSelection /></PublicOnlyRoute>} />
-        <Route path="/login"                 element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
-        <Route path="/signup/freelancer"     element={<PublicOnlyRoute><SignupFreelancer /></PublicOnlyRoute>} />
-        <Route path="/signup/client"         element={<PublicOnlyRoute><SignupClient /></PublicOnlyRoute>} />
-        <Route path="/forgot-password"       element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
-
-        {/* ── OAuth callback — public, no auth required ─────────────── */}
-        <Route path="/auth/callback" element={<OAuthCallback />} />
-
-        {/* ── Protected routes — require login ──────────────────────── */}
+        {/* ── 🔓 Public Routes ── */}
+        <Route path="/" element={<PublicOnlyRoute><RoleSelection /></PublicOnlyRoute>} />
+        <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
+        <Route path="/signup/freelancer" element={<SignupFreelancer />} />
+        <Route path="/signup/client" element={<SignupClient />} />
+        
+        {/* ── 🏢 Main App (With Sidebar/Header Layout) ── */}
         <Route element={<Layout />}>
-
-          <Route path="/dashboard"            element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/freelancer/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/client/dashboard"     element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-
-          {/* FindProjects */}
+          {/* ✅ FIXED: Protected and inside Layout so Sidebar appears */}
+          <Route path="/reviews" element={<ProtectedRoute><ReviewPage /></ProtectedRoute>} />
+          
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/find-projects" element={<ProtectedRoute><FindProjects /></ProtectedRoute>} />
-
-          {/* Profile pages */}
-          <Route path="/profile/freelancer"      element={<ProtectedRoute><FreelancerView /></ProtectedRoute>} />
-          <Route path="/profile/freelancer/edit" element={<ProtectedRoute><FreelancerProfile /></ProtectedRoute>} />
-          <Route path="/profile/client"          element={<ProtectedRoute><ClientView /></ProtectedRoute>} />
-          <Route path="/profile/client/edit"     element={<ProtectedRoute><ClientProfile /></ProtectedRoute>} />
-
-          {/* Proposals */}
-          <Route path="/projects/:projectId/apply" element={<ProtectedRoute><SubmitProposal /></ProtectedRoute>} />
-
-          {/* Messages */}
-          <Route path="/messages"   element={<ProtectedRoute><Messages /></ProtectedRoute>} />
-
-          {/* Contracts — role-based split */}
-          <Route path="/contracts"  element={<ProtectedRoute><ContractsRoute /></ProtectedRoute>} />
-
+          <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+          <Route path="/contracts" element={<ProtectedRoute><ContractsFreelancer /></ProtectedRoute>} />
         </Route>
 
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );

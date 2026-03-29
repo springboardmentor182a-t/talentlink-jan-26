@@ -1,14 +1,13 @@
 version: '3.8'
 
 services:
-  db:
-    image: postgres:15
+db:
+    image: postgres:16-alpine
     container_name: talentlink_db
-    restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: talentlink
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=talentlink
     ports:
       - "5432:5432"
     volumes:
