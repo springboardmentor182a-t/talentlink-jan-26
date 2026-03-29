@@ -1,83 +1,83 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-
-const navItems = [
-  {
-    label: 'Dashboard',
-    path: '/dashboard',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-      </svg>
-    ),
-  },
-  {
-    label: 'Projects',
-    path: '/projects',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-      </svg>
-    ),
-  },
-  {
-    label: 'Contracts',
-    path: '/contracts',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-        <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/>
-        <line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
-      </svg>
-    ),
-  },
-  {
-    label: 'Messages',
-    path: '/messages',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-      </svg>
-    ),
-  },
-  {
-    label: 'Profile',
-    path: '/profile',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-        <circle cx="12" cy="7" r="4"/>
-      </svg>
-    ),
-  },
-];
+import { useAuth } from '../features/hooks/useAuth';
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
 
-  // The conflict-free sign out logic
+  const isClient = user?.role === 'client';
+
+  // Dynamic navigation array based on user role
+  const navItems = [
+    {
+      label: 'Dashboard',
+      path: isClient ? '/client/dashboard' : '/freelancer/dashboard',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
+        </svg>
+      ),
+    },
+    {
+      label: isClient ? 'Post Project' : 'Find Projects',
+      path: isClient ? '/post-project' : '/projects',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Contracts',
+      path: '/contracts',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" />
+          <line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Messages',
+      path: '/messages',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Profile',
+      path: isClient ? '/profile/client' : '/profile/freelancer',
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      ),
+    },
+  ];
+
   const handleSignOut = () => {
-    // 1. Remove the auth token from local storage
     localStorage.removeItem('token');
-    // Note: If you saved user data under a different key (like 'user'), remove it here too:
-    // localStorage.removeItem('user');
-    
-    // 2. Redirect to the login page
     navigate('/');
+    window.location.reload(); // Hard reset to clear React state memory
   };
 
   return (
     <div style={styles.sidebar}>
       {/* Logo */}
-      <div style={styles.logo} onClick={() => navigate('/dashboard')}>
+      <div style={styles.logo} onClick={() => navigate(isClient ? '/client/dashboard' : '/freelancer/dashboard')}>
         <span style={styles.logoText}>TalentLink</span>
       </div>
 
       {/* Nav items */}
       <nav style={styles.nav}>
         {navItems.map(item => {
-          const isActive = location.pathname === item.path;
+          const isActive = location.pathname.startsWith(item.path);
           return (
             <button
               key={item.path}
@@ -108,13 +108,12 @@ const Sidebar = () => {
       </nav>
 
       {/* Sign Out Button pinned to the bottom */}
-      <button 
+      <button
         onClick={handleSignOut}
         style={styles.signOutBtn}
         title="Sign Out"
       >
         <span style={{ ...styles.navIcon, color: 'rgba(255,255,255,0.7)' }}>
-          {/* Sign Out SVG Icon */}
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <polyline points="16 17 21 12 16 7"></polyline>
@@ -125,7 +124,6 @@ const Sidebar = () => {
           Sign Out
         </span>
       </button>
-
     </div>
   );
 };
@@ -210,9 +208,8 @@ const styles = {
     background: '#fff',
     borderRadius: '3px 0 0 3px',
   },
-  // New style specifically for the Sign Out button
   signOutBtn: {
-    marginTop: 'auto', // This specifically pushes it to the bottom
+    marginTop: 'auto',
     width: '100%',
     display: 'flex',
     flexDirection: 'column',

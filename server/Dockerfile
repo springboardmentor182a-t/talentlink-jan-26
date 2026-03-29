@@ -1,5 +1,5 @@
 # ── Stage 1: build dependencies ───────────────────────────────────────────────
-FROM python:3.10-slim AS deps
+FROM python:3.11-slim AS deps
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN /app/venv/bin/pip install --no-cache-dir -r requirements.txt
 
 
 # ── Stage 2: runtime image ────────────────────────────────────────────────────
-FROM python:3.10-slim AS runtime
+FROM python:3.11-slim AS runtime
 
 # Non-root user — never run app servers as root inside a container.
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
@@ -35,5 +35,4 @@ USER appuser
 
 # Use the venv's uvicorn directly.
 # Single worker — ConnectionManager is in-memory, breaks with --workers > 1.
-# Fix: add Redis pub/sub (REMAINING_ISSUES.md #9) then increase workers.
 CMD ["/app/venv/bin/uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]

@@ -76,11 +76,14 @@ def get_client_profile(user_id: int, db: Session = Depends(get_db)):
 @router.post("/{user_id}/proposals", response_model=schemas.ProposalResponse)
 def create_proposal(user_id: int, proposal: schemas.ProposalCreate, db: Session = Depends(get_db)):
     from . import models
+    import logging
+    logger = logging.getLogger(__name__)
     
     # 1. Find the freelancer profile for this user
     freelancer = db.query(models.FreelancerProfile).filter(models.FreelancerProfile.user_id == user_id).first()
     
     if not freelancer:
+        logger.warning(f"User {user_id} attempted to apply without a freelancer profile.")
         raise HTTPException(status_code=404, detail="You must have a Freelancer Profile to apply.")
     
     # 2. PREVENT DUPLICATES: Check if this freelancer already applied to this specific project
@@ -90,12 +93,14 @@ def create_proposal(user_id: int, proposal: schemas.ProposalCreate, db: Session 
     ).first()
     
     if existing_proposal:
+        logger.warning(f"Freelancer {freelancer.id} attempted duplicate proposal submission for project {proposal.project_id}.")
         raise HTTPException(
             status_code=400, 
             detail="You have already submitted a proposal for this project."
         )
     
     # 3. Create proposal linked to that freelancer
+    logger.info(f"Initiating proposal creation for freelancer {freelancer.id} on project {proposal.project_id}.")
     return service.create_proposal(db=db, proposal=proposal, freelancer_id=freelancer.id)
 
 # 7. Get My Proposals (View Application History)
