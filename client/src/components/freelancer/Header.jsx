@@ -1,17 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import './Header.css';
+import authService from '../../services/auth';
 
 const Header = () => {
   const [userName, setUserName] = useState('Freelancer');
 
   useEffect(() => {
-    const apiBase = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
+    const apiBase = process.env.REACT_APP_API_URL || 'http://localhost:8000';
     const controller = new AbortController();
 
     const fetchUser = async () => {
       try {
-        const response = await fetch(`${apiBase}/freelancer/profile`, {
-          signal: controller.signal
+        const token = authService.getToken();
+        if (!token) {
+          setUserName('Freelancer');
+          return;
+        }
+
+        const response = await fetch(`${apiBase}/freelancer/dashboard`, {
+          signal: controller.signal,
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         });
 
         if (!response.ok) {
@@ -19,7 +29,10 @@ const Header = () => {
         }
 
         const data = await response.json();
-        const name = data?.name || data?.firstName || data?.user?.name;
+        const name =
+          data?.user?.full_name ||
+          data?.user?.name ||
+          data?.user?.firstName;
         if (name) {
           setUserName(name);
         }

@@ -1,0 +1,129 @@
+.client-proposals-page {
+  padding: 30px;
+  background: #f8fafc;
+  min-height: 100vh;
+}
+.page-header h1 {
+  font-size: 2rem;
+  margin-bottom: 8px;
+  color: #1f2937;
+}
+.page-header p {
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+.proposal-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 26px;
+}
+.stat-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+}
+.stat-card p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 0.85rem;
+}
+.stat-card h2 {
+  font-size: 1.8rem;
+  margin: 6px 0 0;
+  color: #111827;
+}
+.proposal-list {
+  display: grid;
+  gap: 14px;
+}
+.proposal-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 16px;
+}
+.proposal-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.proposal-top h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #111827;
+}
+.proposal-top p {
+  margin: 0;
+  color: #4b5563;
+}
+.status-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  color: #374151;
+}
+.status-under-review {
+  background: #fef3c7;
+  color: #92400e;
+}
+.status-accepted {
+  background: #dcfce7;
+  color: #166534;
+}
+.status-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.proposal-details-row {
+  display: flex;
+  gap: 22px;
+  margin-bottom: 10px;
+  color: #4b5563;
+}
+.proposal-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.proposal-tag {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 0.75rem;
+}
+.proposal-actions {
+  display: flex;
+  gap: 10px;
+}
+.btn-outline {
+  border: 1px solid #cbd5e1;
+  background: white;
+  color: #1f2937;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+.btn-accept {
+  border: 1px solid #22c55e;
+  background: #22c55e;
+  color: white;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+.btn-reject {
+  border: 1px solid #ef4444;
+  background: #ef4444;
+  color: white;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
