@@ -33,9 +33,9 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     token = create_token({"sub": user.email, "role": user.role})
     return {
         "access_token": token,
-        "token_type": "bearer",
-        "token": token,
-        "role": user.role,
+        "token_type":   "bearer",
+        "token":        token,
+        "role":         user.role,
         "user": {"id": user.id, "name": user.name, "email": user.email, "role": user.role}
     }
 
@@ -43,8 +43,8 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
 @router.post("/google")
 async def google_login(payload: dict, db: Session = Depends(get_db)):
     access_token = payload.get("token")
-    role = payload.get("role", "client")
-    async with httpx.AsyncClient() as client:
+    role         = payload.get("role", "client")
+    async with httpx.AsyncClient(timeout=30.0) as client:
         res = await client.get(
             "https://www.googleapis.com/oauth2/v2/userinfo",
             headers={"Authorization": f"Bearer {access_token}"}
@@ -54,52 +54,81 @@ async def google_login(payload: dict, db: Session = Depends(get_db)):
         user_info = res.json()
     email = user_info.get("email")
     name  = user_info.get("name", email)
-    user = db.query(User).filter(User.email == email).first()
+    user  = db.query(User).filter(User.email == email).first()
     if not user:
         user = register_user(db, name, email, "google_oauth", role)
+    else:
+        # Always update role to match where they logged in from
+        user.role = role
+        db.commit()
+        print(f"✅ Google user role updated to: {role}")
     token = create_token({"sub": user.email, "role": user.role})
     return {
         "token": token,
-        "role": user.role,
-        "user": {"id": user.id, "name": user.name, "email": user.email, "role": user.role}
+        "role":  user.role,
+        "user":  {"id": user.id, "name": user.name, "email": user.email, "role": user.role}
     }
 
 
 @router.get("/github/callback")
-async def github_callback(code: str, db: Session = Depends(get_db)):
-    async with httpx.AsyncClient() as client:
+async def github_callback(code: str, state: str = "client", db: Session = Depends(get_db)):
+    async with httpx.AsyncClient(timeout=30.0) as client:
+
+        # Step 1 — Exchange code for access token
         token_res = await client.post(
             "https://github.com/login/oauth/access_token",
             json={
-                "client_id": os.getenv("GITHUB_CLIENT_ID"),
+                "client_id":     os.getenv("GITHUB_CLIENT_ID"),
                 "client_secret": os.getenv("GITHUB_CLIENT_SECRET"),
-                "code": code
+                "code":          code
             },
             headers={"Accept": "application/json"}
         )
-        token_data = token_res.json()
+        token_data   = token_res.json()
+        print("✅ GitHub token response:", token_data)
+
         access_token = token_data.get("access_token")
         if not access_token:
-            raise HTTPException(status_code=401, detail="Invalid GitHub code")
-        user_res = await client.get(
+            print("❌ GitHub error:", token_data.get("error"), token_data.get("error_description"))
+            return RedirectResponse(url="http://localhost:3000/?error=github_auth_failed")
+
+        # Step 2 — Get user info
+        user_res  = await client.get(
             "https://api.github.com/user",
             headers={"Authorization": f"Bearer {access_token}"}
         )
         user_info = user_res.json()
+        print("✅ GitHub user info:", user_info.get("login"), user_info.get("email"))
+
+        # Step 3 — Get email if not public
         if not user_info.get("email"):
             email_res = await client.get(
                 "https://api.github.com/user/emails",
                 headers={"Authorization": f"Bearer {access_token}"}
             )
-            emails = email_res.json()
+            emails  = email_res.json()
             primary = next((e["email"] for e in emails if e["primary"]), None)
             user_info["email"] = primary or f"{user_info['login']}@github.com"
+            print("✅ GitHub primary email:", user_info["email"])
 
     email = user_info.get("email")
     name  = user_info.get("name") or user_info.get("login")
+
+    # Use state param as role
+    role = state if state in ("client", "freelancer") else "client"
+    print(f"✅ Role from state: {role}")
+
     user = db.query(User).filter(User.email == email).first()
     if not user:
-        user = register_user(db, name, email, "github_oauth", "client")
+        # New user — register with role from state
+        user = register_user(db, name, email, "github_oauth", role)
+        print(f"✅ New user created: {email} as {role}")
+    else:
+        # Always update role to match where they logged in from
+        user.role = role
+        db.commit()
+        print(f"✅ User role updated to: {role}")
+
     token = create_token({"sub": user.email, "role": user.role})
     return RedirectResponse(
         url=f"http://localhost:3000/oauth/callback?token={token}&role={user.role}&id={user.id}&name={user.name}&email={user.email}"
@@ -116,12 +145,12 @@ async def forgot_password(payload: dict, db: Session = Depends(get_db)):
     if not user:
         return {"message": "If this email exists, a reset link has been sent."}
 
-    token = secrets.token_urlsafe(32)
+    token      = secrets.token_urlsafe(32)
     reset_tokens[token] = email
     reset_link = f"http://localhost:3000/reset-password?token={token}"
 
     try:
-        msg = MIMEMultipart("alternative")
+        msg            = MIMEMultipart("alternative")
         msg["Subject"] = "TalentLink - Password Reset Request"
         msg["From"]    = os.getenv("EMAIL_ADDRESS")
         msg["To"]      = email

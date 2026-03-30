@@ -21,18 +21,18 @@ const GitHubIcon = () => (
 export default function ClientLogin() {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
-  const [email, setEmail]       = useState("");
+  const [email,    setEmail]    = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError]       = useState("");
-  const [loading, setLoading]   = useState(false);
-  const [visible, setVisible]   = useState(false);
+  const [error,    setError]    = useState("");
+  const [loading,  setLoading]  = useState(false);
+  const [visible,  setVisible]  = useState(false);
 
   useEffect(() => { setTimeout(() => setVisible(true), 50); }, []);
 
   const fadeUp = {
-    opacity: visible ? 1 : 0,
+    opacity:   visible ? 1 : 0,
     transform: visible ? "translateY(0)" : "translateY(24px)",
-    transition: "opacity 0.6s ease, transform 0.6s ease",
+    transition:"opacity 0.6s ease, transform 0.6s ease"
   };
 
   const googleLogin = useGoogleLogin({
@@ -47,7 +47,7 @@ export default function ClientLogin() {
   });
 
   const handleGitHub = () => {
-    window.location.href = `https://github.com/login/oauth/authorize?client_id=Ov23lil8Mv6gmI3t7Ecd&scope=user:email`;
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=Ov23lil8Mv6gmI3t7Ecd&scope=user:email&state=client`;
   };
 
   const handleSubmit = async () => {
@@ -57,12 +57,19 @@ export default function ClientLogin() {
       setLoading(true);
       const res = await api.post("/auth/login", { email, password });
       const userRole = res.data.role?.toLowerCase();
-      if (userRole !== "client") { setError("This account is not a client. Please use Freelancer Login."); return; }
+      if (userRole !== "client") {
+        setError("This account is not a client. Please use Freelancer Login.");
+        return;
+      }
       login({ token: res.data.token, role: userRole, user: res.data.user });
       navigate("/dashboard");
     } catch (err) {
       const detail = err.response?.data?.detail;
-      setError(typeof detail === "string" ? detail : Array.isArray(detail) ? detail[0]?.msg || "Invalid email or password." : "Invalid email or password.");
+      setError(
+        typeof detail === "string" ? detail :
+        Array.isArray(detail) ? detail[0]?.msg || "Invalid email or password." :
+        "Invalid email or password."
+      );
     } finally { setLoading(false); }
   };
 
@@ -75,13 +82,12 @@ export default function ClientLogin() {
         .social-hover:hover { transform:translateY(-1px) !important; box-shadow:0 4px 12px rgba(0,0,0,0.15) !important; }
       `}</style>
 
-      {/* Blobs */}
+      {/* Background blobs */}
       <div style={{ position:"fixed", top:-150, left:-150, width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle, rgba(37,99,235,0.6) 0%, rgba(37,99,235,0.2) 40%, transparent 70%)", pointerEvents:"none", animation:"pulse 4s ease-in-out infinite", filter:"blur(30px)" }} />
       <div style={{ position:"fixed", bottom:-150, right:-150, width:550, height:550, borderRadius:"50%", background:"radial-gradient(circle, rgba(124,58,237,0.6) 0%, rgba(124,58,237,0.2) 40%, transparent 70%)", pointerEvents:"none", animation:"pulse 5s ease-in-out infinite reverse", filter:"blur(30px)" }} />
       <div style={{ position:"fixed", top:50, right:-100, width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle, rgba(59,130,246,0.5) 0%, transparent 70%)", pointerEvents:"none", animation:"pulse 6s ease-in-out infinite 1s", filter:"blur(25px)" }} />
       <div style={{ position:"fixed", top:"40%", left:-80, width:350, height:350, borderRadius:"50%", background:"radial-gradient(circle, rgba(168,85,247,0.5) 0%, transparent 70%)", pointerEvents:"none", animation:"pulse 5s ease-in-out infinite 2s", filter:"blur(25px)" }} />
 
-      {/* White Card */}
       <div style={{ ...fadeUp, position:"relative", zIndex:10, backgroundColor:"#ffffff", borderRadius:24, padding:"44px 40px", width:"100%", maxWidth:440, boxShadow:"0 20px 60px rgba(0,0,0,0.4)", border:"1px solid rgba(255,255,255,0.2)" }}>
 
         <button onClick={() => navigate("/")}
@@ -97,6 +103,7 @@ export default function ClientLogin() {
         <h2 style={{ fontSize:24, fontWeight:800, color:"#111827", marginBottom:6, textAlign:"center", letterSpacing:"-0.5px" }}>Client Login</h2>
         <p style={{ fontSize:14, color:"#6b7280", marginBottom:28, textAlign:"center" }}>Access your dashboard to manage projects and freelancers</p>
 
+        {/* Social buttons */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:20 }}>
           <button className="social-hover" onClick={() => googleLogin()}
             style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:12, border:"1.5px solid #e5e7eb", borderRadius:10, cursor:"pointer", backgroundColor:"white", fontSize:14, fontWeight:600, color:"#374151", transition:"all 0.2s" }}>
@@ -121,22 +128,17 @@ export default function ClientLogin() {
         )}
 
         <label style={{ display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 }}>Email</label>
-        <input className="inp-focus"
-          type="email" placeholder="client@company.com" value={email}
-          onChange={e => setEmail(e.target.value)}
-          style={{ width:"100%", padding:"12px 16px", border:"1.5px solid #e5e7eb", borderRadius:10, fontSize:14, backgroundColor:"#f9fafb", outline:"none", boxSizing:"border-box", marginBottom:16, transition:"all 0.2s", color:"#111827" }}
-        />
+        <input className="inp-focus" type="email" placeholder="client@company.com"
+          value={email} onChange={e => setEmail(e.target.value)}
+          style={{ width:"100%", padding:"12px 16px", border:"1.5px solid #e5e7eb", borderRadius:10, fontSize:14, backgroundColor:"#f9fafb", outline:"none", boxSizing:"border-box", marginBottom:16, transition:"all 0.2s", color:"#111827" }} />
 
         <label style={{ display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 }}>Password</label>
-        <input className="inp-focus"
-          type="password" placeholder="••••••••" value={password}
-          onChange={e => setPassword(e.target.value)}
+        <input className="inp-focus" type="password" placeholder="••••••••"
+          value={password} onChange={e => setPassword(e.target.value)}
           onKeyDown={e => e.key === "Enter" && handleSubmit()}
-          style={{ width:"100%", padding:"12px 16px", border:"1.5px solid #e5e7eb", borderRadius:10, fontSize:14, backgroundColor:"#f9fafb", outline:"none", boxSizing:"border-box", marginBottom:24, transition:"all 0.2s", color:"#111827" }}
-        />
+          style={{ width:"100%", padding:"12px 16px", border:"1.5px solid #e5e7eb", borderRadius:10, fontSize:14, backgroundColor:"#f9fafb", outline:"none", boxSizing:"border-box", marginBottom:24, transition:"all 0.2s", color:"#111827" }} />
 
-        <button className="btn-hover"
-          onClick={handleSubmit} disabled={loading}
+        <button className="btn-hover" onClick={handleSubmit} disabled={loading}
           style={{ width:"100%", padding:14, background: loading ? "#cbd5e1" : "linear-gradient(135deg,#2563eb,#7c3aed)", color:"white", border:"none", borderRadius:10, cursor: loading ? "not-allowed" : "pointer", fontWeight:700, fontSize:15, boxShadow:"0 4px 15px rgba(37,99,235,0.4)", transition:"all 0.2s" }}>
           {loading ? "Signing in..." : "Sign In →"}
         </button>

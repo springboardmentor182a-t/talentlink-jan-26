@@ -1,13 +1,89 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, and_, func
 from src.database.core import get_db
 from .model import Message
 from .schema import MessageCreate, MessageResponse, ConversationResponse
 from src.entities.user import User
+from typing import Dict, List
+import json
 
 router = APIRouter(tags=["Messages"])
 
+
+# ── WebSocket Connection Manager ─────────────────────────────
+class ConnectionManager:
+    def __init__(self):
+        # room_key -> list of websockets
+        # room_key = "min_id_max_id" e.g. "3_7"
+        self.active_connections: Dict[str, List[WebSocket]] = {}
+
+    def get_room_key(self, user_id: int, other_id: int) -> str:
+        return f"{min(user_id, other_id)}_{max(user_id, other_id)}"
+
+    async def connect(self, websocket: WebSocket, user_id: int, other_id: int):
+        await websocket.accept()
+        key = self.get_room_key(user_id, other_id)
+        if key not in self.active_connections:
+            self.active_connections[key] = []
+        self.active_connections[key].append(websocket)
+
+    def disconnect(self, websocket: WebSocket, user_id: int, other_id: int):
+        key = self.get_room_key(user_id, other_id)
+        if key in self.active_connections:
+            self.active_connections[key].remove(websocket)
+            if not self.active_connections[key]:
+                del self.active_connections[key]
+
+    async def send_to_room(self, user_id: int, other_id: int, message: dict):
+        key = self.get_room_key(user_id, other_id)
+        if key in self.active_connections:
+            for connection in self.active_connections[key]:
+                await connection.send_text(json.dumps(message))
+
+
+manager = ConnectionManager()
+
+
+# ── WebSocket endpoint ────────────────────────────────────────
+@router.websocket("/ws/{user_id}/{other_user_id}")
+async def websocket_endpoint(
+    websocket: WebSocket,
+    user_id: int,
+    other_user_id: int,
+    db: Session = Depends(get_db),
+):
+    await manager.connect(websocket, user_id, other_user_id)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            payload = json.loads(data)
+
+            # Save message to DB
+            msg = Message(
+                sender_id=user_id,
+                receiver_id=other_user_id,
+                content=payload["content"],
+            )
+            db.add(msg)
+            db.commit()
+            db.refresh(msg)
+
+            # Broadcast to both users in the room
+            await manager.send_to_room(user_id, other_user_id, {
+                "id":          msg.id,
+                "sender_id":   msg.sender_id,
+                "receiver_id": msg.receiver_id,
+                "content":     msg.content,
+                "is_read":     msg.is_read,
+                "created_at":  msg.created_at.isoformat(),
+            })
+
+    except WebSocketDisconnect:
+        manager.disconnect(websocket, user_id, other_user_id)
+
+
+# ── REST endpoints (unchanged) ────────────────────────────────
 
 @router.post("/", response_model=MessageResponse)
 def send_message(data: MessageCreate, db: Session = Depends(get_db)):
@@ -18,8 +94,6 @@ def send_message(data: MessageCreate, db: Session = Depends(get_db)):
     return msg
 
 
-# ⚠️ MUST be before /{user_id}/{other_user_id} — otherwise FastAPI
-# tries to parse "conversations" as an integer and returns 422
 @router.get("/conversations/{user_id}", response_model=list[ConversationResponse])
 def get_conversations(user_id: int, db: Session = Depends(get_db)):
     """Get all unique conversations for a user with latest message and unread count."""
