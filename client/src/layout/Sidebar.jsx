@@ -8,25 +8,25 @@ import {
   User,
   Building2,
   LogOut,
+  Star, // ✅ Added for the Reviews icon
 } from 'lucide-react';
 
 // ── Nav config ────────────────────────────────────────────────────────────────
-// Profile is NOT in the main nav — it lives pinned at the bottom.
-// Main nav = destinations you visit regularly.
-// Bottom = account-level actions you visit occasionally.
 
 const FREELANCER_NAV = [
-  { label: 'Dashboard',  path: '/dashboard', icon: LayoutDashboard },
-  { label: 'Find Work',  path: '/jobs',       icon: Briefcase },
-  { label: 'Contracts',  path: '/contracts',  icon: FileText },
-  { label: 'Messages',   path: '/messages',   icon: MessageSquare },
+  { label: 'Dashboard',   path: '/dashboard', icon: LayoutDashboard },
+  { label: 'Find Work',   path: '/jobs',      icon: Briefcase },
+  { label: 'Contracts',   path: '/contracts', icon: FileText },
+  { label: 'Messages',    path: '/messages',  icon: MessageSquare },
+  { label: 'My Reviews',  path: '/reviews',   icon: Star }, // ✅ Added Reviews Link
 ];
 
 const CLIENT_NAV = [
-  { label: 'Dashboard',   path: '/dashboard', icon: LayoutDashboard },
-  { label: 'Job Listings', path: '/jobs',     icon: Briefcase },
-  { label: 'Contracts',   path: '/contracts', icon: FileText },
-  { label: 'Messages',    path: '/messages',  icon: MessageSquare },
+  { label: 'Dashboard',    path: '/dashboard', icon: LayoutDashboard },
+  { label: 'Job Listings', path: '/jobs',      icon: Briefcase },
+  { label: 'Contracts',    path: '/contracts', icon: FileText },
+  { label: 'Messages',     path: '/messages',  icon: MessageSquare },
+  { label: 'Reviews',      path: '/reviews',   icon: Star }, // ✅ Added Reviews Link
 ];
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -46,6 +46,11 @@ const Sidebar = () => {
     location.pathname === profilePath ||
     location.pathname.startsWith(profilePath + '/');
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
     <aside style={styles.sidebar}>
 
@@ -58,6 +63,7 @@ const Sidebar = () => {
       {/* Primary nav */}
       <nav style={styles.nav}>
         {navItems.map(({ label, path, icon: Icon }) => {
+          // Check if current path matches to highlight the button
           const isActive =
             location.pathname === path ||
             location.pathname.startsWith(path + '/');
@@ -117,7 +123,7 @@ const Sidebar = () => {
         </button>
 
         {/* Sign Out */}
-        <button onClick={logout} style={styles.navItem}>
+        <button onClick={handleLogout} style={styles.navItem}>
           <LogOut
             size={18}
             style={{ color: 'rgba(255,255,255,0.65)', flexShrink: 0 }}
@@ -133,14 +139,14 @@ const Sidebar = () => {
   );
 };
 
-// ── Styles ────────────────────────────────────────────────────────────────────
+// ── Styles (Internal) ─────────────────────────────────────────────────────────
 
 const styles = {
   sidebar: {
     width: 220,
     flexShrink: 0,
     height: '100vh',
-    background: '#f97316',
+    background: '#f97316', // Primary theme color
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',

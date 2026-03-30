@@ -24,9 +24,10 @@ import OAuthCallback from './pages/OAuthCallback';
 import Dashboard from './pages/Dashboard';
 import Messages from './pages/Messages';
 
-// --- CONTRACTS ---
+// --- CONTRACTS & REVIEWS ---
 import ContractsClient from './pages/ContractsClient';
 import ContractsFreelancer from './pages/ContractsFreelancer';
+import ReviewPage from './pages/ReviewPage';
 
 /**
  * ProtectedRoute: Redirects unauthenticated users to /login.
@@ -69,6 +70,8 @@ export default function App() {
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/freelancer/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/client/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          
+          <Route path="/reviews" element={<ProtectedRoute><ReviewPage /></ProtectedRoute>} />
 
           {/* Marketplace Core */}
           <Route path="/projects" element={<ProtectedRoute><ProjectFeed /></ProtectedRoute>} />
@@ -88,6 +91,8 @@ export default function App() {
           {/* Messages */}
           <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
         </Route>
+        
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );
