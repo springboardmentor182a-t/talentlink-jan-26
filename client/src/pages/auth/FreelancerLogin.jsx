@@ -47,7 +47,7 @@ export default function FreelancerLogin() {
   });
 
   const handleGitHub = () => {
-    window.location.href = `https://github.com/login/oauth/authorize?client_id=Ov23lil8Mv6gmI3t7Ecd&scope=user:email`;
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=Ov23lil8Mv6gmI3t7Ecd&scope=user:email&state=freelancer`;
   };
 
   const handleSubmit = async () => {
@@ -62,7 +62,7 @@ export default function FreelancerLogin() {
         return;
       }
       login({ token: res.data.token, role: userRole, user: res.data.user });
-      navigate("/freelancer/dashboard");   // ✅ fixed
+      navigate("/freelancer/dashboard");
     } catch (err) {
       const detail = err.response?.data?.detail;
       setError(

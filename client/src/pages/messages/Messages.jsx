@@ -8,6 +8,7 @@ export default function Messages({ onNavigate }) {
   const location       = useLocation();
   const bottomRef      = useRef(null);
   const inputRef       = useRef(null);
+  const wsRef          = useRef(null);
 
   const params         = new URLSearchParams(location.search);
   const initFreelancer = params.get("freelancer");
@@ -21,6 +22,7 @@ export default function Messages({ onNavigate }) {
   const [loadingConvs, setLoadingConvs]   = useState(true);
   const [loadingMsgs, setLoadingMsgs]     = useState(false);
   const [searchQuery, setSearchQuery]     = useState("");
+  const [connected, setConnected]         = useState(false);
 
   // ── Theme based on role ──────────────────────────────
   const isFreelancer = role === "freelancer";
@@ -58,7 +60,7 @@ export default function Messages({ onNavigate }) {
     if (onNavigate) onNavigate(theme.backPage);
   };
 
-  // ── Data loading ─────────────────────────────────────
+  // ── Load conversations ───────────────────────────────
   const loadConversations = async () => {
     try {
       const res = await api.get(`/messages/conversations/${user.id}`);
@@ -84,6 +86,7 @@ export default function Messages({ onNavigate }) {
     }
   };
 
+  // ── Load messages (initial load only) ───────────────
   const loadMessages = async () => {
     if (!activeConv?.other_user_id) return;
     try {
@@ -97,27 +100,79 @@ export default function Messages({ onNavigate }) {
     }
   };
 
-  useEffect(() => { if (user) loadConversations(); }, [user]);
-  useEffect(() => { if (activeConv) loadMessages(); }, [activeConv]);
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior:"smooth" }); }, [messages]);
+  // ── WebSocket connect/disconnect on active conversation change ──
+  useEffect(() => {
+    if (!activeConv?.other_user_id || !user?.id) return;
 
+    // Close previous WebSocket if any
+    if (wsRef.current) {
+      wsRef.current.close();
+    }
+
+    const wsUrl = `ws://localhost:8000/messages/ws/${user.id}/${activeConv.other_user_id}`;
+    const ws = new WebSocket(wsUrl);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      setConnected(true);
+    };
+
+    ws.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+      setMessages(prev => {
+        // Avoid duplicate messages
+        if (prev.find(m => m.id === msg.id)) return prev;
+        return [...prev, msg];
+      });
+      // Refresh conversation list to update last message
+      loadConversations();
+    };
+
+    ws.onclose = () => {
+      setConnected(false);
+    };
+
+    ws.onerror = (err) => {
+      console.error("WebSocket error:", err);
+      setConnected(false);
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, [activeConv?.other_user_id, user?.id]);
+
+  useEffect(() => { if (user) loadConversations(); }, [user]);
+  useEffect(() => { if (activeConv) loadMessages(); }, [activeConv?.other_user_id]);
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+
+  // ── Send message via WebSocket ───────────────────────
   const sendMessage = async () => {
     if (!text.trim() || !activeConv) return;
-    try {
-      setSending(true);
-      await api.post("/messages/", {
-        sender_id:   user.id,
-        receiver_id: activeConv.other_user_id,
-        content:     text.trim(),
-      });
+
+    // Use WebSocket if connected
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({ content: text.trim() }));
       setText("");
-      await loadMessages();
-      await loadConversations();
-    } catch (err) {
-      console.error("Send error:", err.message);
-    } finally {
-      setSending(false);
       inputRef.current?.focus();
+    } else {
+      // Fallback to REST API if WebSocket not connected
+      try {
+        setSending(true);
+        await api.post("/messages/", {
+          sender_id:   user.id,
+          receiver_id: activeConv.other_user_id,
+          content:     text.trim(),
+        });
+        setText("");
+        await loadMessages();
+        await loadConversations();
+      } catch (err) {
+        console.error("Send error:", err.message);
+      } finally {
+        setSending(false);
+        inputRef.current?.focus();
+      }
     }
   };
 
@@ -127,7 +182,7 @@ export default function Messages({ onNavigate }) {
 
   const formatTime = (dt) => {
     if (!dt) return "";
-    return new Date(dt).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
+    return new Date(dt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   const formatDay = (dt) => {
@@ -137,14 +192,14 @@ export default function Messages({ onNavigate }) {
     const diff  = Math.floor((today - d) / 86400000);
     if (diff === 0) return "Today";
     if (diff === 1) return "Yesterday";
-    return d.toLocaleDateString([], { month:"short", day:"numeric" });
+    return d.toLocaleDateString([], { month: "short", day: "numeric" });
   };
 
-  const filtered      = conversations.filter(c =>
+  const filtered       = conversations.filter(c =>
     (c.other_name || "").toLowerCase().includes(searchQuery.toLowerCase())
   );
-  const getInitial    = (name) => (name || "?").charAt(0).toUpperCase();
-  const avatarColors  = [
+  const getInitial     = (name) => (name || "?").charAt(0).toUpperCase();
+  const avatarColors   = [
     "linear-gradient(135deg,#2563eb,#7c3aed)",
     "linear-gradient(135deg,#7c3aed,#a855f7)",
     "linear-gradient(135deg,#0891b2,#2563eb)",
@@ -154,61 +209,60 @@ export default function Messages({ onNavigate }) {
   const getAvatarColor = (id) => avatarColors[(id || 0) % avatarColors.length];
 
   return (
-    <div style={{ display:"flex", height:"100vh", fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#f8fafc", overflow:"hidden" }}>
+    <div style={{ display: "flex", height: "100vh", fontFamily: "'Segoe UI',sans-serif", backgroundColor: "#f8fafc", overflow: "hidden" }}>
 
       {/* ── Sidebar ── */}
-      <div style={{ width:320, borderRight:"1px solid #e2e8f0", display:"flex", flexDirection:"column", backgroundColor:"#fff", flexShrink:0 }}>
+      <div style={{ width: 320, borderRight: "1px solid #e2e8f0", display: "flex", flexDirection: "column", backgroundColor: "#fff", flexShrink: 0 }}>
 
         {/* Header */}
-        <div style={{ background:theme.headerBg, padding:"24px 20px 20px" }}>
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
+        <div style={{ background: theme.headerBg, padding: "24px 20px 20px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
             <div>
-              <h2 style={{ fontSize:20, fontWeight:800, color:"white", margin:0, letterSpacing:"-0.5px" }}>Messages</h2>
-              <p style={{ fontSize:12, color:"rgba(255,255,255,0.7)", margin:"4px 0 0" }}>
+              <h2 style={{ fontSize: 20, fontWeight: 800, color: "white", margin: 0, letterSpacing: "-0.5px" }}>Messages</h2>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", margin: "4px 0 0" }}>
                 {conversations.length} conversation{conversations.length !== 1 ? "s" : ""}
               </p>
             </div>
             {onNavigate && (
               <button onClick={handleBack}
-                style={{ background:"rgba(255,255,255,0.15)", border:"none", borderRadius:8, padding:"6px 12px", color:"white", fontSize:12, cursor:"pointer", fontWeight:600, whiteSpace:"nowrap" }}>
+                style={{ background: "rgba(255,255,255,0.15)", border: "none", borderRadius: 8, padding: "6px 12px", color: "white", fontSize: 12, cursor: "pointer", fontWeight: 600, whiteSpace: "nowrap" }}>
                 {theme.backLabel}
               </button>
             )}
           </div>
-          <div style={{ position:"relative" }}>
-            <span style={{ position:"absolute", left:10, top:"50%", transform:"translateY(-50%)", color:"rgba(255,255,255,0.6)", fontSize:14 }}>🔍</span>
+          <div style={{ position: "relative" }}>
+            <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "rgba(255,255,255,0.6)", fontSize: 14 }}>🔍</span>
             <input
               placeholder="Search conversations..."
               value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
-              style={{ width:"100%", padding:"9px 12px 9px 32px", backgroundColor:"rgba(255,255,255,0.15)", border:"1px solid rgba(255,255,255,0.2)", borderRadius:10, fontSize:13, color:"white", outline:"none", boxSizing:"border-box", fontFamily:"inherit" }}
+              style={{ width: "100%", padding: "9px 12px 9px 32px", backgroundColor: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 10, fontSize: 13, color: "white", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
             />
           </div>
         </div>
 
         {/* Conversation List */}
-        <div style={{ flex:1, overflowY:"auto" }}>
+        <div style={{ flex: 1, overflowY: "auto" }}>
           {loadingConvs && (
-            <div style={{ padding:24, textAlign:"center", color:"#64748b", fontSize:14 }}>Loading...</div>
+            <div style={{ padding: 24, textAlign: "center", color: "#64748b", fontSize: 14 }}>Loading...</div>
           )}
           {!loadingConvs && filtered.length === 0 && (
-            <div style={{ padding:32, textAlign:"center" }}>
-              <div style={{ fontSize:40, marginBottom:12 }}>💬</div>
-              <p style={{ fontSize:14, color:"#64748b", margin:0 }}>No conversations yet</p>
-              <p style={{ fontSize:12, color:"#94a3b8", marginTop:4 }}>
+            <div style={{ padding: 32, textAlign: "center" }}>
+              <div style={{ fontSize: 40, marginBottom: 12 }}>💬</div>
+              <p style={{ fontSize: 14, color: "#64748b", margin: 0 }}>No conversations yet</p>
+              <p style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
                 {isFreelancer ? "Clients will message you once a proposal is accepted" : "Messages from freelancers will appear here"}
               </p>
             </div>
           )}
 
-          {/* Placeholder for new convo navigated from contracts */}
           {!loadingConvs && initFreelancer && activeConv && !conversations.find(c => String(c.other_user_id) === String(initFreelancer)) && (
-            <div style={{ padding:"14px 16px", backgroundColor:theme.activeConv, borderLeft:`3px solid ${theme.activeBorder}`, display:"flex", alignItems:"center", gap:12 }}>
-              <div style={{ width:44, height:44, borderRadius:"50%", background:getAvatarColor(parseInt(initFreelancer)), display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:16, flexShrink:0 }}>
+            <div style={{ padding: "14px 16px", backgroundColor: theme.activeConv, borderLeft: `3px solid ${theme.activeBorder}`, display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 44, height: 44, borderRadius: "50%", background: getAvatarColor(parseInt(initFreelancer)), display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: 16, flexShrink: 0 }}>
                 {getInitial(decodeURIComponent(initName || "F"))}
               </div>
               <div>
-                <div style={{ fontWeight:700, fontSize:14, color:"#111827" }}>{decodeURIComponent(initName || `User #${initFreelancer}`)}</div>
-                <div style={{ fontSize:12, color:"#64748b" }}>New conversation</div>
+                <div style={{ fontWeight: 700, fontSize: 14, color: "#111827" }}>{decodeURIComponent(initName || `User #${initFreelancer}`)}</div>
+                <div style={{ fontSize: 12, color: "#64748b" }}>New conversation</div>
               </div>
             </div>
           )}
@@ -217,25 +271,25 @@ export default function Messages({ onNavigate }) {
             const isActive = activeConv?.other_user_id === c.other_user_id;
             return (
               <div key={c.other_user_id} onClick={() => setActiveConv(c)}
-                style={{ padding:"14px 16px", cursor:"pointer", borderBottom:"1px solid #f1f5f9", display:"flex", alignItems:"center", gap:12, backgroundColor:isActive ? theme.activeConv : "transparent", borderLeft:isActive ? `3px solid ${theme.activeBorder}` : "3px solid transparent", transition:"all 0.15s" }}
-                onMouseEnter={e => { if (!isActive) e.currentTarget.style.backgroundColor="#f8fafc"; }}
-                onMouseLeave={e => { if (!isActive) e.currentTarget.style.backgroundColor="transparent"; }}>
-                <div style={{ width:44, height:44, borderRadius:"50%", background:getAvatarColor(c.other_user_id), display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:16, flexShrink:0, boxShadow:"0 2px 8px rgba(0,0,0,0.15)" }}>
+                style={{ padding: "14px 16px", cursor: "pointer", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", gap: 12, backgroundColor: isActive ? theme.activeConv : "transparent", borderLeft: isActive ? `3px solid ${theme.activeBorder}` : "3px solid transparent", transition: "all 0.15s" }}
+                onMouseEnter={e => { if (!isActive) e.currentTarget.style.backgroundColor = "#f8fafc"; }}
+                onMouseLeave={e => { if (!isActive) e.currentTarget.style.backgroundColor = "transparent"; }}>
+                <div style={{ width: 44, height: 44, borderRadius: "50%", background: getAvatarColor(c.other_user_id), display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: 16, flexShrink: 0, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
                   {getInitial(c.other_name)}
                 </div>
-                <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                    <span style={{ fontWeight:700, fontSize:14, color:"#111827", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontWeight: 700, fontSize: 14, color: "#111827", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {c.other_name || `User #${c.other_user_id}`}
                     </span>
-                    <span style={{ fontSize:11, color:"#94a3b8", flexShrink:0, marginLeft:8 }}>{formatDay(c.last_message_at)}</span>
+                    <span style={{ fontSize: 11, color: "#94a3b8", flexShrink: 0, marginLeft: 8 }}>{formatDay(c.last_message_at)}</span>
                   </div>
-                  <div style={{ fontSize:12, color:"#64748b", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", marginTop:2 }}>
+                  <div style={{ fontSize: 12, color: "#64748b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 2 }}>
                     {c.last_message || "No messages yet"}
                   </div>
                 </div>
                 {c.unread_count > 0 && (
-                  <div style={{ width:20, height:20, borderRadius:"50%", background:theme.unreadBg, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontSize:11, fontWeight:700, flexShrink:0 }}>
+                  <div style={{ width: 20, height: 20, borderRadius: "50%", background: theme.unreadBg, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
                     {c.unread_count}
                   </div>
                 )}
@@ -246,40 +300,40 @@ export default function Messages({ onNavigate }) {
       </div>
 
       {/* ── Chat Area ── */}
-      <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
         {!activeConv ? (
-          <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column", gap:12 }}>
-            <div style={{ fontSize:64 }}>💬</div>
-            <h3 style={{ fontSize:18, fontWeight:700, color:"#111827", margin:0 }}>Select a conversation</h3>
-            <p style={{ fontSize:14, color:"#64748b", margin:0 }}>Choose from the sidebar to start messaging</p>
+          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
+            <div style={{ fontSize: 64 }}>💬</div>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: "#111827", margin: 0 }}>Select a conversation</h3>
+            <p style={{ fontSize: 14, color: "#64748b", margin: 0 }}>Choose from the sidebar to start messaging</p>
           </div>
         ) : (
           <>
             {/* Chat Header */}
-            <div style={{ backgroundColor:"#fff", borderBottom:"1px solid #e2e8f0", padding:"16px 24px", display:"flex", alignItems:"center", gap:14, boxShadow:"0 1px 3px rgba(0,0,0,0.05)" }}>
-              <div style={{ width:44, height:44, borderRadius:"50%", background:getAvatarColor(activeConv.other_user_id), display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:18, boxShadow:"0 2px 8px rgba(0,0,0,0.15)" }}>
+            <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #e2e8f0", padding: "16px 24px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+              <div style={{ width: 44, height: 44, borderRadius: "50%", background: getAvatarColor(activeConv.other_user_id), display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: 18, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
                 {getInitial(activeConv.other_name)}
               </div>
               <div>
-                <div style={{ fontWeight:700, fontSize:16, color:"#111827" }}>
+                <div style={{ fontWeight: 700, fontSize: 16, color: "#111827" }}>
                   {activeConv.other_name || `User #${activeConv.other_user_id}`}
                 </div>
-                <div style={{ fontSize:12, color:"#16a34a", display:"flex", alignItems:"center", gap:4 }}>
-                  <span style={{ width:6, height:6, borderRadius:"50%", backgroundColor:theme.onlineDot, display:"inline-block" }} />
-                  Active now
+                <div style={{ fontSize: 12, color: connected ? "#16a34a" : "#94a3b8", display: "flex", alignItems: "center", gap: 4 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", backgroundColor: connected ? theme.onlineDot : "#94a3b8", display: "inline-block" }} />
+                  {connected ? "Active now" : "Connecting..."}
                 </div>
               </div>
             </div>
 
             {/* Messages */}
-            <div style={{ flex:1, overflowY:"auto", padding:"24px", display:"flex", flexDirection:"column", gap:4, backgroundColor:"#f8fafc" }}>
+            <div style={{ flex: 1, overflowY: "auto", padding: "24px", display: "flex", flexDirection: "column", gap: 4, backgroundColor: "#f8fafc" }}>
               {loadingMsgs && (
-                <div style={{ textAlign:"center", color:"#64748b", fontSize:14, padding:24 }}>Loading messages...</div>
+                <div style={{ textAlign: "center", color: "#64748b", fontSize: 14, padding: 24 }}>Loading messages...</div>
               )}
               {!loadingMsgs && messages.length === 0 && (
-                <div style={{ flex:1, display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column", gap:8, marginTop:80 }}>
-                  <div style={{ fontSize:48 }}>👋</div>
-                  <p style={{ fontSize:14, color:"#64748b", margin:0 }}>No messages yet. Say hello!</p>
+                <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8, marginTop: 80 }}>
+                  <div style={{ fontSize: 48 }}>👋</div>
+                  <p style={{ fontSize: 14, color: "#64748b", margin: 0 }}>No messages yet. Say hello!</p>
                 </div>
               )}
               {messages.map((m, i) => {
@@ -287,36 +341,36 @@ export default function Messages({ onNavigate }) {
                 const prevMsg = messages[i - 1];
                 const showDay = !prevMsg || formatDay(m.created_at) !== formatDay(prevMsg.created_at);
                 return (
-                  <div key={m.id}>
+                  <div key={m.id || i}>
                     {showDay && (
-                      <div style={{ textAlign:"center", margin:"12px 0" }}>
-                        <span style={{ fontSize:11, color:"#94a3b8", backgroundColor:"#e2e8f0", padding:"3px 12px", borderRadius:20, fontWeight:600 }}>
+                      <div style={{ textAlign: "center", margin: "12px 0" }}>
+                        <span style={{ fontSize: 11, color: "#94a3b8", backgroundColor: "#e2e8f0", padding: "3px 12px", borderRadius: 20, fontWeight: 600 }}>
                           {formatDay(m.created_at)}
                         </span>
                       </div>
                     )}
-                    <div style={{ display:"flex", justifyContent:isMe ? "flex-end" : "flex-start", marginBottom:4 }}>
+                    <div style={{ display: "flex", justifyContent: isMe ? "flex-end" : "flex-start", marginBottom: 4 }}>
                       {!isMe && (
-                        <div style={{ width:28, height:28, borderRadius:"50%", background:getAvatarColor(m.sender_id), display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:11, marginRight:8, flexShrink:0, alignSelf:"flex-end" }}>
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: getAvatarColor(m.sender_id), display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: 11, marginRight: 8, flexShrink: 0, alignSelf: "flex-end" }}>
                           {getInitial(activeConv.other_name)}
                         </div>
                       )}
-                      <div style={{ maxWidth:"65%" }}>
+                      <div style={{ maxWidth: "65%" }}>
                         <div style={{
-                          padding:"10px 14px",
+                          padding: "10px 14px",
                           borderRadius: isMe ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
                           background:   isMe ? theme.bubbleBg : "#fff",
                           color:        isMe ? "white" : "#111827",
-                          fontSize:14, lineHeight:1.5,
+                          fontSize: 14, lineHeight: 1.5,
                           boxShadow:    isMe ? theme.bubbleShadow : "0 1px 3px rgba(0,0,0,0.08)",
                           border:       isMe ? "none" : "1px solid #e2e8f0",
-                          wordBreak:"break-word",
+                          wordBreak: "break-word",
                         }}>
                           {m.content}
                         </div>
-                        <div style={{ fontSize:11, color:"#94a3b8", marginTop:4, textAlign:isMe ? "right" : "left", paddingLeft:isMe ? 0 : 4, paddingRight:isMe ? 4 : 0 }}>
+                        <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 4, textAlign: isMe ? "right" : "left", paddingLeft: isMe ? 0 : 4, paddingRight: isMe ? 4 : 0 }}>
                           {formatTime(m.created_at)}
-                          {isMe && <span style={{ marginLeft:4 }}>✓✓</span>}
+                          {isMe && <span style={{ marginLeft: 4 }}>✓✓</span>}
                         </div>
                       </div>
                     </div>
@@ -327,7 +381,7 @@ export default function Messages({ onNavigate }) {
             </div>
 
             {/* Input */}
-            <div style={{ backgroundColor:"#fff", borderTop:"1px solid #e2e8f0", padding:"16px 24px", display:"flex", gap:12, alignItems:"flex-end" }}>
+            <div style={{ backgroundColor: "#fff", borderTop: "1px solid #e2e8f0", padding: "16px 24px", display: "flex", gap: 12, alignItems: "flex-end" }}>
               <textarea
                 ref={inputRef}
                 value={text}
@@ -335,11 +389,11 @@ export default function Messages({ onNavigate }) {
                 onKeyDown={handleKeyDown}
                 placeholder="Type a message... (Enter to send)"
                 rows={1}
-                style={{ flex:1, padding:"12px 16px", border:`1.5px solid ${text ? theme.inputFocus : "#e2e8f0"}`, borderRadius:12, fontSize:14, fontFamily:"inherit", outline:"none", resize:"none", lineHeight:1.5, maxHeight:120, overflowY:"auto", transition:"border-color 0.2s" }}
-                onInput={e => { e.target.style.height="auto"; e.target.style.height=Math.min(e.target.scrollHeight,120)+"px"; }}
+                style={{ flex: 1, padding: "12px 16px", border: `1.5px solid ${text ? theme.inputFocus : "#e2e8f0"}`, borderRadius: 12, fontSize: 14, fontFamily: "inherit", outline: "none", resize: "none", lineHeight: 1.5, maxHeight: 120, overflowY: "auto", transition: "border-color 0.2s" }}
+                onInput={e => { e.target.style.height = "auto"; e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px"; }}
               />
               <button onClick={sendMessage} disabled={sending || !text.trim()}
-                style={{ padding:"12px 20px", background:(sending || !text.trim()) ? "#cbd5e1" : theme.sendBtn, color:"white", border:"none", borderRadius:12, cursor:(sending || !text.trim()) ? "not-allowed" : "pointer", fontWeight:700, fontSize:14, boxShadow:(sending || !text.trim()) ? "none" : theme.sendShadow, transition:"all 0.2s", whiteSpace:"nowrap", display:"flex", alignItems:"center", gap:6 }}>
+                style={{ padding: "12px 20px", background: (sending || !text.trim()) ? "#cbd5e1" : theme.sendBtn, color: "white", border: "none", borderRadius: 12, cursor: (sending || !text.trim()) ? "not-allowed" : "pointer", fontWeight: 700, fontSize: 14, boxShadow: (sending || !text.trim()) ? "none" : theme.sendShadow, transition: "all 0.2s", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 6 }}>
                 {sending ? "..." : "Send ➤"}
               </button>
             </div>
