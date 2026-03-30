@@ -1,0 +1,47 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import os
+from dotenv import load_dotenv
+
+from src.database.core import Base, engine
+from src.users.router import router as users_router
+from src.auth.controller import router as auth_router
+from src.client_dashboard.router import router as client_dashboard_router
+from src.freelancer_dashboard.router import router as freelancer_dashboard_router
+from src.proposals.controller import router as proposals_router
+from src.projects.controller import router as projects_router  # ← ADD
+from src.entities.contract import Contract, Milestone  # ← ADD
+load_dotenv()
+
+# Create all database tables
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title="TalentLink API",
+    description="Authentication and Proposal management endpoints for TalentLink",
+    version="1.0.0"
+)
+
+# Configure CORS for React frontend
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        os.getenv("CLIENT_ORIGIN", "http://localhost:3000"),
+        "http://localhost:3001",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ── Routers ──────────────────────────────────
+app.include_router(auth_router, tags=["Auth"])
+app.include_router(client_dashboard_router)
+app.include_router(freelancer_dashboard_router)
+app.include_router(users_router)
+app.include_router(proposals_router, prefix="/proposals", tags=["Proposals"])
+app.include_router(projects_router)  # ← ADD
+
+@app.get("/")
+def root():
+    return {"message": "TalentLink API is running ✅"}

@@ -1,0 +1,150 @@
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthProvider, AuthContext } from "./context/AuthContext";
+
+// Auth pages
+import ChooseRole from "./pages/auth/ChooseRole";
+import ClientLogin from "./pages/auth/ClientLogin";
+import ClientSignup from "./pages/auth/ClientSignup";
+import FreelancerLogin from "./pages/auth/FreelancerLogin";
+import FreelancerSignup from "./pages/auth/FreelancerSignup";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+
+// Proposal pages
+import SubmitProposal from "./pages/proposal/SubmitProposal";
+import ViewProposals from "./pages/proposal/ViewProposals";
+import ProposalTracking from "./pages/proposal/ProposalTracking";
+
+import Sidebar from "./layout/Sidebar";
+import ClientDashboard from "./pages/ClientDashboard";
+import Contracts from "./pages/Contracts";
+import FreelancerContracts from "./pages/freelancer/FreelancerContracts";
+// Project pages
+import Projects from "./pages/Projects";
+import PostProject from "./pages/PostProject";
+
+// Freelancer
+import FreelancerDashboard from "./pages/freelancer/Freelancerdasboard";
+
+// Dashboard
+
+
+
+import "./App.css";
+
+function ProtectedRoute({ children, allowedRole }) {
+  const { user, role, loading } = useContext(AuthContext);
+  if (loading) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh" }}>Loading...</div>;
+  if (!user) return <Navigate to="/" replace />;
+  if (allowedRole && role !== allowedRole) return <Navigate to="/" replace />;
+  return children;
+}
+
+const DashboardLayout = ({ children }) => {
+  return (
+    <div style={{ display: "flex" }}>
+      <Sidebar />
+      <main style={{ flex: 1, marginLeft: "250px", minHeight: "100vh", backgroundColor: "var(--background)" }}>
+        {children}
+      </main>
+    </div>
+  );
+};
+
+function AppRoutes() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Auth Routes */}
+        <Route path="/" element={<ChooseRole />} />
+        <Route path="/client/login" element={<ClientLogin />} />
+        <Route path="/client/signup" element={<ClientSignup />} />
+        <Route path="/freelancer/login" element={<FreelancerLogin />} />
+        <Route path="/freelancer/signup" element={<FreelancerSignup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+
+        {/* Freelancer Routes */}
+        <Route path="/freelancer/dashboard" element={
+          <ProtectedRoute allowedRole="freelancer">
+            <FreelancerDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/submit-proposal/:projectId" element={
+          <ProtectedRoute allowedRole="freelancer"><SubmitProposal /></ProtectedRoute>
+        } />
+        <Route path="/proposal-tracking" element={
+          <ProtectedRoute allowedRole="freelancer"><ProposalTracking /></ProtectedRoute>
+        } />
+
+        {/* Client Routes */}
+        <Route path="/view-proposals/:projectId" element={
+          <ProtectedRoute allowedRole="client">
+            <DashboardLayout><ViewProposals /></DashboardLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/projects" element={
+          <ProtectedRoute allowedRole="client">
+            <DashboardLayout><Projects /></DashboardLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/post-project" element={
+          <ProtectedRoute allowedRole="client">
+            <DashboardLayout><PostProject /></DashboardLayout>
+          </ProtectedRoute>
+        } />
+
+<<<<<<< HEAD
+  {/* Dashboard routes - auth guard temporarily removed */ }
+        <Route
+          path="/dashboard"
+          element={
+            <DashboardLayout>
+              <ClientDashboard />
+            </DashboardLayout>
+          }
+        />
+        <Route
+          path="/contracts"
+          element={
+            <DashboardLayout>
+              <Contracts />
+            </DashboardLayout>
+          }
+        />
+        <Route
+          path="/freelancer/contracts"
+          element={
+            <DashboardLayout>
+              <FreelancerContracts />
+            </DashboardLayout>
+          }
+        />
+=======
+        {/* Dashboard Routes */}
+        <Route path="/client/dashboard" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={
+          <ProtectedRoute allowedRole="client">
+            <DashboardLayout><ClientDashboard /></DashboardLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/contracts" element={
+          <ProtectedRoute allowedRole="client">
+            <DashboardLayout><Contracts /></DashboardLayout>
+          </ProtectedRoute>
+        } />
+>>>>>>> cad8369364665b2ea1f91469c8268a4815bb19b5
+
+  {/* Catch-all */ }
+  <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes >
+    </BrowserRouter >
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
+  );
+}
