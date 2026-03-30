@@ -1,11 +1,26 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
+import os
 
-# for simplicity we'll use a local SQLite file; swap URL for other databases
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+# Load environment variables from .env file
+load_dotenv()
 
-# connect_args needed for SQLite to allow multiple threads
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+# Get database URL from environment (required)
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not SQLALCHEMY_DATABASE_URL:
+    raise ValueError(
+        "DATABASE_URL environment variable is not set. "
+        "Please configure your database connection in the .env file. "
+        "See .env.example for examples."
+    )
+
+# connect_args needed for SQLite to allow multiple threads (optional for other databases)
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    connect_args={"check_same_thread": False} if "sqlite" in SQLALCHEMY_DATABASE_URL else {}
+)
 
 # create a configured "Session" class
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
