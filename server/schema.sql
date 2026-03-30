@@ -51,7 +51,22 @@ CREATE TABLE contracts (
     freelancer_id INTEGER REFERENCES users(id) ON DELETE SET NULL
 );
 
--- 6. Payments Table (For Spending Chart)
+-- 6. Proposals Table
+CREATE TABLE proposals (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    amount DOUBLE PRECISION DEFAULT 0.0,
+    rate DOUBLE PRECISION DEFAULT 0.0,
+    status VARCHAR(50) DEFAULT 'Under Review',
+    timeline VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
+    client_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    freelancer_id INTEGER REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- 7. Payments Table (For Spending Chart)
 CREATE TABLE payments (
     id SERIAL PRIMARY KEY,
     amount DOUBLE PRECISION NOT NULL,

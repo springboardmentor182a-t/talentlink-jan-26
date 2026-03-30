@@ -27,7 +27,7 @@ const Navbar = ({ profile }) => {
         <div className="flex items-center gap-3 pl-6 border-l border-gray-200">
           <div className="text-right hidden sm:block">
             <p className="text-sm font-semibold text-gray-700">
-              {profile?.full_name || "Client User"}
+              {profile?.full_name || "Account User"}
             </p>
             <p className="text-xs text-gray-500">
               {profile?.role || "Client"}
