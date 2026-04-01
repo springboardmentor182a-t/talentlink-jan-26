@@ -14,7 +14,7 @@ import OAuthCallback    from './pages/OAuthCallback';
 
 // ── Dashboards ────────────────────────────────────────────────────────────────
 import FreelancerDashboard from './pages/FreelancerDashboard';
-import Dashboard           from './pages/Dashboard';           // client dashboard / fallback
+import Dashboard           from './pages/Dashboard';
 
 // ── Projects ──────────────────────────────────────────────────────────────────
 import FindProjects   from './pages/FindProjects';
@@ -38,9 +38,10 @@ import Profile           from './pages/Profile';
 // ── Proposals ─────────────────────────────────────────────────────────────────
 import SubmitProposal from './pages/SubmitProposal';
 
+// ── Reviews ───────────────────────────────────────────────────────────────────
+import ReviewPage from './pages/ReviewPage';
 
 // ── Route guards ──────────────────────────────────────────────────────────────
-
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return null;
@@ -82,24 +83,24 @@ export default function App() {
         {/* ── Protected — inside the shared sidebar layout ──────────── */}
         <Route element={<Layout />}>
 
-          {/* Dashboards — role-specific pages, not a shared placeholder */}
+          {/* Dashboards */}
           <Route path="/freelancer/dashboard" element={<ProtectedRoute><FreelancerDashboard /></ProtectedRoute>} />
           <Route path="/client/dashboard"     element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/dashboard"            element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
-          {/* Projects — both pages wired, sidebar links to /find-projects */}
+          {/* Projects */}
           <Route path="/find-projects"   element={<ProtectedRoute><FindProjects /></ProtectedRoute>} />
           <Route path="/browse-projects" element={<ProtectedRoute><BrowseProjects /></ProtectedRoute>} />
           <Route path="/jobs"            element={<ProtectedRoute><FindProjects /></ProtectedRoute>} />
 
-          {/* Contracts — role split at /contracts, individual pages also accessible */}
+          {/* Contracts */}
           <Route path="/contracts"             element={<ProtectedRoute><ContractsRoute /></ProtectedRoute>} />
           <Route path="/contracts/freelancer"  element={<ProtectedRoute><FreelancerContracts /></ProtectedRoute>} />
 
           {/* Messages */}
           <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
 
-          {/* Profiles — view + edit for both roles, plus the generic profile page */}
+          {/* Profiles */}
           <Route path="/profile"                 element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/profile/freelancer"      element={<ProtectedRoute><FreelancerView /></ProtectedRoute>} />
           <Route path="/profile/freelancer/edit" element={<ProtectedRoute><FreelancerProfile /></ProtectedRoute>} />
@@ -109,8 +110,12 @@ export default function App() {
           {/* Proposals */}
           <Route path="/projects/:projectId/apply" element={<ProtectedRoute><SubmitProposal /></ProtectedRoute>} />
 
+          {/* Reviews */}
+          <Route path="/reviews" element={<ProtectedRoute><ReviewPage /></ProtectedRoute>} />
+
         </Route>
 
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );

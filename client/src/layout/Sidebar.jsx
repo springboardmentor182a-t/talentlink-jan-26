@@ -8,21 +8,25 @@ import {
   User,
   Building2,
   LogOut,
-  PlusCircle,
+  Star,
 } from 'lucide-react';
 
+// ── Nav config ────────────────────────────────────────────────────────────────
+
 const FREELANCER_NAV = [
-  { label: 'Dashboard',    path: '/freelancer/dashboard', icon: LayoutDashboard },
-  { label: 'Job Listings', path: '/find-projects',        icon: Briefcase       },
-  { label: 'Contracts',    path: '/contracts',            icon: FileText        },
-  { label: 'Messages',     path: '/messages',             icon: MessageSquare   },
+  { label: 'Dashboard',   path: '/freelancer/dashboard', icon: LayoutDashboard },
+  { label: 'Job Listings', path: '/find-projects',       icon: Briefcase       },
+  { label: 'Contracts',   path: '/contracts',            icon: FileText        },
+  { label: 'Messages',    path: '/messages',             icon: MessageSquare   },
+  { label: 'My Reviews',  path: '/reviews',              icon: Star            },
 ];
 
 const CLIENT_NAV = [
-  { label: 'Dashboard',      path: '/dashboard', icon: LayoutDashboard },
-  { label: 'Post a Project', path: null,         icon: PlusCircle, disabled: true, soon: true },
-  { label: 'Contracts',      path: '/contracts', icon: FileText        },
-  { label: 'Messages',       path: '/messages',  icon: MessageSquare   },
+  { label: 'Dashboard',    path: '/dashboard',    icon: LayoutDashboard },
+  { label: 'Job Postings', path: '/my-projects',  icon: Briefcase       },
+  { label: 'Contracts',    path: '/contracts',    icon: FileText        },
+  { label: 'Messages',     path: '/messages',     icon: MessageSquare   },
+  { label: 'Reviews',      path: '/reviews',      icon: Star            },
 ];
 
 const Sidebar = () => {
@@ -40,6 +44,11 @@ const Sidebar = () => {
     location.pathname === profilePath ||
     location.pathname.startsWith(profilePath + '/');
 
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
     <aside style={styles.sidebar}>
 
@@ -51,40 +60,33 @@ const Sidebar = () => {
 
       {/* Primary nav */}
       <nav style={styles.nav}>
-        {navItems.map(({ label, path, icon: Icon, disabled, soon }) => {
-          const isActive = !disabled && (
+        {navItems.map(({ label, path, icon: Icon }) => {
+          const isActive =
             location.pathname === path ||
-            location.pathname.startsWith(path + '/')
-          );
+            location.pathname.startsWith(path + '/');
 
           return (
             <button
               key={label}
-              onClick={() => !disabled && navigate(path)}
-              disabled={disabled}
-              title={soon ? 'Coming soon' : undefined}
+              onClick={() => navigate(path)}
               style={{
                 ...styles.navItem,
-                ...(isActive   ? styles.navItemActive   : {}),
-                ...(disabled   ? styles.navItemDisabled : {}),
+                ...(isActive ? styles.navItemActive : {}),
               }}
             >
               {isActive && <div style={styles.activeBar} />}
               <Icon
                 size={18}
-                style={{ color: disabled ? 'rgba(255,255,255,0.3)' : isActive ? '#fff' : 'rgba(255,255,255,0.65)', flexShrink: 0 }}
+                style={{ color: isActive ? '#fff' : 'rgba(255,255,255,0.65)', flexShrink: 0 }}
               />
               <span style={{
                 ...styles.navLabel,
-                color:      disabled ? 'rgba(255,255,255,0.3)' : isActive ? '#fff' : 'rgba(255,255,255,0.65)',
+                color:      isActive ? '#fff' : 'rgba(255,255,255,0.65)',
                 fontWeight: isActive ? 600 : 400,
                 flex: 1,
               }}>
                 {label}
               </span>
-              {soon && (
-                <span style={styles.soonBadge}>Soon</span>
-              )}
             </button>
           );
         })}
@@ -115,7 +117,8 @@ const Sidebar = () => {
           </span>
         </button>
 
-        <button onClick={logout} style={styles.navItem}>
+        {/* Sign Out */}
+        <button onClick={handleLogout} style={styles.navItem}>
           <LogOut
             size={18}
             style={{ color: 'rgba(255,255,255,0.65)', flexShrink: 0 }}
@@ -129,6 +132,8 @@ const Sidebar = () => {
     </aside>
   );
 };
+
+// ── Styles ────────────────────────────────────────────────────────────────────
 
 const styles = {
   sidebar: {
@@ -170,8 +175,7 @@ const styles = {
     border: 'none', background: 'transparent', cursor: 'pointer',
     position: 'relative', transition: 'background 0.15s', textAlign: 'left',
   },
-  navItemActive:   { background: 'rgba(0,0,0,0.12)' },
-  navItemDisabled: { cursor: 'not-allowed' },
+  navItemActive: { background: 'rgba(0,0,0,0.12)' },
   activeBar: {
     position: 'absolute', left: 0, top: '50%',
     transform: 'translateY(-50%)',
@@ -180,13 +184,6 @@ const styles = {
   navLabel: {
     fontSize: 13.5, fontFamily: 'Inter, sans-serif',
     letterSpacing: '0.01em', lineHeight: 1,
-  },
-  soonBadge: {
-    fontSize: 10, fontWeight: 700,
-    background: 'rgba(255,255,255,0.2)',
-    color: 'rgba(255,255,255,0.7)',
-    padding: '2px 6px', borderRadius: '999px',
-    letterSpacing: '0.04em', flexShrink: 0,
   },
   bottomSection: { flexShrink: 0, paddingBottom: 8 },
   divider: { margin: '4px 24px', borderTop: '1px solid rgba(255,255,255,0.15)' },
