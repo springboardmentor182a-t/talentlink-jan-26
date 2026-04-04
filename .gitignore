@@ -1,15 +1,28 @@
-# React
-client/node_modules
-client/build
-
+# ---------------------------
 # Python
-server/venv
-server/__pycache__/
-server/**/*.pyc
+# ---------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+server/venv/
 
+# ---------------------------
+# React / Node
+# ---------------------------
+node_modules/
+build/
+client/node_modules/
+client/build/
+
+# ---------------------------
 # OS files
+# ---------------------------
 .DS_Store
 Thumbs.db
 
-# Env files
+# ---------------------------
+# Environment variables
+# ---------------------------
 .env
