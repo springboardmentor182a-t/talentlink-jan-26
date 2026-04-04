@@ -8,6 +8,10 @@ __pycache__/
 venv/
 server/venv/
 
+# SQLite Database
+*.db
+*.sqlite3
+
 # ---------------------------
 # React / Node
 # ---------------------------

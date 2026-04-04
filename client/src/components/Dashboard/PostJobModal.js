@@ -16,17 +16,32 @@ const PostJobModal = ({ isOpen, onClose, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
-      await createProject({
-        ...formData,
+      const payload = {
+        title: formData.title,
+        description: formData.description,
         budget: parseFloat(formData.budget),
-        deadline: new Date(formData.deadline).toISOString(),
-      });
+        deadline: `${formData.deadline}T00:00:00`, // ✅ FIXED FORMAT
+      };
+
+      console.log("📤 Sending Data:", payload); // DEBUG
+
+      await createProject(payload);
 
       onSuccess();
       onClose();
-      setFormData({ title: "", description: "", budget: "", deadline: "" });
+
+      // Reset form
+      setFormData({
+        title: "",
+        description: "",
+        budget: "",
+        deadline: "",
+      });
+
     } catch (error) {
+      console.error("❌ Error creating project:", error); // DEBUG
       alert("Error creating project");
     } finally {
       setLoading(false);
@@ -35,7 +50,9 @@ const PostJobModal = ({ isOpen, onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-full max-w-lg p-6 relative shadow-2xl animate-fade-in">
+      <div className="bg-white rounded-xl w-full max-w-lg p-6 relative shadow-2xl">
+        
+        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
@@ -48,6 +65,8 @@ const PostJobModal = ({ isOpen, onClose, onSuccess }) => {
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          
+          {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Project Title
@@ -64,6 +83,7 @@ const PostJobModal = ({ isOpen, onClose, onSuccess }) => {
             />
           </div>
 
+          {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Description
@@ -80,7 +100,10 @@ const PostJobModal = ({ isOpen, onClose, onSuccess }) => {
             />
           </div>
 
+          {/* Budget + Deadline */}
           <div className="grid grid-cols-2 gap-4">
+            
+            {/* Budget */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Budget ($)
@@ -96,6 +119,8 @@ const PostJobModal = ({ isOpen, onClose, onSuccess }) => {
                 placeholder="5000"
               />
             </div>
+
+            {/* Deadline */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Deadline
@@ -110,8 +135,10 @@ const PostJobModal = ({ isOpen, onClose, onSuccess }) => {
                 }
               />
             </div>
+
           </div>
 
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
@@ -119,6 +146,7 @@ const PostJobModal = ({ isOpen, onClose, onSuccess }) => {
           >
             {loading ? "Posting..." : "Post Job Now"}
           </button>
+
         </form>
       </div>
     </div>
