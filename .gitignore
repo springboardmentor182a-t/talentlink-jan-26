@@ -16,13 +16,29 @@ build/
 client/node_modules/
 client/build/
 
+# React specific (from your old project)
+.pnp
+.pnp.js
+/coverage
+
+# ---------------------------
+# Environment files
+# ---------------------------
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ---------------------------
+# Logs
+# ---------------------------
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
 # ---------------------------
 # OS files
 # ---------------------------
 .DS_Store
 Thumbs.db
-
-# ---------------------------
-# Environment variables
-# ---------------------------
-.env

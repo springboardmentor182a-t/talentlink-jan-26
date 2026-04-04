@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./styles/theme.css";
 
-import ClientProfile from "./components/profile/ClientProfile";
-import FreelancerProfile from "./components/profile/FreelancerProfile";
+import ClientProfile from "../../../../client/src/components/profile/ClientProfile";
+import FreelancerProfile from "../../../../client/src/components/profile/FreelancerProfile";
 
 import { FaUser, FaBriefcase, FaHome } from "react-icons/fa";
 
