@@ -52,16 +52,25 @@ async def google_login(payload: dict, db: Session = Depends(get_db)):
         if res.status_code != 200:
             raise HTTPException(status_code=401, detail="Invalid Google token")
         user_info = res.json()
+
     email = user_info.get("email")
     name  = user_info.get("name", email)
     user  = db.query(User).filter(User.email == email).first()
+
     if not user:
+        # New user — register with role
         user = register_user(db, name, email, "google_oauth", role)
+        print(f"✅ New Google user created: {email} as {role}")
     else:
-        # Always update role to match where they logged in from
-        user.role = role
-        db.commit()
-        print(f"✅ Google user role updated to: {role}")
+        # Existing user — check role mismatch
+        if user.role != role:
+            print(f"❌ Role mismatch: user is {user.role}, tried to login as {role}")
+            raise HTTPException(
+                status_code=403,
+                detail=f"This email is already registered as a {user.role}. Please use {user.role} login."
+            )
+        print(f"✅ Google user logged in as: {user.role}")
+
     token = create_token({"sub": user.email, "role": user.role})
     return {
         "token": token,
@@ -124,10 +133,13 @@ async def github_callback(code: str, state: str = "client", db: Session = Depend
         user = register_user(db, name, email, "github_oauth", role)
         print(f"✅ New user created: {email} as {role}")
     else:
-        # Always update role to match where they logged in from
-        user.role = role
-        db.commit()
-        print(f"✅ User role updated to: {role}")
+        # Existing user — check role mismatch
+        if user.role != role:
+            print(f"❌ Role mismatch: user is {user.role}, tried to login as {role}")
+            return RedirectResponse(
+                url=f"http://localhost:3000/?error=role_mismatch&existing_role={user.role}"
+            )
+        print(f"✅ User logged in as: {user.role}")
 
     token = create_token({"sub": user.email, "role": user.role})
     return RedirectResponse(

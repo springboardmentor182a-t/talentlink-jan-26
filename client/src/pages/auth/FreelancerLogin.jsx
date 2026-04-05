@@ -29,6 +29,19 @@ export default function FreelancerLogin() {
 
   useEffect(() => { setTimeout(() => setVisible(true), 50); }, []);
 
+  // ── Handle GitHub OAuth errors redirected back from backend ──
+  useEffect(() => {
+    const params       = new URLSearchParams(window.location.search);
+    const errorParam   = params.get("error");
+    const existingRole = params.get("existing_role");
+    if (errorParam === "role_mismatch") {
+      setError(`This email is already registered as a ${existingRole}. Please use ${existingRole} login.`);
+    }
+    if (errorParam === "github_auth_failed") {
+      setError("GitHub login failed. Please try again.");
+    }
+  }, []);
+
   const fadeUp = {
     opacity:   visible ? 1 : 0,
     transform: visible ? "translateY(0)" : "translateY(24px)",
@@ -41,7 +54,10 @@ export default function FreelancerLogin() {
         const res = await api.post("/auth/google", { token: tokenResponse.access_token, role: "freelancer" });
         login({ token: res.data.token, role: res.data.role, user: res.data.user });
         navigate("/freelancer/dashboard");
-      } catch { setError("Google login failed. Please try again."); }
+      } catch (err) {
+        const detail = err.response?.data?.detail;
+        setError(typeof detail === "string" ? detail : "Google login failed. Please try again.");
+      }
     },
     onError: () => setError("Google login failed.")
   });
