@@ -6,9 +6,21 @@ export default function ChooseRole() {
   const [visible, setVisible] = useState(false);
   const [hoverClient, setHoverClient] = useState(false);
   const [hoverFreelancer, setHoverFreelancer] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
+  useEffect(() => { setTimeout(() => setVisible(true), 100); }, []);
+
+  // ── Handle GitHub OAuth errors redirected back to homepage ──
   useEffect(() => {
-    setTimeout(() => setVisible(true), 100);
+    const params       = new URLSearchParams(window.location.search);
+    const errorParam   = params.get("error");
+    const existingRole = params.get("existing_role");
+    if (errorParam === "role_mismatch") {
+      setErrorMsg(`This email is already registered as a ${existingRole}. Please use ${existingRole} login.`);
+    }
+    if (errorParam === "github_auth_failed") {
+      setErrorMsg("GitHub login failed. Please try again.");
+    }
   }, []);
 
   const fadeIn       = { opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(30px)", transition: "opacity 0.7s ease, transform 0.7s ease" };
@@ -68,7 +80,6 @@ export default function ChooseRole() {
 
       {/* Navbar */}
       <div style={{ position: "relative", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "18px 40px", backgroundColor: "rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(20px)" }}>
-        {/* Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ width: 38, height: 38, background: "linear-gradient(135deg,#2563eb,#7c3aed)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 18, boxShadow: "0 4px 15px rgba(37,99,235,0.4)" }}>💼</div>
           <span style={{ fontWeight: 800, fontSize: 20, background: "linear-gradient(135deg,#60a5fa,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>TalentLink</span>
@@ -77,20 +88,22 @@ export default function ChooseRole() {
         {/* Direct sign in links */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginRight: 4 }}>Sign in as</span>
-          <button
-            className="nav-link-blue"
-            style={navLinkStyle}
-            onClick={() => navigate("/client/login")}>
+          <button className="nav-link-blue" style={navLinkStyle} onClick={() => navigate("/client/login")}>
             💼 Client
           </button>
-          <button
-            className="nav-link-purple"
-            style={navLinkStyle}
-            onClick={() => navigate("/freelancer/login")}>
+          <button className="nav-link-purple" style={navLinkStyle} onClick={() => navigate("/freelancer/login")}>
             👤 Freelancer
           </button>
         </div>
       </div>
+
+      {/* Error message banner */}
+      {errorMsg && (
+        <div style={{ position: "relative", zIndex: 10, margin: "20px 40px 0", backgroundColor: "rgba(220,38,38,0.15)", border: "1px solid rgba(220,38,38,0.4)", borderRadius: 12, padding: "14px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+          <span style={{ color: "#fca5a5", fontSize: 14, fontWeight: 500 }}>⚠️ {errorMsg}</span>
+          <button onClick={() => setErrorMsg("")} style={{ background: "none", border: "none", color: "#fca5a5", cursor: "pointer", fontSize: 18, lineHeight: 1 }}>×</button>
+        </div>
+      )}
 
       {/* Hero */}
       <div style={{ position: "relative", zIndex: 10, textAlign: "center", padding: "64px 20px 40px" }}>
