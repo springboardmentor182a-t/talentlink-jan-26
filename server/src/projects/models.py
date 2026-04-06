@@ -8,8 +8,10 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    full_name = Column(String)
+    email = Column(String, unique=True, index=True)
+    first_name = Column(String)
+    last_name = Column(String)
+    password_hash = Column(String)
     role = Column(String, default="Client")
     rating = Column(Float, default=0.0)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -107,3 +109,24 @@ class ActivityLog(Base):
 
     user = relationship("User", back_populates="activities")
     project = relationship("Project", back_populates="activities")
+
+
+class Proposal(Base):
+    __tablename__ = "proposals"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    amount = Column(Float, default=0.0)
+    rate = Column(Float, default=0.0)
+    status = Column(String, default="Under Review")  # Under Review, Accepted, Rejected
+    timeline = Column(String, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)
+    client_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    freelancer_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    project = relationship("Project", backref="proposals")
+    client = relationship("User", foreign_keys=[client_id], backref="received_proposals")
+    freelancer = relationship("User", foreign_keys=[freelancer_id], backref="sent_proposals")

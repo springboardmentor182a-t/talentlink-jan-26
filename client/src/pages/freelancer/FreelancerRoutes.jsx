@@ -1,22 +1,28 @@
 // Routes configuration for Freelancer module
 // Import and use these in your App.js or main routing file
 
-import React from 'react';
-import { Routes, Route } from 'react-router-dom';
-import FreelancerLayout from '../../components/freelancer/FreelancerLayout';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import FreelancerLayout from "../../components/freelancer/FreelancerLayout";
 
 // Pages
-import Dashboard from './dashboard/Dashboard';
-import Projects from './projects/Projects';
-import Proposals from './proposals/Proposals';
-import Earnings from './earnings/Earnings';
-import Profile from './profile/Profile';
-import Messages from './messages/Messages';
+import Dashboard from "./dashboard/Dashboard";
+import Projects from "./projects/Projects";
+import Proposals from "./proposals/Proposals";
+import Earnings from "./earnings/Earnings";
+import Profile from "./profile/Profile";
+import Messages from "./messages/Messages";
+
+import { Navigate } from "react-router-dom";
 
 export const FreelancerRoutes = () => {
   return (
     <FreelancerLayout>
       <Routes>
+        <Route
+          path="/"
+          element={<Navigate to="/freelancer/dashboard" replace />}
+        />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/proposals" element={<Proposals />} />

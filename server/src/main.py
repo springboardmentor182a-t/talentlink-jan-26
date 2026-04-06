@@ -3,14 +3,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from src.projects.controller import router as projects_router
-from src.client_dashboard.controller import router as client_dashboard_router
+from src.client_dashboard.controller import (
+    router as client_dashboard_router,
+    freelancer_router as freelancer_dashboard_router
+)
+from src.database.core import engine, Base
 
-from .database import engine, Base, SessionLocal
+from .database import engine as local_engine, Base as local_Base, SessionLocal
 from .models import FreelancerProfile, ClientProfile
 from . import schemas
 
+from src.auth.controller import router as auth_router
+
 # Create tables
-Base.metadata.create_all(bind=engine)
+local_Base.metadata.create_all(bind=local_engine)
 
 app = FastAPI(title="TalentLink API", version="1.0.0")
 
@@ -23,9 +29,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Existing routers
+# Include Routers
+app.include_router(auth_router)
 app.include_router(projects_router)
 app.include_router(client_dashboard_router)
+app.include_router(freelancer_dashboard_router)
 
 
 # ---------------------------
