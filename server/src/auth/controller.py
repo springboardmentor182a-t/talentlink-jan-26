@@ -16,6 +16,10 @@ router = APIRouter(tags=["Authentication"])
 
 reset_tokens = {}
 
+# ── Helper to get frontend URL from env ──────────────────────
+def frontend_url():
+    return os.getenv("FRONTEND_URL", "http://localhost:3000")
+
 
 @router.post("/register")
 def register(data: RegisterRequest, db: Session = Depends(get_db)):
@@ -58,11 +62,9 @@ async def google_login(payload: dict, db: Session = Depends(get_db)):
     user  = db.query(User).filter(User.email == email).first()
 
     if not user:
-        # New user — register with role
         user = register_user(db, name, email, "google_oauth", role)
         print(f"✅ New Google user created: {email} as {role}")
     else:
-        # Existing user — check role mismatch
         if user.role != role:
             print(f"❌ Role mismatch: user is {user.role}, tried to login as {role}")
             raise HTTPException(
@@ -99,7 +101,9 @@ async def github_callback(code: str, state: str = "client", db: Session = Depend
         access_token = token_data.get("access_token")
         if not access_token:
             print("❌ GitHub error:", token_data.get("error"), token_data.get("error_description"))
-            return RedirectResponse(url="http://localhost:3000/?error=github_auth_failed")
+            return RedirectResponse(
+                url=f"{frontend_url()}/?error=github_auth_failed"
+            )
 
         # Step 2 — Get user info
         user_res  = await client.get(
@@ -129,21 +133,19 @@ async def github_callback(code: str, state: str = "client", db: Session = Depend
 
     user = db.query(User).filter(User.email == email).first()
     if not user:
-        # New user — register with role from state
         user = register_user(db, name, email, "github_oauth", role)
         print(f"✅ New user created: {email} as {role}")
     else:
-        # Existing user — check role mismatch
         if user.role != role:
             print(f"❌ Role mismatch: user is {user.role}, tried to login as {role}")
             return RedirectResponse(
-                url=f"http://localhost:3000/?error=role_mismatch&existing_role={user.role}"
+                url=f"{frontend_url()}/?error=role_mismatch&existing_role={user.role}"
             )
         print(f"✅ User logged in as: {user.role}")
 
     token = create_token({"sub": user.email, "role": user.role})
     return RedirectResponse(
-        url=f"http://localhost:3000/oauth/callback?token={token}&role={user.role}&id={user.id}&name={user.name}&email={user.email}"
+        url=f"{frontend_url()}/oauth/callback?token={token}&role={user.role}&id={user.id}&name={user.name}&email={user.email}"
     )
 
 
@@ -159,7 +161,7 @@ async def forgot_password(payload: dict, db: Session = Depends(get_db)):
 
     token      = secrets.token_urlsafe(32)
     reset_tokens[token] = email
-    reset_link = f"http://localhost:3000/reset-password?token={token}"
+    reset_link = f"{frontend_url()}/reset-password?token={token}"
 
     try:
         msg            = MIMEMultipart("alternative")
