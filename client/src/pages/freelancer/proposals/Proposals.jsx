@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 import { fetchFreelancerProposals } from "../../../services/freelancer";
 import authService from "../../../services/auth";
 import "./Proposals.css";
@@ -22,6 +22,7 @@ const Proposals = () => {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState(initialForm);
   const [submitError, setSubmitError] = useState("");
+  const navigate = useNavigate();
 
   const loadProposals = async () => {
     setLoading(true);
@@ -82,6 +83,10 @@ const Proposals = () => {
     }
   };
 
+  const openChat = (proposal) => {
+    navigate(`/freelancer/messages?proposal=${proposal.id}`);
+  };
+
   return (
     <div className="freelancer-section-page">
       <div className="section-hero proposals-hero">
@@ -129,6 +134,15 @@ const Proposals = () => {
                 <span>${Number(proposal.rate || 0)}/hr</span>
                 <span>{proposal.timeline}</span>
                 <span>{proposal.time_ago}</span>
+              </div>
+              <div className="proposal-card-actions">
+                <button
+                  type="button"
+                  className="secondary-action"
+                  onClick={() => openChat(proposal)}
+                >
+                  Message Client
+                </button>
               </div>
             </article>
           ))}

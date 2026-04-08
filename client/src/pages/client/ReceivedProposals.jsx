@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ClientShell from "../../components/client/ClientShell";
 import {
   fetchClientProfile,
@@ -19,6 +20,7 @@ const ReceivedProposals = () => {
   const [error, setError] = useState("");
   const [activeProjects, setActiveProjects] = useState(0);
   const [profile, setProfile] = useState(null);
+  const navigate = useNavigate();
 
   const loadProposals = async () => {
     setIsLoading(true);
@@ -29,7 +31,9 @@ const ReceivedProposals = () => {
         fetchClientProfile(),
         fetchClientReceivedProposals(),
       ]);
-      const incoming = Array.isArray(proposalData?.proposals) ? proposalData.proposals : [];
+      const incoming = Array.isArray(proposalData?.proposals)
+        ? proposalData.proposals
+        : [];
       setProfile(profileData.profile);
       setProposals(incoming);
       setActiveProjects(
@@ -55,10 +59,14 @@ const ReceivedProposals = () => {
     }
   };
 
+  const handleOpenChat = (proposal) => {
+    navigate(`/client/messages?proposal=${proposal.id}`);
+  };
+
   const total = proposals.length;
-  const accepted = proposals.filter((p) => p.status === "Accepted").length;
+  const accepted = proposals.filter((proposal) => proposal.status === "Accepted").length;
   const underReview = proposals.filter(
-    (p) => p.status === "Under Review",
+    (proposal) => proposal.status === "Under Review",
   ).length;
 
   return (
@@ -123,6 +131,12 @@ const ReceivedProposals = () => {
                 </div>
               )}
               <div className="proposal-actions">
+                <button
+                  className="btn-outline"
+                  onClick={() => handleOpenChat(proposal)}
+                >
+                  Message
+                </button>
                 <button
                   className="btn-accept"
                   onClick={() => handleStatusUpdate(proposal.id, "Accepted")}

@@ -9,6 +9,7 @@ import ClientDashboard from "./pages/ClientDashboard";
 import ReceivedProposals from "./pages/client/ReceivedProposals";
 import ClientProjects from "./pages/client/ClientProjects";
 import ClientProfile from "./pages/client/ClientProfile";
+import ClientMessages from "./pages/client/ClientMessages";
 import { FreelancerRoutes } from "./pages/freelancer/FreelancerRoutes";
 import Login from "./pages/login";
 import SignUp from "./pages/signup";
@@ -74,6 +75,14 @@ function App() {
             element={
               <PrivateRoute>
                 <ClientProfile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/client/messages"
+            element={
+              <PrivateRoute>
+                <ClientMessages />
               </PrivateRoute>
             }
           />

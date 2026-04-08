@@ -3,10 +3,10 @@ import {
   LayoutDashboard,
   Briefcase,
   FileText,
+  MessageSquare,
   LogOut,
   UserCircle2,
 } from "lucide-react";
-
 import { NavLink, useNavigate } from "react-router-dom";
 import authService from "../services/auth";
 
@@ -36,6 +36,12 @@ const Sidebar = () => {
       name: "Received Proposals",
       icon: <FileText size={20} />,
       path: "/client/received-proposals",
+    },
+    {
+      id: "messages",
+      name: "Messages",
+      icon: <MessageSquare size={20} />,
+      path: "/client/messages",
     },
     {
       id: "profile",
