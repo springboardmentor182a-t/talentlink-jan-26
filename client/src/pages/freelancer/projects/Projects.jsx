@@ -1,109 +1,90 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import './Projects.css';
+import React, { useEffect, useMemo, useState } from "react";
+import { Clock3, Send } from "lucide-react";
+
+import { fetchFreelancerProjects } from "../../../services/freelancer";
+import "./Projects.css";
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
-  const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('All Categories');
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const apiBase = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
-    const controller = new AbortController();
-
-    const fetchProjects = async () => {
-      setIsLoading(true);
-      setError('');
-
+    const loadProjects = async () => {
+      setLoading(true);
+      setError("");
       try {
-        const response = await fetch(`${apiBase}/freelancer/projects`, {
-          signal: controller.signal
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to load projects');
-        }
-
-        const data = await response.json();
+        const data = await fetchFreelancerProjects();
         setProjects(Array.isArray(data?.projects) ? data.projects : []);
       } catch (err) {
-        if (err.name !== 'AbortError') {
-          setError(err.message || 'Failed to load projects');
-        }
+        setError(err.message || "Failed to load projects.");
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    fetchProjects();
-
-    return () => controller.abort();
+    loadProjects();
   }, []);
 
   const filteredProjects = useMemo(() => {
     return projects.filter((project) => {
-      const matchesSearch = project.title?.toLowerCase().includes(search.toLowerCase());
-      const matchesCategory =
-        category === 'All Categories' || project.category === category;
-      return matchesSearch && matchesCategory;
+      const haystack = `${project.title || ""} ${project.client_name || ""} ${project.description || ""}`.toLowerCase();
+      return haystack.includes(search.toLowerCase());
     });
-  }, [projects, search, category]);
+  }, [projects, search]);
 
   return (
-    <div className="projects-page">
-      <div className="page-header">
-        <h1>Find Projects</h1>
-        <p>Browse and apply for projects matching your skills</p>
-      </div>
-
-      <div className="filters-section">
+    <div className="freelancer-section-page">
+      <div className="section-hero">
+        <div>
+          <h2>Find Projects</h2>
+          <p>Open opportunities from real client records in your database.</p>
+        </div>
         <input
+          className="section-search"
           type="text"
-          placeholder="Search projects..."
-          className="search-box"
+          placeholder="Search by title, client, or description"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         />
-        <select
-          className="filter-select"
-          value={category}
-          onChange={(event) => setCategory(event.target.value)}
-        >
-          <option>All Categories</option>
-          <option>Web Development</option>
-          <option>UI/UX Design</option>
-          <option>Mobile Development</option>
-        </select>
       </div>
 
-      <div className="projects-list">
-        {isLoading && <p className="placeholder">Loading projects...</p>}
-        {!isLoading && error && <p className="placeholder">{error}</p>}
-        {!isLoading && !error && filteredProjects.length === 0 && (
-          <p className="placeholder">No projects found.</p>
-        )}
-        {!isLoading && !error && filteredProjects.length > 0 && (
-          <ul className="project-grid">
-            {filteredProjects.map((project) => (
-              <li key={project.id || project._id} className="project-card">
-                <div className="project-top">
-                  <h3 className="project-title">{project.title || 'Untitled Project'}</h3>
-                  <span className="project-budget">${project.budget ?? 0}</span>
+      {loading && <div className="freelancer-state">Loading projects...</div>}
+      {!loading && error && <div className="freelancer-state error">{error}</div>}
+
+      {!loading && !error && (
+        <div className="project-grid-list">
+          {filteredProjects.length === 0 && (
+            <div className="empty-card">No open projects match your search.</div>
+          )}
+          {filteredProjects.map((project) => (
+            <article key={project.id} className="project-market-card">
+              <div className="project-market-top">
+                <div>
+                  <h3>{project.title}</h3>
+                  <p>{project.client_name}</p>
                 </div>
-                <p className="project-meta">
-                  {project.client || 'Client'} • {project.postedDaysAgo || '—'} days ago
-                </p>
-                <div className="project-tags">
-                  {(project.tags || []).map((tag) => (
-                    <span key={tag} className="project-tag">{tag}</span>
-                  ))}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+                <span className={`project-badge ${project.already_applied ? "applied" : "open"}`}>
+                  {project.already_applied ? "Proposal Sent" : project.status}
+                </span>
+              </div>
+              <p className="project-description">{project.description}</p>
+              <div className="project-market-meta">
+                <span>${Number(project.budget || 0).toLocaleString()}</span>
+                <span>
+                  <Clock3 size={15} />
+                  {project.days_left ?? 0} days left
+                </span>
+                <span>
+                  <Send size={15} />
+                  {project.time_ago}
+                </span>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

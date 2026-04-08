@@ -1,79 +1,58 @@
-import React, { useEffect, useState } from 'react';
-import './Header.css';
-import authService from '../../services/auth';
+import React from "react";
+import { Bell, CalendarDays, Search } from "lucide-react";
+import { useLocation } from "react-router-dom";
+
+import { useFreelancerShell } from "../../context/FreelancerShellContext";
+import "./Header.css";
+
+const titleMap = {
+  "/freelancer/dashboard": "Freelancer Dashboard",
+  "/freelancer/projects": "Project Marketplace",
+  "/freelancer/proposals": "Proposal Center",
+  "/freelancer/earnings": "Earnings",
+  "/freelancer/profile": "Freelancer Profile",
+};
 
 const Header = () => {
-  const [userName, setUserName] = useState('Freelancer');
-
-  useEffect(() => {
-    const apiBase = process.env.REACT_APP_API_URL || 'http://localhost:8000';
-    const controller = new AbortController();
-
-    const fetchUser = async () => {
-      try {
-        const token = authService.getToken();
-        if (!token) {
-          setUserName('Freelancer');
-          return;
-        }
-
-        const response = await fetch(`${apiBase}/freelancer/dashboard`, {
-          signal: controller.signal,
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-
-        if (!response.ok) {
-          return;
-        }
-
-        const data = await response.json();
-        const name =
-          data?.user?.full_name ||
-          data?.user?.name ||
-          data?.user?.firstName;
-        if (name) {
-          setUserName(name);
-        }
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          setUserName('Freelancer');
-        }
-      }
-    };
-
-    fetchUser();
-
-    return () => controller.abort();
-  }, []);
+  const location = useLocation();
+  const { profileData } = useFreelancerShell();
+  const profile = profileData?.profile;
+  const heading = titleMap[location.pathname] || "Freelancer Workspace";
+  const today = new Intl.DateTimeFormat("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date());
 
   return (
     <header className="freelancer-header">
       <div className="header-left">
-        <input
-          type="text"
-          className="search-input"
-          placeholder="Search..."
-        />
+        <p className="header-eyebrow">TalentLink</p>
+        <h1>{heading}</h1>
       </div>
 
       <div className="header-right">
-        {/* Notifications */}
-        <button className="header-icon notification-btn">
-          <span>🔔</span>
+        <label className="header-search">
+          <Search size={16} />
+          <input type="text" placeholder="Search projects, proposals, clients" />
+        </label>
+
+        <div className="header-date">
+          <CalendarDays size={16} />
+          <span>{today}</span>
+        </div>
+
+        <button className="header-icon" type="button" aria-label="Notifications">
+          <Bell size={18} />
         </button>
 
-        {/* Messages */}
-        <button className="header-icon message-btn">
-          <span>💬</span>
-        </button>
-
-        {/* Profile Dropdown */}
-        <button className="profile-dropdown">
-          <div className="profile-avatar">👤</div>
-          <span className="profile-name">{userName}</span>
-        </button>
+        <div className="profile-dropdown">
+          <div className="profile-avatar">{profile?.initials || "FR"}</div>
+          <div className="profile-copy">
+            <span className="profile-name">{profile?.full_name || "Freelancer"}</span>
+            <span className="profile-email">{profile?.email || ""}</span>
+          </div>
+        </div>
       </div>
     </header>
   );

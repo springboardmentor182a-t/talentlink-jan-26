@@ -1,230 +1,224 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
-  LineChart,
-  Line,
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
-import StatsCard from "./components/StatsCard";
-import ProposalCard from "./components/ProposalCard";
-import ContractCard from "./components/ContractCard";
-import ActivityItem from "./components/ActivityItem";
+import { ArrowUpRight, Clock3, DollarSign, FileText, FolderKanban } from "lucide-react";
+
+import { fetchFreelancerDashboard } from "../../../services/freelancer";
 import "./Dashboard.css";
 
 const Dashboard = () => {
-  const [stats, setStats] = useState({
-    activeProposals: 0,
-    ongoingProjects: 0,
-    totalEarnings: 0,
-    profileViews: 0,
-  });
-  const [proposals, setProposals] = useState([]);
-  const [contracts, setContracts] = useState([]);
-  const [earningsData, setEarningsData] = useState([]);
-  const [activities, setActivities] = useState([]);
-  const [displayName, setDisplayName] = useState("Freelancer");
-  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const apiBase = process.env.REACT_APP_API_URL || "http://localhost:8000";
-    const controller = new AbortController();
-
-    const fetchDashboard = async () => {
-      setIsLoading(true);
+    const loadDashboard = async () => {
+      setLoading(true);
       setError("");
-
       try {
-        const token = localStorage.getItem("token");
-        const response = await fetch(`${apiBase}/freelancer/dashboard`, {
-          signal: controller.signal,
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to load dashboard data");
-        }
-
-        const data = await response.json();
-
-        setStats({
-          activeProposals: data?.stats?.activeProposals ?? 0,
-          ongoingProjects: data?.stats?.ongoingProjects ?? 0,
-          totalEarnings: data?.stats?.totalEarnings ?? 0,
-          profileViews: data?.stats?.profileViews ?? 0,
-        });
-        setProposals(Array.isArray(data?.proposals) ? data.proposals : []);
-        setContracts(Array.isArray(data?.contracts) ? data.contracts : []);
-        setEarningsData(
-          Array.isArray(data?.earningsSeries) ? data.earningsSeries : [],
-        );
-        setActivities(Array.isArray(data?.activities) ? data.activities : []);
-
-        const name =
-          data?.user?.full_name || data?.user?.name || data?.user?.firstName;
-        if (name) {
-          setDisplayName(name);
-        }
+        const response = await fetchFreelancerDashboard();
+        setData(response);
       } catch (err) {
-        if (err.name !== "AbortError") {
-          setError(err.message || "Failed to load dashboard data");
-        }
+        setError(err.message || "Failed to load dashboard data.");
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    fetchDashboard();
-
-    return () => controller.abort();
+    loadDashboard();
   }, []);
 
+  const statCards = useMemo(() => {
+    const stats = data?.stats || {};
+    return [
+      {
+        key: "earnings",
+        label: "Total Earnings",
+        value: `$${Number(stats.totalEarnings || 0).toLocaleString()}`,
+        icon: DollarSign,
+        tone: "blue",
+      },
+      {
+        key: "projects",
+        label: "Active Projects",
+        value: stats.activeProjects || 0,
+        icon: FolderKanban,
+        tone: "pink",
+      },
+      {
+        key: "proposals",
+        label: "Proposals Sent",
+        value: stats.proposalsSent || 0,
+        icon: FileText,
+        tone: "orange",
+      },
+      {
+        key: "rate",
+        label: "Success Rate",
+        value: `${stats.successRate || 0}%`,
+        icon: ArrowUpRight,
+        tone: "green",
+      },
+    ];
+  }, [data]);
+
+  if (loading) {
+    return <div className="freelancer-state">Loading dashboard...</div>;
+  }
+
+  if (error) {
+    return <div className="freelancer-state error">{error}</div>;
+  }
+
   return (
-    <div className="freelancer-dashboard">
-      {/* Welcome Section */}
-      <div className="dashboard-welcome">
-        <h1>Welcome back, {displayName}! 👋</h1>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="stats-grid">
-        <StatsCard
-          icon="📋"
-          title="Active Proposals"
-          value={stats.activeProposals}
-        />
-        <StatsCard
-          icon="📁"
-          title="Ongoing Projects"
-          value={stats.ongoingProjects}
-        />
-        <StatsCard
-          icon="💰"
-          title="Total Earnings"
-          value={`$${stats.totalEarnings}`}
-        />
-        <StatsCard icon="👁️" title="Profile views" value={stats.profileViews} />
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="dashboard-content">
-        {/* Left Section */}
-        <div className="left-section">
-          {/* My Proposals */}
-          <section className="proposals-section">
-            <div className="section-header">
-              <h2>My Proposals</h2>
-              <a href="/freelancer/proposals" className="view-all">
-                View all {">"}
-              </a>
-            </div>
-            <div className="proposals-list">
-              {isLoading && <p className="placeholder">Loading proposals...</p>}
-              {!isLoading && error && <p className="placeholder">{error}</p>}
-              {!isLoading && !error && proposals.length === 0 && (
-                <p className="placeholder">No proposals found.</p>
-              )}
-              {!isLoading &&
-                !error &&
-                proposals.map((proposal) => (
-                  <ProposalCard
-                    key={proposal.id || proposal._id}
-                    proposal={proposal}
-                  />
-                ))}
-            </div>
-          </section>
-
-          {/* Monthly Earnings Chart */}
-          <section className="earnings-section">
-            <div className="section-header">
-              <h2>Monthly Earnings</h2>
-              <a href="/freelancer/earnings" className="view-all">
-                View all {">"}
-              </a>
-            </div>
-            <div className="chart-container">
-              {isLoading && <p className="placeholder">Loading earnings...</p>}
-              {!isLoading && error && <p className="placeholder">{error}</p>}
-              {!isLoading && !error && earningsData.length === 0 && (
-                <p className="placeholder">No earnings data available.</p>
-              )}
-              {!isLoading && !error && earningsData.length > 0 && (
-                <ResponsiveContainer width="100%" height={250}>
-                  <LineChart data={earningsData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                    <XAxis dataKey="month" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="earnings"
-                      stroke="#4CAF50"
-                      dot={{ fill: "#4CAF50", r: 5 }}
-                      strokeWidth={2}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              )}
-            </div>
-          </section>
-        </div>
-
-        {/* Right Section */}
-        <div className="right-section">
-          {/* My Contracts */}
-          <section className="contracts-section">
-            <div className="section-header">
-              <h2>My Contracts</h2>
-              <a href="/freelancer/contracts" className="view-all">
-                View all {">"}
-              </a>
-            </div>
-            <div className="contracts-list">
-              {isLoading && <p className="placeholder">Loading contracts...</p>}
-              {!isLoading && error && <p className="placeholder">{error}</p>}
-              {!isLoading && !error && contracts.length === 0 && (
-                <p className="placeholder">No contracts found.</p>
-              )}
-              {!isLoading &&
-                !error &&
-                contracts.map((contract) => (
-                  <ContractCard
-                    key={contract.id || contract._id}
-                    contract={contract}
-                  />
-                ))}
-            </div>
-          </section>
-
-          {/* Recent Activities */}
-          <section className="activities-section">
-            <div className="section-header">
-              <h2>Recent Activities</h2>
-            </div>
-            <div className="activities-list">
-              {isLoading && (
-                <p className="placeholder">Loading activities...</p>
-              )}
-              {!isLoading && error && <p className="placeholder">{error}</p>}
-              {!isLoading && !error && activities.length === 0 && (
-                <p className="placeholder">No recent activity.</p>
-              )}
-              {!isLoading &&
-                !error &&
-                activities.map((activity) => (
-                  <ActivityItem
-                    key={activity.id || activity._id}
-                    activity={activity}
-                  />
-                ))}
-            </div>
-          </section>
+    <div className="freelancer-dashboard-page">
+      <div className="dashboard-hero">
+        <div>
+          <h2>Welcome back, {data?.user?.full_name || "Freelancer"}</h2>
+          <p>Here is a live view of your projects, proposals, and earnings.</p>
         </div>
       </div>
+
+      <section className="dashboard-stats-grid">
+        {statCards.map((card) => (
+          <article key={card.key} className={`dashboard-stat-card tone-${card.tone}`}>
+            <div className="stat-icon-wrap">
+              <card.icon size={22} />
+            </div>
+            <p>{card.label}</p>
+            <h3>{card.value}</h3>
+          </article>
+        ))}
+      </section>
+
+      <section className="dashboard-main-grid">
+        <article className="dashboard-panel wide-panel">
+          <div className="panel-heading">
+            <div>
+              <h3>Earnings Overview</h3>
+              <p>Completed payments recorded this year</p>
+            </div>
+          </div>
+          <div className="chart-shell">
+            <ResponsiveContainer width="100%" height={280}>
+              <AreaChart data={data?.earningsSeries || []}>
+                <defs>
+                  <linearGradient id="earningsFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.28} />
+                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.02} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke="#dbe4f0" strokeDasharray="4 4" vertical={false} />
+                <XAxis dataKey="month" tickLine={false} axisLine={false} />
+                <YAxis tickLine={false} axisLine={false} />
+                <Tooltip />
+                <Area
+                  type="monotone"
+                  dataKey="earnings"
+                  stroke="#4f46e5"
+                  fill="url(#earningsFill)"
+                  strokeWidth={3}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </article>
+
+        <article className="dashboard-panel activity-panel">
+          <div className="panel-heading">
+            <div>
+              <h3>Recent Activity</h3>
+              <p>Latest updates from your account</p>
+            </div>
+          </div>
+          <div className="activity-list">
+            {(data?.recentActivity || []).length === 0 && (
+              <p className="empty-copy">No recent activity found.</p>
+            )}
+            {(data?.recentActivity || []).map((item) => (
+              <div key={item.id} className="activity-row">
+                <span className="activity-dot" />
+                <div>
+                  <strong>{item.description}</strong>
+                  <p>{item.time_ago}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+      </section>
+
+      <section className="dashboard-main-grid lower-grid">
+        <article className="dashboard-panel timeline-panel">
+          <div className="panel-heading">
+            <div>
+              <h3>Proposal Timeline</h3>
+              <p>Proposals created by month</p>
+            </div>
+          </div>
+          <div className="chart-shell compact-chart">
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={data?.projectTimeline || []}>
+                <CartesianGrid stroke="#dbe4f0" strokeDasharray="4 4" vertical={false} />
+                <XAxis dataKey="month" tickLine={false} axisLine={false} />
+                <YAxis tickLine={false} axisLine={false} />
+                <Tooltip />
+                <Bar dataKey="projects" radius={[12, 12, 0, 0]} fill="#7c3aed" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </article>
+
+        <article className="dashboard-panel projects-panel">
+          <div className="panel-heading">
+            <div>
+              <h3>Active Projects</h3>
+              <p>Contracts currently in progress</p>
+            </div>
+          </div>
+          <div className="project-stack">
+            {(data?.activeProjects || []).length === 0 && (
+              <p className="empty-copy">No active projects are assigned right now.</p>
+            )}
+            {(data?.activeProjects || []).map((project) => (
+              <div key={project.id} className="active-project-card">
+                <div className="project-card-top">
+                  <div>
+                    <h4>{project.title}</h4>
+                    <p>Client: {project.client_name}</p>
+                  </div>
+                  <span className={`status-pill ${project.status_label.toLowerCase().replace(/\s+/g, "-")}`}>
+                    {project.status_label}
+                  </span>
+                </div>
+                <div className="progress-copy">
+                  <span>Progress</span>
+                  <strong>{project.progress}%</strong>
+                </div>
+                <div className="progress-track">
+                  <span style={{ width: `${project.progress}%` }} />
+                </div>
+                <div className="project-footer-meta">
+                  <span>
+                    <Clock3 size={15} />
+                    Deadline: {project.days_left ?? 0} days
+                  </span>
+                  <span>${Number(project.budget || 0).toLocaleString()}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+      </section>
     </div>
   );
 };
