@@ -28,6 +28,8 @@ const Sidebar = () => {
     // Set active menu item based on current route
     if (location.pathname.startsWith("/client/received-proposals")) {
       setActiveItem("received-proposals");
+    } else if (location.pathname.startsWith("/client/messages")) {
+      setActiveItem("messages");
     } else if (location.pathname.startsWith("/client")) {
       setActiveItem("dashboard");
     } else if (location.pathname.startsWith("/freelancer/projects")) {
@@ -77,7 +79,7 @@ const Sidebar = () => {
       id: "messages",
       name: "Messages",
       icon: <MessageSquare size={20} />,
-      path: "/client",
+      path: "/client/messages",
     },
     {
       id: "settings",
