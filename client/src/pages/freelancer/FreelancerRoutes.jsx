@@ -11,7 +11,6 @@ import Projects from "./projects/Projects";
 import Proposals from "./proposals/Proposals";
 import Earnings from "./earnings/Earnings";
 import Profile from "./profile/Profile";
-import Messages from "./messages/Messages";
 
 import { Navigate } from "react-router-dom";
 
@@ -28,7 +27,6 @@ export const FreelancerRoutes = () => {
         <Route path="/proposals" element={<Proposals />} />
         <Route path="/earnings" element={<Earnings />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/messages" element={<Messages />} />
       </Routes>
     </FreelancerLayout>
   );

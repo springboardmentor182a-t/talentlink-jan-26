@@ -1,97 +1,119 @@
-import React, { useEffect, useState } from 'react';
-import './Earnings.css';
+import React, { useEffect, useState } from "react";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
+import { fetchFreelancerEarnings } from "../../../services/freelancer";
+import "./Earnings.css";
 
 const Earnings = () => {
-  const [summary, setSummary] = useState({
-    totalEarned: 0,
-    availableBalance: 0,
-    pending: 0
-  });
-  const [history, setHistory] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const apiBase = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api';
-    const controller = new AbortController();
-
-    const fetchEarnings = async () => {
-      setIsLoading(true);
-      setError('');
-
+    const loadEarnings = async () => {
+      setLoading(true);
+      setError("");
       try {
-        const response = await fetch(`${apiBase}/freelancer/earnings`, {
-          signal: controller.signal
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to load earnings data');
-        }
-
-        const data = await response.json();
-        setSummary({
-          totalEarned: data?.summary?.totalEarned ?? 0,
-          availableBalance: data?.summary?.availableBalance ?? 0,
-          pending: data?.summary?.pending ?? 0
-        });
-        setHistory(Array.isArray(data?.history) ? data.history : []);
+        const response = await fetchFreelancerEarnings();
+        setData(response);
       } catch (err) {
-        if (err.name !== 'AbortError') {
-          setError(err.message || 'Failed to load earnings data');
-        }
+        setError(err.message || "Failed to load earnings.");
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    fetchEarnings();
-
-    return () => controller.abort();
+    loadEarnings();
   }, []);
 
+  const summary = data?.summary || {};
+
   return (
-    <div className="earnings-page">
-      <div className="page-header">
-        <h1>Earnings & Payments</h1>
-        <p>View your earnings, payment history, and withdrawal options</p>
-      </div>
-
-      <div className="earnings-cards">
-        <div className="earning-card">
-          <h3>Total Earned</h3>
-          <p className="amount">${summary.totalEarned}</p>
-        </div>
-        <div className="earning-card">
-          <h3>Available Balance</h3>
-          <p className="amount">${summary.availableBalance}</p>
-        </div>
-        <div className="earning-card">
-          <h3>Pending</h3>
-          <p className="amount">${summary.pending}</p>
+    <div className="freelancer-section-page">
+      <div className="section-hero">
+        <div>
+          <h2>Earnings</h2>
+          <p>Completed and pending payments sourced from PostgreSQL.</p>
         </div>
       </div>
 
-      <div className="earnings-chart">
-        <h2 className="section-title">Payment History</h2>
-        {isLoading && <p className="placeholder">Loading earnings history...</p>}
-        {!isLoading && error && <p className="placeholder">{error}</p>}
-        {!isLoading && !error && history.length === 0 && (
-          <p className="placeholder">No earnings history available.</p>
-        )}
-        {!isLoading && !error && history.length > 0 && (
-          <ul className="earnings-history">
-            {history.map((item) => (
-              <li key={item.id || item._id} className="history-item">
-                <div className="history-main">
-                  <span className="history-title">{item.title || 'Payment'}</span>
-                  <span className="history-date">{item.date || '—'}</span>
-                </div>
-                <span className="history-amount">${item.amount ?? 0}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      {loading && <div className="freelancer-state">Loading earnings...</div>}
+      {!loading && error && <div className="freelancer-state error">{error}</div>}
+
+      {!loading && !error && (
+        <>
+          <div className="earnings-summary-grid">
+            <article className="earnings-summary-card">
+              <span>Total Earned</span>
+              <strong>${Number(summary.totalEarned || 0).toLocaleString()}</strong>
+            </article>
+            <article className="earnings-summary-card">
+              <span>Available Balance</span>
+              <strong>${Number(summary.availableBalance || 0).toLocaleString()}</strong>
+            </article>
+            <article className="earnings-summary-card">
+              <span>Pending</span>
+              <strong>${Number(summary.pending || 0).toLocaleString()}</strong>
+            </article>
+          </div>
+
+          <section className="earnings-layout-grid">
+            <article className="earnings-panel chart-panel">
+              <div className="section-heading">
+                <h3>Monthly Earnings</h3>
+                <p>This year&apos;s payment totals by month</p>
+              </div>
+              <div className="chart-shell">
+                <ResponsiveContainer width="100%" height={280}>
+                  <AreaChart data={data?.monthly || []}>
+                    <defs>
+                      <linearGradient id="monthlyEarningsFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#0284c7" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#0284c7" stopOpacity={0.03} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid stroke="#dbe4f0" strokeDasharray="4 4" vertical={false} />
+                    <XAxis dataKey="month" tickLine={false} axisLine={false} />
+                    <YAxis tickLine={false} axisLine={false} />
+                    <Tooltip />
+                    <Area type="monotone" dataKey="amount" stroke="#0284c7" fill="url(#monthlyEarningsFill)" strokeWidth={3} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </article>
+
+            <article className="earnings-panel">
+              <div className="section-heading">
+                <h3>Payment History</h3>
+                <p>Latest recorded payouts</p>
+              </div>
+              <div className="payment-history-stack">
+                {(data?.history || []).length === 0 && <p className="empty-copy">No payment history available.</p>}
+                {(data?.history || []).map((item) => (
+                  <div key={item.id} className="payment-history-card">
+                    <div>
+                      <h4>{item.project_title}</h4>
+                      <p>{item.client_name}</p>
+                    </div>
+                    <div className="payment-history-right">
+                      <strong>${Number(item.amount || 0).toLocaleString()}</strong>
+                      <span>{item.time_ago}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </article>
+          </section>
+        </>
+      )}
     </div>
   );
 };

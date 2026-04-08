@@ -1,173 +1,152 @@
-.proposals-page {
-  padding: 30px;
-  background: #f5f7fa;
-  min-height: 100vh;
+.proposals-hero {
+  margin-bottom: 18px;
 }
 
-.page-header {
-  margin-bottom: 30px;
-}
-
-.page-header h1 {
-  font-size: 28px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 10px 0;
-}
-
-.page-header p {
-  color: #666;
-  margin: 0;
-  font-size: 14px;
-}
-
-.proposals-filters {
+.proposal-filter-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
-.filter-btn {
-  padding: 8px 16px;
-  border: 1px solid #e5e7eb;
+.filter-chip {
+  border: 1px solid #dbe4f0;
   background: white;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #666;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.filter-btn:hover,
-.filter-btn.active {
-  background: #6c63ff;
-  color: white;
-  border-color: #6c63ff;
-}
-
-.proposals-list {
-  background: white;
-  padding: 40px;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.proposal-grid {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 16px;
-}
-
-.proposal-item {
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 16px;
-  background: #f9fafb;
-  text-align: left;
-}
-
-.proposal-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.proposal-title {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-  color: #333;
-}
-
-.proposal-summary {
-  margin: 8px 0 12px;
-  font-size: 14px;
-  color: #4b5563;
-  min-height: 42px;
-}
-
-.proposal-details {
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-  color: #6b7280;
-  border-top: 1px solid #e5e7eb;
-  padding-top: 10px;
-}
-
-.proposal-actions {
-  margin-top: 10px;
-  display: flex;
-  gap: 8px;
-}
-
-.action-btn {
-  border: 1px solid #cbd5e1;
-  background: white;
-  border-radius: 8px;
-  font-size: 13px;
-  padding: 6px 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.action-btn:hover {
-  border-color: #6c63ff;
-  color: #6c63ff;
-}
-
-.edit-btn {
-  background: #6c63ff;
-  color: white;
-  border-color: #6c63ff;
-}
-
-.edit-btn:hover {
-  background: #584be5;
-  border-color: #584be5;
-}
-
-.proposal-meta {
-  margin: 8px 0;
-  font-size: 12px;
-  color: #999;
-}
-
-.proposal-amount {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  color: #22c55e;
-}
-
-.proposal-status {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 4px 8px;
+  color: #334155;
   border-radius: 999px;
-  text-transform: capitalize;
-  background: #e8e8ff;
-  color: #6c63ff;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.status-accepted {
+.filter-chip.active {
+  background: linear-gradient(135deg, #4f46e5, #2563eb);
+  border-color: transparent;
+  color: white;
+}
+
+.proposal-grid-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.proposal-card-v2,
+.proposal-modal-card {
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(203, 213, 225, 0.72);
+  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.08);
+}
+
+.proposal-card-v2 {
+  padding: 24px;
+}
+
+.proposal-card-top,
+.proposal-meta-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.proposal-card-top h3 {
+  margin: 0;
+  color: #0f172a;
+}
+
+.proposal-card-top p,
+.proposal-description {
+  margin: 8px 0 0;
+  color: #64748b;
+}
+
+.proposal-description {
+  min-height: 72px;
+}
+
+.proposal-meta-row {
+  margin-top: 18px;
+  color: #475569;
+  flex-wrap: wrap;
+}
+
+.proposal-status-badge {
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 700;
+}
+
+.proposal-status-badge.under-review,
+.proposal-status-badge.pending {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.proposal-status-badge.accepted {
   background: #dcfce7;
   color: #15803d;
 }
 
-.status-rejected {
+.proposal-status-badge.rejected {
   background: #fee2e2;
   color: #b91c1c;
 }
 
-.placeholder {
-  color: #999;
-  font-size: 14px;
-  margin: 0;
+.proposal-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 30;
+}
+
+.proposal-modal-card {
+  width: min(640px, 100%);
+  padding: 28px;
+}
+
+.proposal-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.proposal-form-grid input,
+.proposal-form-grid textarea {
+  border: 1px solid #dbe4f0;
+  border-radius: 16px;
+  padding: 14px 16px;
+  background: #f8fbff;
+}
+
+.proposal-form-row,
+.proposal-form-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.proposal-form-actions {
+  margin-top: 4px;
+}
+
+.form-error {
+  margin: 12px 0 0;
+  color: #b91c1c;
+}
+
+@media (max-width: 768px) {
+  .proposal-card-top,
+  .proposal-form-row,
+  .proposal-form-actions {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

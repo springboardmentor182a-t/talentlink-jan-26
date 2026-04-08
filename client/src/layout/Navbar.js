@@ -1,40 +1,55 @@
 import React from "react";
-import { Bell, Search, User } from "lucide-react";
+import { Bell, CalendarDays, Search } from "lucide-react";
 
 const Navbar = ({ profile }) => {
+  const today = new Intl.DateTimeFormat("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date());
+
   return (
-    <div className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-8">
-      {/* Search Bar */}
-      <div className="relative">
-        <Search
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-          size={18}
-        />
-        <input
-          type="text"
-          placeholder="Search projects..."
-          className="pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-sm w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
-        />
+    <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-slate-200/70 bg-white/85 px-8 py-5 backdrop-blur-xl">
+      <div>
+        <p className="text-xs uppercase tracking-[0.18em] text-slate-500">
+          TalentLink
+        </p>
+        <p className="mt-1 text-2xl font-extrabold text-slate-900">
+          Client Workspace
+        </p>
       </div>
 
-      {/* Right Side Icons */}
-      <div className="flex items-center gap-6">
-        <button className="relative text-gray-500 hover:text-gray-700 transition-colors">
+      <div className="flex items-center gap-4">
+        <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-500">
+          <Search size={16} />
+          <input
+            type="text"
+            placeholder="Search projects, freelancers, payments"
+            className="w-80 bg-transparent text-sm outline-none"
+          />
+        </label>
+
+        <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
+          <CalendarDays size={16} />
+          <span>{today}</span>
+        </div>
+
+        <button className="relative rounded-2xl border border-slate-200 bg-white p-3 text-slate-500 transition-colors hover:text-slate-700">
           <Bell size={20} />
-          <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+          <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-rose-500"></span>
         </button>
 
-        <div className="flex items-center gap-3 pl-6 border-l border-gray-200">
-          <div className="text-right hidden sm:block">
-            <p className="text-sm font-semibold text-gray-700">
+        <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2">
+          <div className="hidden text-right sm:block">
+            <p className="text-sm font-semibold text-slate-700">
               {profile?.full_name || "Account User"}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-slate-500">
               {profile?.role || "Client"}
             </p>
           </div>
-          <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 border-2 border-white shadow-sm">
-            <User size={20} />
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,_#4f46e5,_#7c3aed)] font-bold text-white shadow-sm">
+            {profile?.initials || "CL"}
           </div>
         </div>
       </div>

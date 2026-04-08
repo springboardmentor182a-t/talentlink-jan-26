@@ -1,187 +1,105 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import "./Proposals.css";
+import React, { useEffect, useMemo, useState } from "react";
+
+import { fetchFreelancerProposals } from "../../../services/freelancer";
 import authService from "../../../services/auth";
+import "./Proposals.css";
 
-
+const initialForm = {
+  title: "",
+  description: "",
+  amount: "",
+  rate: "",
+  timeline: "",
+  client_email: "",
+  project_id: "",
+};
 
 const Proposals = () => {
   const [proposals, setProposals] = useState([]);
   const [statusFilter, setStatusFilter] = useState("All");
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [newProposal, setNewProposal] = useState({
-    title: "",
-    description: "",
-    amount: "",
-    rate: "",
-    timeline: "",
-    client_email: "",
-    project_id: "",
-  });
+  const [formData, setFormData] = useState(initialForm);
   const [submitError, setSubmitError] = useState("");
-  const [submitSuccess, setSubmitSuccess] = useState("");
-  const isMountedRef = useRef(false);
 
-  const fetchProposals = async () => {
-    const apiBase = process.env.REACT_APP_API_URL || "http://localhost:8000";
-    if (isMountedRef.current) {
-      setIsLoading(true);
-      setError("");
-    }
-
-    const timeoutController = new AbortController();
-    const timeoutId = setTimeout(() => timeoutController.abort(), 10000);
-
+  const loadProposals = async () => {
+    setLoading(true);
+    setError("");
     try {
-      const token = authService.getToken();
-      if (!token) {
-        throw new Error("Session expired. Please sign in again.");
-      }
-      const response = await fetch(`${apiBase}/freelancer/proposals`, {
-        signal: timeoutController.signal,
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error("Session expired. Please sign in again.");
-        }
-        throw new Error("Failed to load proposals from backend.");
-      }
-
-      const data = await response.json();
-      if (isMountedRef.current) {
-        setProposals(Array.isArray(data?.proposals) ? data.proposals : []);
-      }
+      const data = await fetchFreelancerProposals();
+      setProposals(Array.isArray(data?.proposals) ? data.proposals : []);
     } catch (err) {
-      if (isMountedRef.current) {
-        if (err.name === "AbortError") {
-          setError("Request timed out. Please ensure backend is running on port 8000.");
-        } else {
-          setError(err.message || "Unable to load proposals");
-        }
-        setProposals([]);
-      }
+      setError(err.message || "Failed to load proposals.");
     } finally {
-      clearTimeout(timeoutId);
-      if (isMountedRef.current) {
-        setIsLoading(false);
-      }
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    isMountedRef.current = true;
-    fetchProposals();
-
-    return () => {
-      isMountedRef.current = false;
-    };
+    loadProposals();
   }, []);
 
-  const resetForm = () => {
-    setNewProposal({
-      title: "",
-      description: "",
-      amount: "",
-      rate: "",
-      timeline: "",
-      client_email: "",
-      project_id: "",
-    });
-    setSubmitError("");
-    setSubmitSuccess("");
-  };
-
-  const handleCreateProposal = async (e) => {
-    e.preventDefault();
-    setSubmitError("");
-    setSubmitSuccess("");
-
-    const token = authService.getToken();
-    if (!token) {
-      setSubmitError("Session expired. Please sign in again.");
-      return;
+  const filteredProposals = useMemo(() => {
+    if (statusFilter === "All") {
+      return proposals;
     }
+    return proposals.filter(
+      (proposal) => proposal.status?.toLowerCase() === statusFilter.toLowerCase(),
+    );
+  }, [proposals, statusFilter]);
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setSubmitError("");
     try {
+      const token = authService.getToken();
       const apiBase = process.env.REACT_APP_API_URL || "http://localhost:8000";
-      const body = {
-        title: newProposal.title,
-        description: newProposal.description,
-        amount: parseFloat(newProposal.amount),
-        rate: parseFloat(newProposal.rate),
-        timeline: newProposal.timeline,
-        client_email: newProposal.client_email,
-        project_id: newProposal.project_id
-          ? parseInt(newProposal.project_id, 10)
-          : null,
-      };
-
       const response = await fetch(`${apiBase}/freelancer/proposals`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          ...formData,
+          amount: Number(formData.amount),
+          rate: Number(formData.rate),
+          project_id: formData.project_id ? Number(formData.project_id) : null,
+        }),
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.detail || "Failed to create proposal");
+        const payload = await response.json();
+        throw new Error(payload.detail || "Failed to create proposal");
       }
 
-      await fetchProposals();
       setShowModal(false);
-      resetForm();
-      setSubmitSuccess("Proposal created successfully.");
+      setFormData(initialForm);
+      await loadProposals();
     } catch (err) {
-      setSubmitError(err.message || "Failed to create proposal");
+      setSubmitError(err.message || "Failed to create proposal.");
     }
   };
 
-  const filteredProposals = useMemo(() => {
-    if (statusFilter === "All") {
-      return proposals;
-    }
-
-    return proposals.filter(
-      (proposal) =>
-        proposal.status?.toLowerCase() === statusFilter.toLowerCase(),
-    );
-  }, [proposals, statusFilter]);
-
   return (
-    <div className="proposals-page">
-      <div className="page-header">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <div>
-            <h1>My Proposals</h1>
-            <p>Track and manage all your project proposals</p>
-          </div>
-          <button
-            className="action-btn"
-            style={{ padding: "10px 16px", fontWeight: "600" }}
-            onClick={() => setShowModal(true)}
-          >
-            + Add Proposal
-          </button>
+    <div className="freelancer-section-page">
+      <div className="section-hero proposals-hero">
+        <div>
+          <h2>My Proposals</h2>
+          <p>Track live proposal records and submit new ones.</p>
         </div>
+        <button className="primary-action" type="button" onClick={() => setShowModal(true)}>
+          Create Proposal
+        </button>
       </div>
 
-      <div className="proposals-filters">
-        {["All", "Pending", "Accepted", "Rejected"].map((status) => (
+      <div className="proposal-filter-row">
+        {["All", "Under Review", "Pending", "Accepted", "Rejected"].map((status) => (
           <button
             key={status}
-            className={`filter-btn ${statusFilter === status ? "active" : ""}`}
+            type="button"
+            className={`filter-chip ${statusFilter === status ? "active" : ""}`}
             onClick={() => setStatusFilter(status)}
           >
             {status}
@@ -189,257 +107,62 @@ const Proposals = () => {
         ))}
       </div>
 
+      {loading && <div className="freelancer-state">Loading proposals...</div>}
+      {!loading && error && <div className="freelancer-state error">{error}</div>}
+      {!loading && !error && (
+        <div className="proposal-grid-list">
+          {filteredProposals.length === 0 && <div className="empty-card">No proposals found.</div>}
+          {filteredProposals.map((proposal) => (
+            <article key={proposal.id} className="proposal-card-v2">
+              <div className="proposal-card-top">
+                <div>
+                  <h3>{proposal.title}</h3>
+                  <p>{proposal.client_name}</p>
+                </div>
+                <span className={`proposal-status-badge ${proposal.status.toLowerCase().replace(/\s+/g, "-")}`}>
+                  {proposal.status}
+                </span>
+              </div>
+              <p className="proposal-description">{proposal.description}</p>
+              <div className="proposal-meta-row">
+                <span>${Number(proposal.amount || 0).toLocaleString()}</span>
+                <span>${Number(proposal.rate || 0)}/hr</span>
+                <span>{proposal.timeline}</span>
+                <span>{proposal.time_ago}</span>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+
       {showModal && (
-        <div
-          className="proposal-modal-backdrop"
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-          }}
-        >
-          <div
-            style={{
-              background: "white",
-              borderRadius: 12,
-              width: "90%",
-              maxWidth: 500,
-              padding: 24,
-              position: "relative",
-            }}
-          >
-            <h2 style={{ marginTop: 0 }}>Add New Proposal</h2>
-            {submitError && <p style={{ color: "#dc2626" }}>{submitError}</p>}
-            {submitSuccess && (
-              <p style={{ color: "#15803d" }}>{submitSuccess}</p>
-            )}
-            <form onSubmit={handleCreateProposal}>
-              <div style={{ marginBottom: 10 }}>
-                <label style={{ fontWeight: 600 }}>Title</label>
-                <input
-                  type="text"
-                  value={newProposal.title}
-                  onChange={(e) =>
-                    setNewProposal({ ...newProposal, title: e.target.value })
-                  }
-                  required
-                  style={{
-                    width: "100%",
-                    marginTop: 4,
-                    padding: 8,
-                    borderRadius: 6,
-                    border: "1px solid #d1d5db",
-                  }}
-                />
+        <div className="proposal-modal-backdrop">
+          <div className="proposal-modal-card">
+            <div className="section-heading">
+              <h3>Create Proposal</h3>
+              <p>This submits directly to the backend.</p>
+            </div>
+            {submitError && <p className="form-error">{submitError}</p>}
+            <form className="proposal-form-grid" onSubmit={handleSubmit}>
+              <input placeholder="Proposal title" value={formData.title} onChange={(event) => setFormData({ ...formData, title: event.target.value })} required />
+              <input placeholder="Client email" type="email" value={formData.client_email} onChange={(event) => setFormData({ ...formData, client_email: event.target.value })} required />
+              <textarea placeholder="Description" rows={4} value={formData.description} onChange={(event) => setFormData({ ...formData, description: event.target.value })} required />
+              <div className="proposal-form-row">
+                <input placeholder="Amount" type="number" value={formData.amount} onChange={(event) => setFormData({ ...formData, amount: event.target.value })} required />
+                <input placeholder="Rate per hour" type="number" value={formData.rate} onChange={(event) => setFormData({ ...formData, rate: event.target.value })} required />
               </div>
-              <div style={{ marginBottom: 10 }}>
-                <label style={{ fontWeight: 600 }}>Description</label>
-                <textarea
-                  value={newProposal.description}
-                  onChange={(e) =>
-                    setNewProposal({
-                      ...newProposal,
-                      description: e.target.value,
-                    })
-                  }
-                  rows={3}
-                  required
-                  style={{
-                    width: "100%",
-                    marginTop: 4,
-                    padding: 8,
-                    borderRadius: 6,
-                    border: "1px solid #d1d5db",
-                  }}
-                />
+              <div className="proposal-form-row">
+                <input placeholder="Timeline" value={formData.timeline} onChange={(event) => setFormData({ ...formData, timeline: event.target.value })} required />
+                <input placeholder="Project ID (optional)" type="number" value={formData.project_id} onChange={(event) => setFormData({ ...formData, project_id: event.target.value })} />
               </div>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "10px",
-                  marginBottom: 10,
-                }}
-              >
-                <div>
-                  <label style={{ fontWeight: 600 }}>Amount</label>
-                  <input
-                    type="number"
-                    value={newProposal.amount}
-                    onChange={(e) =>
-                      setNewProposal({ ...newProposal, amount: e.target.value })
-                    }
-                    required
-                    style={{
-                      width: "100%",
-                      marginTop: 4,
-                      padding: 8,
-                      borderRadius: 6,
-                      border: "1px solid #d1d5db",
-                    }}
-                  />
-                </div>
-                <div>
-                  <label style={{ fontWeight: 600 }}>Rate</label>
-                  <input
-                    type="number"
-                    value={newProposal.rate}
-                    onChange={(e) =>
-                      setNewProposal({ ...newProposal, rate: e.target.value })
-                    }
-                    required
-                    style={{
-                      width: "100%",
-                      marginTop: 4,
-                      padding: 8,
-                      borderRadius: 6,
-                      border: "1px solid #d1d5db",
-                    }}
-                  />
-                </div>
-              </div>
-              <div style={{ marginBottom: 10 }}>
-                <label style={{ fontWeight: 600 }}>Timeline</label>
-                <input
-                  type="text"
-                  value={newProposal.timeline}
-                  onChange={(e) =>
-                    setNewProposal({ ...newProposal, timeline: e.target.value })
-                  }
-                  required
-                  style={{
-                    width: "100%",
-                    marginTop: 4,
-                    padding: 8,
-                    borderRadius: 6,
-                    border: "1px solid #d1d5db",
-                  }}
-                />
-              </div>
-              <div style={{ marginBottom: 10 }}>
-                <label style={{ fontWeight: 600 }}>Client Email</label>
-                <input
-                  type="email"
-                  value={newProposal.client_email}
-                  onChange={(e) =>
-                    setNewProposal({
-                      ...newProposal,
-                      client_email: e.target.value,
-                    })
-                  }
-                  required
-                  style={{
-                    width: "100%",
-                    marginTop: 4,
-                    padding: 8,
-                    borderRadius: 6,
-                    border: "1px solid #d1d5db",
-                  }}
-                />
-              </div>
-              <div style={{ marginBottom: 20 }}>
-                <label style={{ fontWeight: 600 }}>Project ID (optional)</label>
-                <input
-                  type="number"
-                  value={newProposal.project_id}
-                  onChange={(e) =>
-                    setNewProposal({
-                      ...newProposal,
-                      project_id: e.target.value,
-                    })
-                  }
-                  style={{
-                    width: "100%",
-                    marginTop: 4,
-                    padding: 8,
-                    borderRadius: 6,
-                    border: "1px solid #d1d5db",
-                  }}
-                />
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowModal(false);
-                    resetForm();
-                  }}
-                  className="action-btn"
-                  style={{ background: "#f3f4f6", color: "#111" }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="action-btn"
-                  style={{
-                    background: "#6c63ff",
-                    color: "white",
-                    borderColor: "#6c63ff",
-                  }}
-                >
-                  Submit Proposal
-                </button>
+              <div className="proposal-form-actions">
+                <button type="button" className="secondary-action" onClick={() => setShowModal(false)}>Cancel</button>
+                <button type="submit" className="primary-action">Submit Proposal</button>
               </div>
             </form>
           </div>
         </div>
       )}
-
-      <div className="proposals-list">
-        {isLoading && <p className="placeholder">Loading proposals...</p>}
-        {!isLoading && error && <p className="placeholder">{error}</p>}
-        {!isLoading && !error && filteredProposals.length === 0 && (
-          <p className="placeholder">No proposals found.</p>
-        )}
-        {!isLoading && !error && filteredProposals.length > 0 && (
-          <ul className="proposal-grid">
-            {filteredProposals.map((proposal) => (
-              <li key={proposal.id || proposal._id} className="proposal-item">
-                <div className="proposal-top">
-                  <h3 className="proposal-title">
-                    {proposal.title || "Untitled Proposal"}
-                  </h3>
-                  <span
-                    className={`proposal-status status-${(proposal.status || "pending").toLowerCase()}`}
-                  >
-                    {proposal.status || "Pending"}
-                  </span>
-                </div>
-                <p className="proposal-meta">
-                  {proposal.client_name || proposal.client || "Client"} •{" "}
-                  {proposal.submittedAt || proposal.created_at || "—"}
-                </p>
-
-                <p className="proposal-summary">
-                  {proposal.description ||
-                    proposal.summary ||
-                    "No summary available."}
-                </p>
-
-                <div className="proposal-details">
-                  <span>Rate: ${proposal.rate ?? proposal.budget ?? 0}</span>
-                  <span>
-                    Delivery:{" "}
-                    {proposal.timeline || proposal.deliveryTime || "TBD"}
-                  </span>
-                </div>
-
-                <div className="proposal-actions">
-                  <button className="action-btn detail-btn">
-                    View Details
-                  </button>
-                  <button className="action-btn edit-btn">Edit Proposal</button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
     </div>
   );
 };
