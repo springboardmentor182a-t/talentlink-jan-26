@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Proposals.css";
 import authService from "../../../services/auth";
 
@@ -22,6 +23,7 @@ const Proposals = () => {
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState("");
   const isMountedRef = useRef(false);
+  const navigate = useNavigate();
 
   const fetchProposals = async () => {
     const apiBase = process.env.REACT_APP_API_URL || "http://localhost:8000";
@@ -152,6 +154,10 @@ const Proposals = () => {
         proposal.status?.toLowerCase() === statusFilter.toLowerCase(),
     );
   }, [proposals, statusFilter]);
+
+  const openChat = (proposal) => {
+    navigate(`/freelancer/messages?proposal=${proposal.id}`);
+  };
 
   return (
     <div className="proposals-page">
@@ -430,8 +436,11 @@ const Proposals = () => {
                 </div>
 
                 <div className="proposal-actions">
-                  <button className="action-btn detail-btn">
-                    View Details
+                  <button
+                    className="action-btn detail-btn"
+                    onClick={() => openChat(proposal)}
+                  >
+                    Message Client
                   </button>
                   <button className="action-btn edit-btn">Edit Proposal</button>
                 </div>

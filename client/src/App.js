@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import ClientDashboard from "./pages/ClientDashboard";
 import ReceivedProposals from "./pages/client/ReceivedProposals";
+import ClientMessages from "./pages/client/ClientMessages";
 import { FreelancerRoutes } from "./pages/freelancer/FreelancerRoutes";
 import Login from "./pages/login";
 import SignUp from "./pages/signup";
@@ -56,6 +57,14 @@ function App() {
             element={
               <PrivateRoute>
                 <ReceivedProposals />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/client/messages"
+            element={
+              <PrivateRoute>
+                <ClientMessages />
               </PrivateRoute>
             }
           />

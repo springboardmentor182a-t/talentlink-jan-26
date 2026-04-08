@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../../layout/Sidebar";
 import Navbar from "../../layout/Navbar";
 import "./ReceivedProposals.css";
@@ -15,6 +16,7 @@ const ReceivedProposals = () => {
   const [error, setError] = useState("");
   const [activeProjects, setActiveProjects] = useState(0);
   const [profile, setProfile] = useState({ full_name: "Account User", role: "Client" });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const apiBase = process.env.REACT_APP_API_URL || "http://localhost:8000";
@@ -66,6 +68,10 @@ const ReceivedProposals = () => {
   const underReview = proposals.filter(
     (p) => p.status === "Under Review",
   ).length;
+
+  const handleOpenChat = (proposal) => {
+    navigate(`/client/messages?proposal=${proposal.id}`);
+  };
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -134,7 +140,12 @@ const ReceivedProposals = () => {
                     </div>
                   )}
                   <div className="proposal-actions">
-                    <button className="btn-outline">Message</button>
+                    <button
+                      className="btn-outline"
+                      onClick={() => handleOpenChat(proposal)}
+                    >
+                      Message
+                    </button>
                     <button className="btn-accept">Accept</button>
                     <button className="btn-reject">Reject</button>
                   </div>
