@@ -1,0 +1,180 @@
+/* =========================================
+   TALENTLINK GLOBAL THEME CSS
+   Used Across MOD-1 to MOD-8
+   ========================================= */
+
+/* ---------- CSS VARIABLES ---------- */
+:root {
+  /* Brand Colors */
+  --primary: #4F6EF7;
+  --primary-hover: #3C5AE0;
+
+  /* Backgrounds */
+  --bg-light: #F5F5F5;
+  --bg-white: #FFFFFF;
+  --sidebar-dark: #111827;
+
+  /* Text */
+  --text-dark: #1F2937;
+  --text-gray: #6B7280;
+  --text-light: #FFFFFF;
+
+  /* Borders */
+  --border-light: #D1D5DB;
+
+  /* Status */
+  --success: #22C55E;
+  --warning: #FACC15;
+  --error: #EF4444;
+
+  /* Font */
+  --font-main: 'Inter', Arial, sans-serif;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 6px rgba(0,0,0,0.08);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.12);
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+}
+
+/* ---------- RESET ---------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ---------- BODY ---------- */
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+}
+
+/* ---------- BUTTONS ---------- */
+.btn {
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--text-light);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border-light);
+  color: var(--text-dark);
+}
+
+/* ---------- FORMS ---------- */
+.input,
+.select,
+.textarea,
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  font-size: 14px;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* ---------- CARDS ---------- */
+.card {
+  background-color: var(--bg-white);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------- AUTH PAGES (MOD-1) ---------- */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-light);
+}
+
+.auth-card {
+  width: 420px;
+  background-color: var(--bg-white);
+  padding: var(--space-xl);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+/* ---------- DASHBOARD LAYOUT ---------- */
+.dashboard {
+  display: flex;
+}
+
+.sidebar {
+  width: 240px;
+  background-color: var(--sidebar-dark);
+  color: var(--text-light);
+  min-height: 100vh;
+  padding: var(--space-lg);
+}
+
+.content {
+  flex: 1;
+  padding: var(--space-xl);
+}
+
+/* ---------- TABLES ---------- */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 14px;
+}
+
+/* ---------- STATUS TAGS ---------- */
+.tag-success {
+  color: var(--success);
+}
+
+.tag-warning {
+  color: var(--warning);
+}
+
+.tag-error {
+  color: var(--error);
+}

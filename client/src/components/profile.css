@@ -1,0 +1,99 @@
+/* Profile Page Layout */
+.profile-page {
+  padding: var(--space-xl);
+  background-color: var(--bg-light);
+  min-height: 100vh;
+}
+
+/* Card Styling */
+.profile-card {
+  max-width: 750px;
+  margin: auto;
+  padding: var(--space-lg);
+}
+
+/* Form Fields */
+.profile-field {
+  margin-bottom: var(--space-md);
+}
+
+.profile-field label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-gray);
+  margin-bottom: 6px;
+}
+
+.profile-field input,
+.profile-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  transition: 0.2s ease;
+}
+
+.profile-field input:focus,
+.profile-field textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* Statistics Section */
+.profile-stats {
+  margin-top: var(--space-lg);
+}
+
+.profile-stats h3 {
+  margin-bottom: var(--space-md);
+  font-size: 18px;
+  color: var(--text-dark);
+}
+
+/* Grid Layout for Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-md);
+}
+
+/* Individual Stat Box */
+.stat-box {
+  background-color: var(--white);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: 0.3s ease;
+}
+
+.stat-box:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-box h4 {
+  font-size: 20px;
+  color: var(--primary);
+  margin-bottom: 5px;
+}
+
+.stat-box p {
+  font-size: 13px;
+  color: var(--text-gray);
+}
+
+/* Save Button spacing */
+.btn-primary {
+  margin-top: var(--space-md);
+  width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .profile-card {
+    padding: var(--space-md);
+  }
+}
