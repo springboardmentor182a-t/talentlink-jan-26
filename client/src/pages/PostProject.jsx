@@ -14,6 +14,13 @@ export default function PostProject() {
   const [error, setError]           = useState("");
   const [success, setSuccess]       = useState("");
 
+  const [budgetEstimate, setBudgetEstimate]   = useState(null);
+  const [budgetLoading, setBudgetLoading]     = useState(false);
+
+  // ✅ NEW
+  const [descLoading, setDescLoading]         = useState(false);
+  const [descGenerated, setDescGenerated]     = useState(false);
+
   const addSkill = (e) => {
     if (e.key === "Enter" && skillInput.trim()) {
       e.preventDefault();
@@ -24,6 +31,54 @@ export default function PostProject() {
   };
 
   const removeSkill = (s) => setSkillTags(prev => prev.filter(x => x !== s));
+
+  const estimateBudget = async () => {
+    if (!form.title && skillTags.length === 0) {
+      alert("Please enter a project title and skills first!");
+      return;
+    }
+    setBudgetLoading(true);
+    setBudgetEstimate(null);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.post("/ai/estimate-budget", {
+        title:       form.title,
+        description: form.description,
+        skills:      skillTags.join(", "),
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      setBudgetEstimate(res.data);
+      setForm(prev => ({ ...prev, budget: res.data.recommended }));
+    } catch (err) {
+      console.error("Budget estimate error:", err.message);
+    } finally {
+      setBudgetLoading(false);
+    }
+  };
+
+  // ✅ NEW FUNCTION
+  const generateDescription = async () => {
+    if (!form.title) {
+      alert("Please enter a project title first!");
+      return;
+    }
+    setDescLoading(true);
+    setDescGenerated(false);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.post("/ai/generate-description", {
+        title:  form.title,
+        skills: skillTags.join(", "),
+        budget: form.budget,
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      setForm(prev => ({ ...prev, description: res.data.description }));
+      setDescGenerated(true);
+    } catch (err) {
+      console.error("Description generate error:", err.message);
+      alert("Failed to generate description. Try again.");
+    } finally {
+      setDescLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -119,6 +174,7 @@ export default function PostProject() {
 
               <form onSubmit={handleSubmit}>
 
+                {/* Title */}
                 <div style={{ marginBottom:24 }}>
                   <label style={lbl}>Project Title <span style={{ color:"#ef4444" }}>*</span></label>
                   <input required type="text"
@@ -127,20 +183,49 @@ export default function PostProject() {
                     style={{ ...inp, borderColor: form.title ? "#2563eb" : "#e2e8f0" }} />
                 </div>
 
+                {/* Description with AI Generate button */}
                 <div style={{ marginBottom:24 }}>
-                  <label style={lbl}>
-                    Project Description <span style={{ color:"#ef4444" }}>*</span>
-                    <span style={{ fontSize:11, color:"#9ca3af", fontWeight:400, marginLeft:8 }}>Min. 50 characters</span>
-                  </label>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
+                    <label style={{ ...lbl, margin:0 }}>
+                      Project Description <span style={{ color:"#ef4444" }}>*</span>
+                      <span style={{ fontSize:11, color:"#9ca3af", fontWeight:400, marginLeft:8 }}>Min. 50 characters</span>
+                    </label>
+                    {/* ✅ AI GENERATE DESCRIPTION BUTTON */}
+                    <button type="button" onClick={generateDescription} disabled={descLoading || !form.title}
+                      style={{
+                        display:"flex", alignItems:"center", gap:6,
+                        padding:"6px 14px",
+                        background: descLoading ? "#f1f5f9" : "linear-gradient(135deg,#6366f1,#8b5cf6)",
+                        color: descLoading ? "#9ca3af" : "white",
+                        border:"none", borderRadius:8, cursor: !form.title ? "not-allowed" : "pointer",
+                        fontWeight:600, fontSize:12, opacity: !form.title ? 0.5 : 1,
+                        transition:"all 0.2s"
+                      }}>
+                      {descLoading ? "⏳ Generating..." : "✨ AI Generate"}
+                    </button>
+                  </div>
+
+                  {/* Generated badge */}
+                  {descGenerated && (
+                    <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:6, fontSize:12, color:"#7c3aed", fontWeight:600 }}>
+                      <span>✨</span> AI generated — feel free to edit
+                    </div>
+                  )}
+
                   <textarea required rows={6}
-                    placeholder="Describe your project in detail — requirements, deliverables, tech stack..."
-                    value={form.description} onChange={e => setForm({ ...form, description:e.target.value })}
-                    style={{ ...inp, resize:"vertical", lineHeight:1.7, borderColor: form.description.length > 50 ? "#2563eb" : "#e2e8f0" }} />
+                    placeholder="Describe your project in detail — requirements, deliverables, tech stack... or click ✨ AI Generate above!"
+                    value={form.description} onChange={e => { setForm({ ...form, description:e.target.value }); setDescGenerated(false); }}
+                    style={{
+                      ...inp, resize:"vertical", lineHeight:1.7,
+                      borderColor: descGenerated ? "#7c3aed" : form.description.length > 50 ? "#2563eb" : "#e2e8f0",
+                      background: descGenerated ? "#faf5ff" : "#fff"
+                    }} />
                   <div style={{ fontSize:12, color: form.description.length > 50 ? "#16a34a" : "#9ca3af", marginTop:4, textAlign:"right" }}>
                     {form.description.length} chars {form.description.length < 50 ? `(${50 - form.description.length} more needed)` : "✓"}
                   </div>
                 </div>
 
+                {/* Skills */}
                 <div style={{ marginBottom:24 }}>
                   <label style={lbl}>
                     Required Skills <span style={{ color:"#ef4444" }}>*</span>
@@ -165,6 +250,7 @@ export default function PostProject() {
                   )}
                 </div>
 
+                {/* Budget + Deadline */}
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20, marginBottom:32 }}>
                   <div>
                     <label style={lbl}>Budget (USD) <span style={{ color:"#ef4444" }}>*</span></label>
@@ -174,6 +260,22 @@ export default function PostProject() {
                         value={form.budget} onChange={e => setForm({ ...form, budget:e.target.value })}
                         style={{ ...inp, paddingLeft:28, borderColor: form.budget ? "#2563eb" : "#e2e8f0" }} />
                     </div>
+                    <button type="button" onClick={estimateBudget} disabled={budgetLoading}
+                      style={{ marginTop:8, padding:"8px 16px", backgroundColor:"#fff", color:"#2563eb", border:"1.5px solid #2563eb", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:12, opacity: budgetLoading ? 0.7 : 1 }}>
+                      {budgetLoading ? "⏳ Estimating..." : "🤖 AI Estimate Budget"}
+                    </button>
+
+                    {budgetEstimate && (
+                      <div style={{ marginTop:10, padding:12, backgroundColor:"#eff6ff", borderRadius:10, border:"1px solid #bfdbfe" }}>
+                        <div style={{ fontSize:12, fontWeight:700, color:"#1d4ed8", marginBottom:6 }}>🤖 AI Budget Suggestion</div>
+                        <div style={{ display:"flex", gap:12, marginBottom:6 }}>
+                          <div style={{ fontSize:12, color:"#374151" }}><span style={{ color:"#64748b" }}>Min: </span><strong style={{ color:"#16a34a" }}>${budgetEstimate.min}</strong></div>
+                          <div style={{ fontSize:12, color:"#374151" }}><span style={{ color:"#64748b" }}>Max: </span><strong style={{ color:"#dc2626" }}>${budgetEstimate.max}</strong></div>
+                          <div style={{ fontSize:12, color:"#374151" }}><span style={{ color:"#64748b" }}>Rec: </span><strong style={{ color:"#2563eb" }}>${budgetEstimate.recommended}</strong></div>
+                        </div>
+                        <div style={{ fontSize:11, color:"#64748b" }}>{budgetEstimate.reason}</div>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <label style={lbl}>Deadline <span style={{ color:"#ef4444" }}>*</span></label>

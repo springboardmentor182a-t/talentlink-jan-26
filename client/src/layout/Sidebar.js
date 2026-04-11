@@ -1,30 +1,13 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, User, PlusCircle, Folder, FileText, MessageSquare, Star, LogOut } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
-import api from '../utils/api';
+import { NotificationContext } from '../context/NotificationContext';
 
 const Sidebar = () => {
-  const { user, logout } = useContext(AuthContext);
-  const navigate = useNavigate();
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  useEffect(() => {
-    if (!user) return;
-    const fetchUnread = async () => {
-      try {
-        const res = await api.get(`/messages/conversations/${user.id}`);
-        const total = res.data.reduce((sum, c) => sum + (c.unread_count || 0), 0);
-        setUnreadCount(total);
-      } catch {
-        setUnreadCount(0);
-      }
-    };
-    fetchUnread();
-    // Refresh every 30 seconds
-    const interval = setInterval(fetchUnread, 30000);
-    return () => clearInterval(interval);
-  }, [user]);
+  const { user, logout }       = useContext(AuthContext);
+  const { msgUnreadCount }     = useContext(NotificationContext);
+  const navigate               = useNavigate();
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Dashboard',   path: '/dashboard' },
@@ -32,7 +15,7 @@ const Sidebar = () => {
     { icon: PlusCircle,      label: 'Post Project', path: '/post-project' },
     { icon: Folder,          label: 'Projects',     path: '/projects' },
     { icon: FileText,        label: 'Contracts',    path: '/contracts' },
-    { icon: MessageSquare,   label: 'Messages',     path: '/messages', badge: unreadCount },
+    { icon: MessageSquare,   label: 'Messages',     path: '/messages' },
     { icon: Star,            label: 'Reviews',      path: '/reviews' },
   ];
 
@@ -56,7 +39,8 @@ const Sidebar = () => {
         <ul style={{ listStyle:"none", padding:0, margin:0, display:"flex", flexDirection:"column", gap:4 }}>
           {navItems.map(item => (
             <li key={item.label}>
-              <NavLink to={item.path}
+              <NavLink
+                to={item.path}
                 style={({ isActive }) => ({
                   display:"flex", alignItems:"center", gap:12,
                   padding:"11px 14px", borderRadius:8,
@@ -70,9 +54,11 @@ const Sidebar = () => {
                 })}>
                 <item.icon size={20} />
                 <span style={{ flex:1 }}>{item.label}</span>
-                {item.badge > 0 && (
+
+                {/* Badge — context keeps this accurate automatically */}
+                {item.path === "/messages" && msgUnreadCount > 0 && (
                   <span style={{ background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"white", borderRadius:"50%", width:20, height:20, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700 }}>
-                    {item.badge > 99 ? "99+" : item.badge}
+                    {msgUnreadCount > 99 ? "99+" : msgUnreadCount}
                   </span>
                 )}
               </NavLink>

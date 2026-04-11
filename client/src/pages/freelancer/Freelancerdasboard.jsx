@@ -1,7 +1,8 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import api from "../../utils/api";
+import { NotificationContext } from "../../context/NotificationContext";
+import NotificationBell from "../../components/NotificationBell";
 import BrowseProjects from "./BrowseProjects";
 import ProposalTracking from "../proposal/ProposalTracking";
 import Messages from "../messages/Messages";
@@ -10,80 +11,35 @@ import FreelancerContracts from "./Freelancercontracts";
 import Profile from "../Profile/profile";
 import Reviews from "../Reviews/Reviews";
 
-const DashboardIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-    <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
-  </svg>
-);
-const ProfileIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-    <circle cx="12" cy="7" r="4"/>
-  </svg>
-);
-const BrowseIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="11" cy="11" r="8"/>
-    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-  </svg>
-);
-const ProposalIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-    <polyline points="14 2 14 8 20 8"/>
-    <line x1="16" y1="13" x2="8" y2="13"/>
-    <line x1="16" y1="17" x2="8" y2="17"/>
-  </svg>
-);
-const ContractIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
-    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-  </svg>
-);
-const MessageIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-  </svg>
-);
-const ReviewIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-  </svg>
-);
-const LogoutIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-    <polyline points="16 17 21 12 16 7"/>
-    <line x1="21" y1="12" x2="9" y2="12"/>
-  </svg>
-);
+const DashboardIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>);
+const ProfileIcon  = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>);
+const BrowseIcon   = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>);
+const ProposalIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>);
+const ContractIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>);
+const MessageIcon  = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>);
+const ReviewIcon   = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>);
+const LogoutIcon   = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>);
 
 export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
-  const { user, logout } = useContext(AuthContext);
-  const navigate         = useNavigate();
-  const [activePage, setActivePage] = useState(defaultPage);
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  // Fetch real unread message count
-  useEffect(() => {
-    if (!user) return;
-    const fetchUnread = async () => {
-      try {
-        const res = await api.get(`/messages/conversations/${user.id}`);
-        const total = res.data.reduce((sum, c) => sum + (c.unread_count || 0), 0);
-        setUnreadCount(total);
-      } catch {
-        setUnreadCount(0);
-      }
-    };
-    fetchUnread();
-    const interval = setInterval(fetchUnread, 30000);
-    return () => clearInterval(interval);
-  }, [user]);
+  const { user, logout }                                    = useContext(AuthContext);
+  const { msgUnreadCount, enterMessages, leaveMessages }    = useContext(NotificationContext); // ✅
+  const navigate                                            = useNavigate();
+  const [activePage, setActivePage]                         = useState(defaultPage);
 
   const handleLogout = () => { logout(); navigate("/"); };
+
+  // ✅ Central nav handler — tracks messages page entry/exit
+  const handleNavClick = (key) => {
+    // Leaving messages page → re-enable badge counting
+    if (activePage === "messages" && key !== "messages") {
+      leaveMessages();
+    }
+    setActivePage(key);
+    // Entering messages page → clear badge + stop incrementing
+    if (key === "messages") {
+      enterMessages();
+    }
+  };
 
   const navItems = [
     { key:"dashboard", label:"Dashboard",      icon:<DashboardIcon /> },
@@ -91,18 +47,19 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
     { key:"browse",    label:"Browse Projects", icon:<BrowseIcon />    },
     { key:"proposals", label:"My Proposals",    icon:<ProposalIcon />  },
     { key:"contracts", label:"Contracts",       icon:<ContractIcon />  },
-    { key:"messages",  label:"Messages",        icon:<MessageIcon />,  badge: unreadCount },
+    { key:"messages",  label:"Messages",        icon:<MessageIcon />,  badge: msgUnreadCount }, // ✅
     { key:"reviews",   label:"Reviews",         icon:<ReviewIcon />    },
   ];
 
+  // ✅ Use handleNavClick for onNavigate so leaveMessages is always called
   const renderPage = () => {
-    if (activePage === "dashboard") return <FreelancerHome      onNavigate={setActivePage} />;
-    if (activePage === "profile")   return <Profile             onNavigate={setActivePage} />;
+    if (activePage === "dashboard") return <FreelancerHome      onNavigate={handleNavClick} />;
+    if (activePage === "profile")   return <Profile             onNavigate={handleNavClick} />;
     if (activePage === "browse")    return <BrowseProjects />;
     if (activePage === "proposals") return <ProposalTracking />;
-    if (activePage === "contracts") return <FreelancerContracts onNavigate={setActivePage} />;
-    if (activePage === "messages")  return <Messages            onNavigate={setActivePage} />;
-    if (activePage === "reviews")   return <Reviews             onNavigate={setActivePage} />;
+    if (activePage === "contracts") return <FreelancerContracts onNavigate={handleNavClick} />;
+    if (activePage === "messages")  return <Messages            onNavigate={handleNavClick} />;
+    if (activePage === "reviews")   return <Reviews             onNavigate={handleNavClick} />;
     return null;
   };
 
@@ -120,7 +77,8 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
 
         <nav style={{ flex:1, padding:"16px 12px" }}>
           {navItems.map(item => (
-            <button key={item.key} onClick={() => setActivePage(item.key)}
+            <button key={item.key}
+              onClick={() => handleNavClick(item.key)}
               style={{
                 width:"100%", display:"flex", alignItems:"center", gap:12,
                 padding:"11px 14px", borderRadius:8, border:"none", cursor:"pointer",
@@ -136,6 +94,7 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
               onMouseLeave={e => { if (activePage !== item.key) e.currentTarget.style.backgroundColor="transparent"; }}>
               {item.icon}
               <span style={{ flex:1 }}>{item.label}</span>
+              {/* ✅ Message badge */}
               {item.badge > 0 && (
                 <span style={{ background:"linear-gradient(135deg,#7c3aed,#a855f7)", color:"white", borderRadius:"50%", width:20, height:20, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700 }}>
                   {item.badge > 99 ? "99+" : item.badge}
@@ -166,6 +125,8 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
 
       {/* Main */}
       <main style={{ marginLeft:250, flex:1, backgroundColor:"#f8fafc", minHeight:"100vh" }}>
+
+        {/* Topbar */}
         <div style={{ backgroundColor:"#fff", borderBottom:"1px solid #e5e7eb", padding:"0 32px", height:64, display:"flex", justifyContent:"space-between", alignItems:"center", position:"sticky", top:0, zIndex:100, boxShadow:"0 1px 3px rgba(0,0,0,0.05)" }}>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <div style={{ width:8, height:8, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)" }} />
@@ -173,7 +134,9 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
               {navItems.find(n => n.key === activePage)?.label}
             </span>
           </div>
-          <div style={{ display:"flex", alignItems:"center", gap:16 }}>
+
+          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            <NotificationBell theme="purple" />
             <div style={{ display:"flex", alignItems:"center", gap:10, backgroundColor:"#f8fafc", padding:"6px 14px", borderRadius:20, border:"1px solid #e2e8f0" }}>
               <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:13 }}>
                 {user?.full_name?.[0]?.toUpperCase() || user?.name?.[0]?.toUpperCase() || "F"}
@@ -184,11 +147,14 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
               </div>
             </div>
             <button onClick={handleLogout}
-              style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid #e2e8f0", borderRadius:8, cursor:"pointer", fontSize:13, color:"#64748b", background:"white" }}>
+              style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid #e2e8f0", borderRadius:8, cursor:"pointer", fontSize:13, color:"#64748b", background:"white", fontFamily:"inherit", transition:"all 0.15s" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor="#7c3aed"; e.currentTarget.style.color="#7c3aed"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor="#e2e8f0"; e.currentTarget.style.color="#64748b"; }}>
               <LogoutIcon /> Logout
             </button>
           </div>
         </div>
+
         {renderPage()}
       </main>
     </div>

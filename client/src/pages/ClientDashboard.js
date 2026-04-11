@@ -9,6 +9,8 @@ export default function ClientDashboard() {
   const [projects, setProjects]   = useState([]);
   const [proposals, setProposals] = useState({});
   const [loading, setLoading]     = useState(true);
+  const [recommendations, setRecommendations]   = useState({});
+  const [recommendLoading, setRecommendLoading] = useState({});
 
   useEffect(() => {
     if (!user) return;
@@ -104,28 +106,44 @@ export default function ClientDashboard() {
         {/* Open Projects */}
         {open.length > 0 && (
           <Section title="Open Projects" count={open.length} dotColor="#16a34a" badgeBg="#dcfce7" badgeColor="#16a34a">
-            {open.map(p => <ProjectCard key={p.id} p={p} proposals={proposals[p.id] || []} navigate={navigate} />)}
+            {open.map(p => (
+              <ProjectCard key={p.id} p={p} proposals={proposals[p.id] || []} navigate={navigate}
+                recommendations={recommendations} setRecommendations={setRecommendations}
+                recommendLoading={recommendLoading} setRecommendLoading={setRecommendLoading} />
+            ))}
           </Section>
         )}
 
         {/* In Progress */}
         {inProgress.length > 0 && (
           <Section title="In Progress" count={inProgress.length} dotColor="#f59e0b" badgeBg="#fef3c7" badgeColor="#d97706">
-            {inProgress.map(p => <ProjectCard key={p.id} p={p} proposals={proposals[p.id] || []} navigate={navigate} />)}
+            {inProgress.map(p => (
+              <ProjectCard key={p.id} p={p} proposals={proposals[p.id] || []} navigate={navigate}
+                recommendations={recommendations} setRecommendations={setRecommendations}
+                recommendLoading={recommendLoading} setRecommendLoading={setRecommendLoading} />
+            ))}
           </Section>
         )}
 
         {/* Completed */}
         {completed.length > 0 && (
           <Section title="Completed" count={completed.length} dotColor="#7c3aed" badgeBg="#f5f3ff" badgeColor="#7c3aed">
-            {completed.map(p => <ProjectCard key={p.id} p={p} proposals={proposals[p.id] || []} navigate={navigate} />)}
+            {completed.map(p => (
+              <ProjectCard key={p.id} p={p} proposals={proposals[p.id] || []} navigate={navigate}
+                recommendations={recommendations} setRecommendations={setRecommendations}
+                recommendLoading={recommendLoading} setRecommendLoading={setRecommendLoading} />
+            ))}
           </Section>
         )}
 
         {/* Closed */}
         {closed.length > 0 && (
           <Section title="Closed" count={closed.length} dotColor="#94a3b8" badgeBg="#f1f5f9" badgeColor="#64748b">
-            {closed.map(p => <ProjectCard key={p.id} p={p} proposals={proposals[p.id] || []} navigate={navigate} />)}
+            {closed.map(p => (
+              <ProjectCard key={p.id} p={p} proposals={proposals[p.id] || []} navigate={navigate}
+                recommendations={recommendations} setRecommendations={setRecommendations}
+                recommendLoading={recommendLoading} setRecommendLoading={setRecommendLoading} />
+            ))}
           </Section>
         )}
 
@@ -161,7 +179,7 @@ function Section({ title, count, dotColor, badgeBg, badgeColor, children }) {
   );
 }
 
-function ProjectCard({ p, proposals, navigate }) {
+function ProjectCard({ p, proposals, navigate, recommendations, setRecommendations, recommendLoading, setRecommendLoading }) {
   const pending  = proposals.filter(pr => pr.status === "pending").length;
   const accepted = proposals.filter(pr => pr.status === "accepted").length;
 
@@ -172,6 +190,21 @@ function ProjectCard({ p, proposals, navigate }) {
     "closed":      { bg:"linear-gradient(135deg,#64748b,#94a3b8)", color:"white" },
   };
   const s = statusStyle[p.status] || statusStyle["closed"];
+
+  const getRecommendations = async () => {
+    setRecommendLoading(prev => ({ ...prev, [p.id]: true }));
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.get(`/ai/recommend-freelancers/${p.id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setRecommendations(prev => ({ ...prev, [p.id]: res.data }));
+    } catch (err) {
+      console.error("Recommendation error:", err.message);
+    } finally {
+      setRecommendLoading(prev => ({ ...prev, [p.id]: false }));
+    }
+  };
 
   return (
     <div style={{ backgroundColor:"#fff", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0", display:"flex", flexDirection:"column", gap:12 }}
@@ -233,6 +266,50 @@ function ProjectCard({ p, proposals, navigate }) {
         style={{ width:"100%", padding:"10px", background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"white", border:"none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13, boxShadow:"0 2px 8px rgba(37,99,235,0.3)", marginTop:4 }}>
         👁 View Proposals {proposals.length > 0 && `(${proposals.length})`}
       </button>
+
+      {/* ✅ AI RECOMMEND BUTTON */}
+      <button onClick={getRecommendations}
+        disabled={recommendLoading[p.id]}
+        style={{ width:"100%", padding:"10px", background:"#fff", color:"#7c3aed", border:"1.5px solid #7c3aed", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13, opacity: recommendLoading[p.id] ? 0.7 : 1 }}>
+        {recommendLoading[p.id] ? "⏳ Finding..." : "⭐ AI Recommend Freelancers"}
+      </button>
+
+      {/* ✅ AI RECOMMENDATIONS RESULT */}
+      {recommendations[p.id] && (
+        <div style={{ padding:16, backgroundColor:"#faf5ff", borderRadius:12, border:"1px solid #ddd6fe" }}>
+          <div style={{ fontSize:13, fontWeight:700, color:"#7c3aed", marginBottom:12 }}>⭐ Top Recommended Freelancers</div>
+          {recommendations[p.id].map((r, i) => (
+            <div key={r.id} style={{ padding:12, backgroundColor:"#fff", borderRadius:10, border:"1px solid #ede9fe", marginBottom:8 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                  <div style={{ width:32, height:32, borderRadius:10, background:"linear-gradient(135deg,#7c3aed,#a855f7)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:800, fontSize:14 }}>
+                    {i + 1}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight:700, fontSize:13, color:"#111827" }}>{r.name}</div>
+                    <div style={{ fontSize:11, color:"#64748b" }}>{r.experience || "N/A"}</div>
+                  </div>
+                </div>
+                <div style={{ fontSize:20, fontWeight:800, color:"#7c3aed" }}>{r.score}%</div>
+              </div>
+              <div style={{ fontSize:12, color:"#64748b", marginBottom:6 }}>{r.summary}</div>
+              {r.matching_skills?.length > 0 && (
+                <div style={{ fontSize:11 }}>
+                  <span style={{ color:"#16a34a", fontWeight:600 }}>✅ </span>
+                  <span style={{ color:"#374151" }}>{r.matching_skills.join(", ")}</span>
+                </div>
+              )}
+              {r.missing_skills?.length > 0 && (
+                <div style={{ fontSize:11, marginTop:2 }}>
+                  <span style={{ color:"#dc2626", fontWeight:600 }}>❌ </span>
+                  <span style={{ color:"#374151" }}>{r.missing_skills.join(", ")}</span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
     </div>
   );
 }

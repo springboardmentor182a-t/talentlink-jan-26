@@ -13,6 +13,8 @@ export default function BrowseProjects() {
   const [budget, setBudget]         = useState("all");
   const [skillInput, setSkillInput] = useState("");
   const [selected, setSelected]     = useState(null);
+  const [matchScores, setMatchScores]   = useState({});      // ✅ NEW
+  const [matchLoading, setMatchLoading] = useState({});      // ✅ NEW
 
   useEffect(() => { fetchProjects(); }, []);
 
@@ -37,6 +39,22 @@ export default function BrowseProjects() {
 
   const clearFilters = () => { setSearch(""); setBudget("all"); setSkillInput(""); };
 
+  // ✅ NEW FUNCTION
+  const checkMatchScore = async (projectId) => {
+    setMatchLoading(prev => ({ ...prev, [projectId]: true }));
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.get(`/ai/match-score/${projectId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMatchScores(prev => ({ ...prev, [projectId]: res.data }));
+    } catch (err) {
+      console.error("Match score error:", err.message);
+    } finally {
+      setMatchLoading(prev => ({ ...prev, [projectId]: false }));
+    }
+  };
+
   return (
     <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#f8fafc", minHeight:"100vh" }}>
 
@@ -53,7 +71,7 @@ export default function BrowseProjects() {
 
       <div style={{ padding:32 }}>
 
-        {/* Filters — 3 columns, no Duration */}
+        {/* Filters */}
         <div style={{ backgroundColor:"#fff", borderRadius:16, padding:"20px 24px", marginBottom:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
             <span style={{ fontSize:15, fontWeight:700, color:"#111827" }}>🔽 Filters</span>
@@ -153,7 +171,8 @@ export default function BrowseProjects() {
               </div>
             </div>
 
-            <div style={{ display:"flex", gap:12 }}>
+            {/* Buttons */}
+            <div style={{ display:"flex", gap:12, flexWrap:"wrap" }}>
               <button onClick={() => navigate(`/submit-proposal/${p.id}`)}
                 style={{ padding:"10px 24px", background:"linear-gradient(135deg,#7c3aed,#a855f7)", color:"white", border:"none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:14, boxShadow:"0 2px 8px rgba(124,58,237,0.3)" }}>
                 🚀 Submit Proposal
@@ -162,7 +181,40 @@ export default function BrowseProjects() {
                 style={{ padding:"10px 24px", backgroundColor:"#fff", color:"#374151", border:"1.5px solid #e2e8f0", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:14 }}>
                 View Details
               </button>
+
+              {/* ✅ NEW BUTTON */}
+              <button onClick={() => checkMatchScore(p.id)}
+                disabled={matchLoading[p.id]}
+                style={{ padding:"10px 24px", backgroundColor:"#fff", color:"#7c3aed", border:"1.5px solid #7c3aed", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:14, opacity: matchLoading[p.id] ? 0.7 : 1 }}>
+                {matchLoading[p.id] ? "⏳ Checking..." : "🤖 Match Score"}
+              </button>
             </div>
+
+            {/* ✅ MATCH SCORE RESULT */}
+            {matchScores[p.id] && (
+              <div style={{ marginTop:16, padding:16, backgroundColor:"#f5f3ff", borderRadius:12, border:"1px solid #ddd6fe" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:10 }}>
+                  <div style={{ fontSize:32, fontWeight:800, color:"#7c3aed" }}>{matchScores[p.id].score}%</div>
+                  <div>
+                    <div style={{ fontSize:13, fontWeight:700, color:"#111827" }}>AI Match Score</div>
+                    <div style={{ fontSize:12, color:"#64748b" }}>{matchScores[p.id].summary}</div>
+                  </div>
+                </div>
+                {matchScores[p.id].matching_skills?.length > 0 && (
+                  <div style={{ marginBottom:6 }}>
+                    <span style={{ fontSize:12, fontWeight:600, color:"#16a34a" }}>✅ Matching: </span>
+                    <span style={{ fontSize:12, color:"#374151" }}>{matchScores[p.id].matching_skills.join(", ")}</span>
+                  </div>
+                )}
+                {matchScores[p.id].missing_skills?.length > 0 && (
+                  <div>
+                    <span style={{ fontSize:12, fontWeight:600, color:"#dc2626" }}>❌ Missing: </span>
+                    <span style={{ fontSize:12, color:"#374151" }}>{matchScores[p.id].missing_skills.join(", ")}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
           </div>
         ))}
       </div>

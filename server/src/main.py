@@ -10,8 +10,11 @@ from src.client_dashboard.router import router as client_dashboard_router
 from src.proposals.controller import router as proposals_router
 from src.projects.controller import router as projects_router
 from src.messages.controller import router as messages_router
+from src.notifications.controller import router as notifications_router
 from src.entities.contract import Contract, Milestone
 from src.reviews.model import Review
+from src.notifications.model import Notification
+from src.ai.router import router as ai_router
 
 load_dotenv()
 
@@ -27,12 +30,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth_router,             prefix="/auth",      tags=["Auth"])
+app.include_router(auth_router,              prefix="/auth",          tags=["Auth"])
 app.include_router(client_dashboard_router)
 app.include_router(users_router)
-app.include_router(proposals_router,        prefix="/proposals", tags=["Proposals"])
-app.include_router(projects_router,         prefix="/projects",  tags=["Projects"])
-app.include_router(messages_router,         prefix="/messages",  tags=["Messages"])
+app.include_router(proposals_router,         prefix="/proposals",     tags=["Proposals"])
+app.include_router(projects_router,          prefix="/projects",      tags=["Projects"])
+app.include_router(messages_router,          prefix="/messages",      tags=["Messages"])
+app.include_router(notifications_router,     prefix="/notifications", tags=["Notifications"])
+app.include_router(ai_router)
 
 @app.get("/")
 def root():

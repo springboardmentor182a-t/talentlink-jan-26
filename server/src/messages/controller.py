@@ -5,17 +5,16 @@ from src.database.core import get_db
 from .model import Message
 from .schema import MessageCreate, MessageResponse, ConversationResponse
 from src.entities.user import User
+from src.notifications.controller import create_and_send_notification
 from typing import Dict, List
 import json
 
 router = APIRouter(tags=["Messages"])
 
 
-# ── WebSocket Connection Manager ─────────────────────────────
+# ── WebSocket Connection Manager ──────────────────────────────
 class ConnectionManager:
     def __init__(self):
-        # room_key -> list of websockets
-        # room_key = "min_id_max_id" e.g. "3_7"
         self.active_connections: Dict[str, List[WebSocket]] = {}
 
     def get_room_key(self, user_id: int, other_id: int) -> str:
@@ -31,15 +30,22 @@ class ConnectionManager:
     def disconnect(self, websocket: WebSocket, user_id: int, other_id: int):
         key = self.get_room_key(user_id, other_id)
         if key in self.active_connections:
-            self.active_connections[key].remove(websocket)
+            if websocket in self.active_connections[key]:
+                self.active_connections[key].remove(websocket)
             if not self.active_connections[key]:
                 del self.active_connections[key]
 
     async def send_to_room(self, user_id: int, other_id: int, message: dict):
         key = self.get_room_key(user_id, other_id)
         if key in self.active_connections:
+            dead = []
             for connection in self.active_connections[key]:
-                await connection.send_text(json.dumps(message))
+                try:
+                    await connection.send_text(json.dumps(message))
+                except Exception:
+                    dead.append(connection)
+            for d in dead:
+                self.active_connections[key].remove(d)
 
 
 manager = ConnectionManager()
@@ -56,37 +62,55 @@ async def websocket_endpoint(
     await manager.connect(websocket, user_id, other_user_id)
     try:
         while True:
-            data = await websocket.receive_text()
+            data    = await websocket.receive_text()
             payload = json.loads(data)
 
             # Save message to DB
             msg = Message(
-                sender_id=user_id,
-                receiver_id=other_user_id,
-                content=payload["content"],
+                sender_id   = user_id,
+                receiver_id = other_user_id,
+                content     = payload["content"],
             )
             db.add(msg)
             db.commit()
             db.refresh(msg)
 
-            # Broadcast to both users in the room
-            await manager.send_to_room(user_id, other_user_id, {
+            msg_data = {
                 "id":          msg.id,
                 "sender_id":   msg.sender_id,
                 "receiver_id": msg.receiver_id,
                 "content":     msg.content,
                 "is_read":     msg.is_read,
                 "created_at":  msg.created_at.isoformat(),
-            })
+            }
+
+            # Broadcast to both users in the room
+            await manager.send_to_room(user_id, other_user_id, msg_data)
+
+            # Always send notification to receiver.
+            # The frontend (NotificationContext) suppresses the badge increment
+            # when the receiver is currently on the /messages page, so we don't
+            # need to check that here — doing so was causing the badge to never
+            # appear because both users share the same WS room key.
+            sender = db.query(User).filter(User.id == user_id).first()
+            sender_name = sender.name if sender else f"User #{user_id}"
+            await create_and_send_notification(
+                db,
+                user_id = other_user_id,
+                title   = "New Message 💬",
+                message = f"{sender_name}: {payload['content'][:60]}{'...' if len(payload['content']) > 60 else ''}",
+                type    = "message",
+            )
 
     except WebSocketDisconnect:
         manager.disconnect(websocket, user_id, other_user_id)
 
 
-# ── REST endpoints (unchanged) ────────────────────────────────
+# ── REST endpoints ────────────────────────────────────────────
 
 @router.post("/", response_model=MessageResponse)
 def send_message(data: MessageCreate, db: Session = Depends(get_db)):
+    """REST fallback for sending messages when WebSocket is not connected."""
     msg = Message(**data.dict())
     db.add(msg)
     db.commit()
@@ -96,7 +120,7 @@ def send_message(data: MessageCreate, db: Session = Depends(get_db)):
 
 @router.get("/conversations/{user_id}", response_model=list[ConversationResponse])
 def get_conversations(user_id: int, db: Session = Depends(get_db)):
-    """Get all unique conversations for a user with latest message and unread count."""
+    """Get all unique conversations with latest message and unread count."""
     sent     = db.query(Message.receiver_id.label("other_id")).filter(Message.sender_id == user_id)
     received = db.query(Message.sender_id.label("other_id")).filter(Message.receiver_id == user_id)
     other_ids = {row.other_id for row in sent.union(received).all()}
