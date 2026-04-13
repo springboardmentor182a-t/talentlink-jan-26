@@ -21,11 +21,14 @@ const postProjectSchema = z.object({
 export default function PostProject() {
   const navigate = useNavigate();
   const [globalError, setGlobalError] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false); // State for the AI Button
 
   // 2. Setup React Hook Form with Zod integration
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(postProjectSchema),
@@ -36,20 +39,42 @@ export default function PostProject() {
     },
   });
 
+  // Watch the title so we can send it to the AI
+  const watchedTitle = watch("title");
+
+  // 3. The AI Generator Function
+  const handleGenerateAI = async () => {
+    setIsGenerating(true);
+    try {
+      // Note: Make sure your FastAPI route matches this exactly!
+      const response = await api.post("/generate-description", {
+        title: watchedTitle,
+        skills: "Standard professional skills", // Placeholder since we don't have a skills input yet
+      });
+      
+      // Inject the AI text directly into the text box and clear validation errors
+      setValue("description", response.data.generated_description, { 
+        shouldValidate: true 
+      });
+      
+    } catch (err) {
+      console.error("AI Error:", err);
+      setGlobalError("Failed to connect to the AI. Check if your backend is running.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // 4. Standard Form Submit Function
   const onSubmit = async (data) => {
     setGlobalError("");
-
     try {
-      // POST directly to the raw Axios instance 'api'
-      // Note: In an auth-enabled app, client_id is inferred via JWT.
       const response = await api.post("/projects/", data);
-      
       alert("Project posted successfully!");
-      navigate(`/projects/${response.data.id}`); // Or dashboard
+      navigate(`/projects/${response.data.id}`); 
     } catch (err) {
       const errorDetail = err.response?.data?.detail;
       if (Array.isArray(errorDetail)) {
-        // Handle Pydantic validation array
         setGlobalError(`Validation Error: ${errorDetail[0].msg}`);
       } else {
         setGlobalError(errorDetail || "Failed to post project. Please try again or check your connection.");
@@ -106,11 +131,22 @@ export default function PostProject() {
             )}
           </div>
 
-          {/* DESCRIPTION */}
+          {/* DESCRIPTION WITH AI BUTTON */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2 flex justify-between">
-              Project Description
-            </label>
+            <div className="flex justify-between items-end mb-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                Project Description
+              </label>
+              
+              <button
+                type="button" // Critical: prevents form submission
+                onClick={handleGenerateAI}
+                disabled={!watchedTitle || watchedTitle.length < 5 || isGenerating}
+                className="bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-3 py-1.5 rounded transition disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+              >
+                {isGenerating ? "🧠 Thinking..." : "✨ Auto-Generate with AI"}
+              </button>
+            </div>
             <textarea
               rows="8"
               className={`w-full p-3 border rounded-lg focus:ring-2 outline-none transition resize-y ${
@@ -118,7 +154,7 @@ export default function PostProject() {
                   ? "border-red-400 focus:ring-red-200 focus:border-red-500 bg-red-50" 
                   : "border-gray-300 focus:ring-orange-200 focus:border-orange-500"
               }`}
-              placeholder="Provide a comprehensive description of the project requirements, deliverables, and any specific technologies required. Be as detailed as possible."
+              placeholder="Provide a comprehensive description of the project requirements..."
               {...register("description")}
             ></textarea>
             {errors.description && (

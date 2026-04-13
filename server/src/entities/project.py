@@ -5,6 +5,9 @@ from src.database.core import Base
 
 class Project(Base):
     __tablename__ = "projects"
+    __table_args__ = {'extend_existing': True}  # ✨ ADD THIS LINE
+    
+    # ... rest of your columns ...
 
     id = Column(Integer, primary_key=True, index=True)
     

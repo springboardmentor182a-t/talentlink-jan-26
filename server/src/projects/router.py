@@ -2,6 +2,9 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
+import os
+import google.generativeai as genai
+from pydantic import BaseModel
 
 from src.database.core import get_db
 from src.projects import schemas
@@ -9,6 +12,14 @@ from src.projects.service import ProjectService
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+# Setup Google Gemini API
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+# Define what data React will send us for the AI
+class DescriptionRequest(BaseModel):
+    title: str
+    skills: str
 
 from src.auth.dependencies import get_current_user
 from src.entities.user import User
@@ -50,3 +61,30 @@ def get_projects(
         search=search,
         min_budget=min_budget
     )
+@router.post("/generate-description")
+async def generate_project_description(request: DescriptionRequest):
+    if not request.title or not request.skills:
+        raise HTTPException(status_code=400, detail="Title and skills are required")
+
+    try:
+        # Write the strict instructions for the AI
+        prompt = f"""
+        Act as a professional project manager. Write a concise, 3-paragraph 
+        project description for a freelance gig.
+        
+        Project Title: {request.title}
+        Required Skills: {request.skills}
+        
+        Keep the tone professional, clear, and attractive to top-tier freelancers.
+        Do not include placeholders like [Insert Company Name].
+        """
+
+        # Send the prompt to the AI and return the result
+        model = genai.GenerativeModel('gemini-pro')
+        response = model.generate_content(prompt)
+        
+        return {"generated_description": response.text.strip()}
+
+    except Exception as e:
+        logger.error(f"AI Generation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to generate description")
