@@ -19,7 +19,6 @@ import src.entities.contract  # noqa: F401
 import src.users.models       # noqa: F401
 import src.reviews.models     # noqa: F401
 import src.projects.models    # noqa: F401
-import src.entities.project   # noqa: F401 - Preserved from our architectural refactor
 
 from src.rate_limiter import rate_limit_middleware
 from src.exceptions import error_handler_middleware

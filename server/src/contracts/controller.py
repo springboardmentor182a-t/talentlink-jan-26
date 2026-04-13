@@ -127,3 +127,42 @@ def update_milestone(
         from fastapi import HTTPException
         raise HTTPException(status_code=403, detail="Only freelancers can update milestones")
     return ContractService.update_milestone(db, milestone_id, data.is_completed, current_user.id)
+
+
+# ── AI Simplified Summaries ───────────────────────────────────────────────────
+
+@router.post("/{contract_id}/simplify")
+async def simplify_contract_endpoint(
+    contract_id: int, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    from fastapi import HTTPException
+    from src.entities.contract import Contract
+
+    # 1. Look up the contract in your Postgres container
+    contract = db.query(Contract).filter(Contract.id == contract_id).first()
+    
+    if not contract:
+        raise HTTPException(status_code=404, detail="Contract not found")
+
+    # 2. Logic: The 'terms' column currently holds the legalese.
+    # We will eventually call Gemini AI here. For now, we use a structured 'Mock'.
+    legalese = contract.terms or "No terms found."
+    
+    ai_summary = {
+        "tl_dr": "This is a simple version of your agreement.",
+        "key_points": [
+            "You get paid when you finish the work.",
+            "The client owns the code after payment.",
+            "You can end the contract with 2 weeks notice."
+        ],
+        "risk_level": "Standard/Safe"
+    }
+
+    # 3. Save the result into our new JSONB column
+    contract.simplified_summary = ai_summary
+    db.commit()
+    db.refresh(contract)
+
+    return {"status": "success", "data": contract.simplified_summary}

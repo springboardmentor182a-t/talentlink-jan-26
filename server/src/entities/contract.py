@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean, Numeric, Index
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean, Numeric, Index, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from src.database.core import Base
@@ -17,6 +17,7 @@ class Contract(Base):
     status      = Column(String(50), default="draft", nullable=False)
     created_at  = Column(DateTime(timezone=True), server_default=func.now())
     updated_at  = Column(DateTime(timezone=True), onupdate=func.now())
+    simplified_summary = Column(JSON, nullable=True)
 
     #proposal   = relationship("Proposal", back_populates="contract")
     milestones = relationship(

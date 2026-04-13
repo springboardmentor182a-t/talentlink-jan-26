@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException
 
-from src.entities import project as models
+from src.projects import models
 from src.projects import schemas
 
 logger = logging.getLogger(__name__)

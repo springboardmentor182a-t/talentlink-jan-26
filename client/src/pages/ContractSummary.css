@@ -1,0 +1,335 @@
+/* ContractSummary.css - Premium Aesthetic Revamp */
+
+.contract-summary-page {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 40px;
+  min-height: calc(100vh - 70px);
+  background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.summary-header {
+  margin-bottom: 24px;
+}
+
+.summary-header .back-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 12px;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.summary-header .back-btn:hover {
+  color: #0f172a;
+}
+
+.summary-header h1 {
+  font-size: 28px;
+  color: #0f172a;
+  margin: 0;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  letter-spacing: -0.5px;
+}
+
+.ai-badge {
+  background: linear-gradient(135deg, #ff7a00, #ff5200);
+  color: white;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(255, 122, 0, 0.3);
+}
+
+.summary-split-layout {
+  display: flex;
+  gap: 30px;
+  height: calc(100vh - 180px);
+}
+
+/* Base Pane Styling */
+.legal-document-pane, .ai-analysis-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.pane-header {
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.pane-header h3 {
+  margin: 0;
+}
+
+/* Left Pane: Legal Document */
+.legal-document-pane {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+}
+
+.legal-document-pane .pane-header {
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+.document-content {
+  padding: 32px 40px;
+  overflow-y: auto;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #334155;
+  background: #fff;
+  position: relative;
+  flex: 1;
+}
+
+.doc-watermark {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  font-size: 60px;
+  font-weight: 800;
+  color: rgba(226, 232, 240, 0.4);
+  pointer-events: none;
+  letter-spacing: 10px;
+}
+
+.document-content p {
+  margin-bottom: 16px;
+  text-align: justify;
+}
+
+/* Right Pane: AI Analysis */
+.ai-analysis-pane {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  box-shadow: 0 15px 40px rgba(15, 23, 42, 0.2);
+}
+
+.ai-analysis-pane .pane-header {
+  background: #1e293b;
+  color: #f8fafc;
+  border-bottom: 1px solid #334155;
+}
+
+.ai-header-theme svg {
+  color: #ff7a00;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.analysis-content {
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+/* Analysis Cards inside Right Pane */
+.analysis-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.analysis-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.analysis-card h4 {
+  color: #cbd5e1;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 12px 0;
+  font-weight: 600;
+}
+
+.highlight-card {
+  background: linear-gradient(145deg, rgba(255, 122, 0, 0.08), rgba(255, 82, 0, 0.02));
+  border-left: 3px solid #ff7a00;
+}
+
+.highlight-card h4 {
+  color: #ff7a00;
+}
+
+.tldr-text {
+  font-size: 18px;
+  line-height: 1.5;
+  color: #f8fafc;
+  font-weight: 500;
+  margin: 0;
+}
+
+.key-points-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.key-points-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #e2e8f0;
+}
+
+.bullet-icon {
+  color: #38bdf8;
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+/* Risk Assessment */
+.risk-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.risk-header h4 {
+  margin: 0;
+}
+
+.risk-badge {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.risk-low {
+  background: rgba(34, 197, 94, 0.1);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.risk-medium {
+  background: rgba(234, 179, 8, 0.1);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.risk-high {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.risk-default {
+  background: rgba(148, 163, 184, 0.1);
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.risk-description {
+  margin: 0;
+  font-size: 14px;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+/* Scrollbars */
+.scroll-box::-webkit-scrollbar, .analysis-content::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll-box::-webkit-scrollbar-track { background: transparent; }
+.scroll-box::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+.analysis-content::-webkit-scrollbar-track { background: transparent; }
+.analysis-content::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+
+/* Loading & Error States */
+.summary-loading-container, .summary-error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 85vh;
+  text-align: center;
+}
+
+.summary-loading-container h2 {
+  color: #ff7a00;
+  margin: 20px 0 10px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.summary-loading-container p {
+  color: #64748b;
+  font-size: 16px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 122, 0, 0.2);
+  border-top-color: #ff7a00;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.summary-error-container h2 {
+  color: #0f172a;
+  margin-bottom: 20px;
+}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ContractsService from '../features/services/contracts';
 import '../assets/contracts.css';
 
@@ -418,6 +419,7 @@ function ContractDetailModal({ contract, onClose }) {
 // ── Contract Row ───────────────────────────────────────────────────────────
 
 function ContractRow({ contract, onSend, onView, onCancel, onRenegotiate }) {
+  const navigate = useNavigate();
   const { status, progress } = contract;
 
   return (
@@ -486,6 +488,9 @@ function ContractRow({ contract, onSend, onView, onCancel, onRenegotiate }) {
             Awaiting Signature
           </button>
         )}
+        <button className="btn-outline btn-sm" style={{borderColor: '#ff7a00', color: '#ff7a00'}} onClick={() => navigate(`/contracts/${contract.id}/summary`)}>
+          Simplify with AI ✨
+        </button>
       </div>
     </div>
   );
