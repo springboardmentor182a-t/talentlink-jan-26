@@ -1,4 +1,10 @@
-const ProjectCard = ({ project, onApply }) => {
+import { useState } from "react";
+import { saveProject, unsaveProject } from "../services/api";
+
+const ProjectCard = ({ project, onApply, initialSaved = false }) => {
+  const [saved,  setSaved]  = useState(initialSaved);
+  const [saving, setSaving] = useState(false);
+
   if (!project) return null;
 
   const skillsArray = project.skills
@@ -9,12 +15,38 @@ const ProjectCard = ({ project, onApply }) => {
     ? `$${project.budget_min.toLocaleString()} – $${project.budget_max.toLocaleString()}`
     : project.budget || "Budget TBD";
 
+  const handleSave = async (e) => {
+    e.stopPropagation();
+    if (saving) return;
+    setSaving(true);
+    try {
+      if (saved) {
+        await unsaveProject(project.id);
+        setSaved(false);
+      } else {
+        await saveProject(project.id);
+        setSaved(true);
+      }
+    } catch (err) {
+      console.error("Save toggle failed:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="project-card">
       <div className="project-header">
         <h3>{project.title}</h3>
         <span className="match-badge">New</span>
       </div>
+
+      {/* Posted by — answers the freelancer's "who is this client?" question */}
+      {project.client_display_name && (
+        <p className="project-poster">
+          Posted by <strong>{project.client_display_name}</strong>
+        </p>
+      )}
 
       <p className="project-description">{project.description}</p>
 
@@ -30,7 +62,13 @@ const ProjectCard = ({ project, onApply }) => {
           <p className="duration">Duration: {project.duration}</p>
         )}
         <div className="actions">
-          <button className="save-btn">Save</button>
+          <button
+            className={`save-btn${saved ? " save-btn--saved" : ""}`}
+            onClick={handleSave}
+            disabled={saving}
+          >
+            {saving ? "..." : saved ? "Saved ✓" : "Save"}
+          </button>
           <button
             className="apply-btn"
             onClick={onApply}

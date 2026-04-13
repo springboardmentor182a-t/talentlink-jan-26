@@ -9,9 +9,10 @@ export default function SubmitProposal() {
 
   const [project, setProject]   = useState(null);
   const [formData, setFormData] = useState({
-    cover_letter:   "",
-    bid_amount:     "",
-    estimated_days: "",
+    cover_letter:       "",
+    bid_amount:         "",
+    estimated_days:     "",
+    availability_start: "",
   });
   const [loading, setLoading]   = useState(false);
   const [fetching, setFetching] = useState(true);
@@ -20,11 +21,8 @@ export default function SubmitProposal() {
 
   // Fetch project details so freelancer knows what they're applying for
   useEffect(() => {
-    axiosInstance.get("/projects/")
-      .then(res => {
-        const found = res.data.find(p => p.id === parseInt(projectId));
-        setProject(found || null);
-      })
+    axiosInstance.get(`/projects/${projectId}`)
+      .then(res => setProject(res.data))
       .catch(() => setProject(null))
       .finally(() => setFetching(false));
   }, [projectId]);
@@ -48,11 +46,12 @@ export default function SubmitProposal() {
 
       const user = JSON.parse(storedUser);
 
-      await createProposal(user.id, {
-        project_id:     parseInt(projectId),
-        cover_letter:   formData.cover_letter,
-        bid_amount:     parseFloat(formData.bid_amount),
-        estimated_days: parseInt(formData.estimated_days),
+      await createProposal({
+        project_id:         parseInt(projectId),
+        cover_letter:       formData.cover_letter,
+        bid_amount:         parseFloat(formData.bid_amount),
+        estimated_days:     formData.estimated_days !== "" ? parseInt(formData.estimated_days, 10) : null,
+        availability_start: formData.availability_start || null,
       });
 
       setSuccess(true);
@@ -158,6 +157,21 @@ export default function SubmitProposal() {
                 onChange={handleChange}
               />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Available From
+            </label>
+            <input
+              type="date"
+              name="availability_start"
+              min={new Date().toISOString().split("T")[0]}
+              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition"
+              value={formData.availability_start}
+              onChange={handleChange}
+            />
+            <p className="text-xs text-gray-400 mt-1">Leave blank if you can start immediately</p>
           </div>
 
           <div>

@@ -9,12 +9,20 @@ const FreelancerProfile = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg]     = useState('');
   const navigate = useNavigate();
-  const [form, setForm]       = useState({
-    full_name:    '',
-    title:        '',
-    bio:          '',
-    hourly_rate:  '',
-    skillsInput:  '',
+  const [form, setForm] = useState({
+    full_name:         '',
+    title:             '',
+    bio:               '',
+    hourly_rate:       '',
+    skillsInput:       '',
+    location:          '',
+    years_experience:  '',
+    availability:      '',
+    linkedin:          '',
+    github:            '',
+    portfolio_website: '',
+    twitter:           '',
+    phone:             '',
   });
 
   useEffect(() => {
@@ -26,11 +34,19 @@ const FreelancerProfile = () => {
       .then(data => {
         setSkills(data.skills || []);
         setForm({
-          full_name:   data.full_name   || '',
-          title:       data.title       || '',
-          bio:         data.bio         || '',
-          hourly_rate: data.hourly_rate || '',
-          skillsInput: (data.skills || []).join(', '),
+          full_name:         data.full_name         || '',
+          title:             data.title             || '',
+          bio:               data.bio               || '',
+          hourly_rate:       data.hourly_rate        || '',
+          skillsInput:       (data.skills || []).join(', '),
+          location:          data.location          || '',
+          years_experience:  data.years_experience  || '',
+          availability:      data.availability      || '',
+          linkedin:          data.linkedin          || '',
+          github:            data.github            || '',
+          portfolio_website: data.portfolio_website || '',
+          twitter:           data.twitter           || '',
+          phone:             data.phone             || '',
         });
       })
       .catch(() => {
@@ -48,11 +64,19 @@ const FreelancerProfile = () => {
     setSaving(true);
     try {
       const payload = {
-        full_name:   form.full_name,
-        title:       form.title,
-        bio:         form.bio,
-        hourly_rate: parseFloat(form.hourly_rate) || 0,
-        skills:      form.skillsInput.split(',').map(s => s.trim()).filter(Boolean),
+        full_name:         form.full_name,
+        title:             form.title,
+        bio:               form.bio,
+        hourly_rate:       parseFloat(form.hourly_rate) || 0,
+        skills:            form.skillsInput.split(',').map(s => s.trim()).filter(Boolean),
+        location:          form.location          || null,
+        years_experience:  form.years_experience  || null,
+        availability:      form.availability      || null,
+        linkedin:          form.linkedin          || null,
+        github:            form.github            || null,
+        portfolio_website: form.portfolio_website || null,
+        twitter:           form.twitter           || null,
+        phone:             form.phone             || null,
       };
       await createFreelancerProfile(user.id, payload);
       setSkills(payload.skills);
@@ -69,6 +93,10 @@ const FreelancerProfile = () => {
   };
 
   const set = field => e => setForm(prev => ({ ...prev, [field]: e.target.value }));
+
+  const inputStyle = { width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #E9ECEF', fontSize: '14px', boxSizing: 'border-box' };
+  const labelStyle = { display: 'block', fontSize: '13px', color: '#6C757D', marginBottom: '6px' };
+  const sectionStyle = { backgroundColor: 'white', padding: '25px', borderRadius: '15px', border: '1px solid #E9ECEF', marginBottom: '20px' };
 
   if (loading) return <div style={{ padding: '40px', backgroundColor: '#F8F9FA', minHeight: '100vh' }}>Loading profile data...</div>;
 
@@ -102,43 +130,91 @@ const FreelancerProfile = () => {
         {/* Right column — edit form */}
         <div style={{ flex: 1 }}>
           <form onSubmit={onSubmit}>
-            <section style={{ backgroundColor: 'white', padding: '25px', borderRadius: '15px', border: '1px solid #E9ECEF', marginBottom: '20px' }}>
+
+            {/* Basic Info */}
+            <section style={sectionStyle}>
               <h3 style={{ margin: '0 0 20px 0' }}>Basic Info</h3>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', color: '#6C757D', marginBottom: '6px' }}>Full Name</label>
-                  <input value={form.full_name} onChange={set('full_name')} required
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #E9ECEF', fontSize: '14px', boxSizing: 'border-box' }}
-                    placeholder="Alex Rivera" />
+                  <label style={labelStyle}>Full Name</label>
+                  <input value={form.full_name} onChange={set('full_name')} required style={inputStyle} placeholder="Alex Rivera" />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', color: '#6C757D', marginBottom: '6px' }}>Title</label>
-                  <input value={form.title} onChange={set('title')}
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #E9ECEF', fontSize: '14px', boxSizing: 'border-box' }}
-                    placeholder="Full Stack Developer" />
+                  <label style={labelStyle}>Title</label>
+                  <input value={form.title} onChange={set('title')} style={inputStyle} placeholder="Full Stack Developer" />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', color: '#6C757D', marginBottom: '6px' }}>Hourly Rate ($)</label>
-                  <input value={form.hourly_rate} onChange={set('hourly_rate')} type="number" min="0"
-                    style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #E9ECEF', fontSize: '14px', boxSizing: 'border-box' }}
-                    placeholder="85" />
+                  <label style={labelStyle}>Hourly Rate ($)</label>
+                  <input value={form.hourly_rate} onChange={set('hourly_rate')} type="number" min="0" style={inputStyle} placeholder="85" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Phone</label>
+                  <input value={form.phone} onChange={set('phone')} style={inputStyle} placeholder="+1 555 000 0000" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Location</label>
+                  <input value={form.location} onChange={set('location')} style={inputStyle} placeholder="San Francisco, CA" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Years of Experience</label>
+                  <select value={form.years_experience} onChange={set('years_experience')} style={inputStyle}>
+                    <option value="">Select…</option>
+                    <option>Less than 1 year</option>
+                    <option>1-2 years</option>
+                    <option>3-5 years</option>
+                    <option>5-10 years</option>
+                    <option>10+ years</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>Availability</label>
+                  <select value={form.availability} onChange={set('availability')} style={inputStyle}>
+                    <option value="">Select…</option>
+                    <option>Full-time</option>
+                    <option>Part-time</option>
+                    <option>Weekends only</option>
+                    <option>Not available</option>
+                  </select>
                 </div>
               </div>
             </section>
 
-            <section style={{ backgroundColor: 'white', padding: '25px', borderRadius: '15px', border: '1px solid #E9ECEF', marginBottom: '20px' }}>
+            {/* About Me */}
+            <section style={sectionStyle}>
               <h3 style={{ margin: '0 0 15px 0' }}>About Me</h3>
               <textarea value={form.bio} onChange={set('bio')} rows={4}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #E9ECEF', fontSize: '14px', lineHeight: '1.5', boxSizing: 'border-box', resize: 'vertical' }}
+                style={{ ...inputStyle, lineHeight: '1.5', resize: 'vertical' }}
                 placeholder="I'm a passionate full stack developer..." />
             </section>
 
-            <section style={{ backgroundColor: 'white', padding: '25px', borderRadius: '15px', border: '1px solid #E9ECEF', marginBottom: '20px' }}>
+            {/* Skills */}
+            <section style={sectionStyle}>
               <h3 style={{ margin: '0 0 8px 0' }}>Skills</h3>
               <p style={{ fontSize: '13px', color: '#6C757D', margin: '0 0 12px 0' }}>Comma-separated list</p>
-              <input value={form.skillsInput} onChange={set('skillsInput')}
-                style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #E9ECEF', fontSize: '14px', boxSizing: 'border-box' }}
-                placeholder="React, Python, FastAPI, PostgreSQL" />
+              <input value={form.skillsInput} onChange={set('skillsInput')} style={inputStyle} placeholder="React, Python, FastAPI, PostgreSQL" />
+            </section>
+
+            {/* Social & Portfolio */}
+            <section style={sectionStyle}>
+              <h3 style={{ margin: '0 0 20px 0' }}>Links</h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={labelStyle}>LinkedIn</label>
+                  <input value={form.linkedin} onChange={set('linkedin')} style={inputStyle} placeholder="https://linkedin.com/in/..." />
+                </div>
+                <div>
+                  <label style={labelStyle}>GitHub</label>
+                  <input value={form.github} onChange={set('github')} style={inputStyle} placeholder="https://github.com/..." />
+                </div>
+                <div>
+                  <label style={labelStyle}>Portfolio Website</label>
+                  <input value={form.portfolio_website} onChange={set('portfolio_website')} style={inputStyle} placeholder="https://yoursite.com" />
+                </div>
+                <div>
+                  <label style={labelStyle}>Twitter / X</label>
+                  <input value={form.twitter} onChange={set('twitter')} style={inputStyle} placeholder="https://x.com/..." />
+                </div>
+              </div>
             </section>
 
             {successMsg && (

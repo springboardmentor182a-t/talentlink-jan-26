@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MessageBubble from './MessageBubble';
 import UserAvatar from './UserAvatar';
 import '../../assets/messages.css';
@@ -16,11 +17,29 @@ import '../../assets/messages.css';
  */
 const ChatArea = ({ messages = [], selectedUser, currentUser, onSend, loading, isOnline = false }) => {
   const [text, setText] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
   const bottomRef = useRef(null);
+  const menuRef = useRef(null);
+  const navigate = useNavigate();
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    if (menuOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [menuOpen]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [selectedUser]);
 
   const handleSend = () => {
     const trimmed = text.trim();
@@ -70,11 +89,47 @@ const ChatArea = ({ messages = [], selectedUser, currentUser, onSend, loading, i
           </div>
         </div>
         <div className="chat-header-actions">
-          <button className="chat-icon-btn" title="More options">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
-            </svg>
-          </button>
+          <div ref={menuRef} style={{ position: 'relative' }}>
+            <button
+              className="chat-icon-btn"
+              title="More options"
+              onClick={() => setMenuOpen(prev => !prev)}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+              </svg>
+            </button>
+            {menuOpen && (
+              <div style={{
+                position: 'absolute', right: 0, top: 'calc(100% + 6px)',
+                background: '#fff', border: '1px solid #e5e7eb',
+                borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.10)',
+                minWidth: 160, zIndex: 50, overflow: 'hidden',
+              }}>
+                <button
+                  onClick={() => {
+                    const role = selectedUser?.role;
+                    const id   = selectedUser?.user_id ?? selectedUser?.id;
+                    const path = role === 'freelancer'
+                      ? `/profile/freelancer?id=${id}`
+                      : `/profile/client?id=${id}`;
+                    navigate(path);
+                    setMenuOpen(false);
+                  }}
+                  style={{
+                    display: 'block', width: '100%', padding: '10px 16px',
+                    background: 'none', border: 'none', textAlign: 'left',
+                    fontSize: 13, fontWeight: 500, color: '#374151',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#f9fafb'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                >
+                  View Profile
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -126,6 +181,7 @@ const ChatArea = ({ messages = [], selectedUser, currentUser, onSend, loading, i
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
             rows={1}
+            maxLength={2000}
             className="chat-textarea"
           />
           <button

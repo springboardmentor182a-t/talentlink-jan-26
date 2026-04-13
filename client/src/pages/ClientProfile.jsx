@@ -28,7 +28,7 @@ export default function ClientProfile() {
           location_city:       data.location_city       || "",
           location_state:      data.location_state      || "",
           location_country:    data.location_country    || "",
-          website:             data.website_url         || "",
+          website_url:         data.website_url         || "",
           linkedin_profile:    data.linkedin_profile    || "",
         });
         setIsPublic(data.is_public ?? true);
@@ -156,7 +156,7 @@ export default function ClientProfile() {
                 <div className="relative">
                   <Globe className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                   <input
-                    {...register("website")}
+                    {...register("website_url")}
                     className="pl-10 w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 transition"
                     placeholder="https://company.com"
                   />

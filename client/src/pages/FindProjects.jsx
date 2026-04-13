@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../services/axios';
 import ProjectCard from '../components/ProjectCard';
 import ProjectFilters from '../components/ProjectFilters';
-import '../assets/findProjects.css';
+import '../assets/projects.css';
 
 const BUDGET_RANGES = [
   { label: 'Any Budget',       min: 0,     max: Infinity },
@@ -29,7 +29,7 @@ export default function FindProjects() {
     const fetchProjects = async () => {
       try {
         const res = await axiosInstance.get('/projects/');
-        const projects = res.data;
+        const projects = res.data.items ?? res.data;
         setAllProjects(projects);
 
         // Auto-populate category filter from skills in real project data
@@ -69,10 +69,11 @@ export default function FindProjects() {
     }
     const range = BUDGET_RANGES[budgetIdx];
     if (range.min > 0 || range.max !== Infinity) {
-      const pMax = p.budget_max ?? p.budget_min ?? 0;
       const pMin = p.budget_min ?? p.budget_max ?? 0;
-      if (range.max !== Infinity && pMax > range.max) return false;
-      if (pMin < range.min) return false;
+      const pMax = p.budget_max ?? p.budget_min ?? 0;
+      // Keep project if its budget range overlaps the selected range at all
+      if (pMax < range.min) return false;
+      if (range.max !== Infinity && pMin > range.max) return false;
     }
     return true;
   });
@@ -101,18 +102,12 @@ export default function FindProjects() {
         onSearch={handleSearch}
       />
 
-      {loading && (
-        <p style={{ color: '#6b7280', padding: '20px 0' }}>Loading projects...</p>
-      )}
+      {loading && <p className="find-projects-status">Loading projects...</p>}
 
-      {!loading && error && (
-        <p style={{ color: '#dc2626', background: '#fef2f2', padding: '12px', borderRadius: '8px' }}>
-          {error}
-        </p>
-      )}
+      {!loading && error && <p className="find-projects-error">{error}</p>}
 
       {!loading && !error && filtered.length === 0 && (
-        <p style={{ color: '#6b7280', padding: '40px 0', textAlign: 'center' }}>
+        <p className="find-projects-empty">
           No projects match your search. Try adjusting your filters.
         </p>
       )}

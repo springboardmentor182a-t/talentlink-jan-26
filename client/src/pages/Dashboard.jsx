@@ -22,7 +22,7 @@ const Dashboard = () => {
       }}>
         <h1 style={{ fontFamily: 'var(--font-heading)', margin: 0 }}>Welcome back 👋</h1>
         <p style={{ color: 'var(--color-tertiary)', marginTop: '8px', fontSize: '14px', margin: '8px 0 0' }}>
-          {user?.username || user?.email}
+          {user?.client_profile?.company_name || user?.freelancer_profile?.full_name || user?.username || user?.email}
           <span style={{
             marginLeft: '10px', background: 'var(--bg-tertiary)',
             color: 'var(--color-primary)', padding: '2px 10px',

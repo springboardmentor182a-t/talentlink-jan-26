@@ -19,6 +19,9 @@ import Dashboard           from './pages/Dashboard';
 // ── Projects ──────────────────────────────────────────────────────────────────
 import FindProjects   from './pages/FindProjects';
 import BrowseProjects from './pages/BrowseProjects';
+import ClientProjects from './pages/ClientProjects';
+import PostProject    from './pages/PostProject';
+import ProjectDetail  from './pages/ProjectDetail';
 
 // ── Contracts ─────────────────────────────────────────────────────────────────
 import ContractsFreelancer from './pages/ContractsFreelancer';
@@ -92,6 +95,9 @@ export default function App() {
           <Route path="/find-projects"   element={<ProtectedRoute><FindProjects /></ProtectedRoute>} />
           <Route path="/browse-projects" element={<ProtectedRoute><BrowseProjects /></ProtectedRoute>} />
           <Route path="/jobs"            element={<ProtectedRoute><FindProjects /></ProtectedRoute>} />
+          <Route path="/my-projects"           element={<ProtectedRoute><ClientProjects /></ProtectedRoute>} />
+          <Route path="/my-projects/new"       element={<ProtectedRoute><PostProject /></ProtectedRoute>} />
+          <Route path="/my-projects/:id"       element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
 
           {/* Contracts */}
           <Route path="/contracts"             element={<ProtectedRoute><ContractsRoute /></ProtectedRoute>} />

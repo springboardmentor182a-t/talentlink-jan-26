@@ -1,26 +1,28 @@
 // client/src/pages/FreelancerView.jsx
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import { getFreelancerProfile } from "../services/api";
 
 export default function FreelancerView() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+
+  // If ?id= is present we're viewing someone else's profile; otherwise show own
+  const viewingId = searchParams.get("id");
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // 1. Get the real user ID from local storage
-        const storedUser = localStorage.getItem("user");
-        if (!storedUser) {
-          setLoading(false);
-          return;
-        }
-        const user = JSON.parse(storedUser);
-        const userId = user.id;
+        let userId = viewingId;
 
-        // 2. Fetch the profile using the dynamic ID
+        if (!userId) {
+          const storedUser = localStorage.getItem("user");
+          if (!storedUser) { setLoading(false); return; }
+          userId = JSON.parse(storedUser).id;
+        }
+
         const data = await getFreelancerProfile(userId);
         setProfile(data);
       } catch (error) {
@@ -29,19 +31,21 @@ export default function FreelancerView() {
         setLoading(false);
       }
     };
-    
     fetchProfile();
-  }, []);
+  }, [viewingId]);
+
+  const isOwnProfile = !viewingId;
 
   if (loading) return <div className="p-10 text-center text-gray-500">Loading Profile...</div>;
   
-  // If no profile exists yet, show a friendly message
   if (!profile) return (
     <div className="p-10 text-center">
       <p className="text-gray-500 mb-4">No profile found.</p>
-      <Link to="/profile/freelancer/edit" className="text-orange-500 font-bold hover:underline">
-        Create your profile here
-      </Link>
+      {isOwnProfile && (
+        <Link to="/profile/freelancer/edit" className="text-orange-500 font-bold hover:underline">
+          Create your profile here
+        </Link>
+      )}
     </div>
   );
 
@@ -56,12 +60,13 @@ export default function FreelancerView() {
               {profile.full_name?.charAt(0) || "U"}
             </div>
             
-            {/* DYNAMIC DATA IS HERE */}
             <h1 className="text-xl font-bold text-gray-900">{profile.full_name}</h1>
             <p className="text-gray-500 text-sm mb-2">{profile.title}</p>
-            <Link to="/profile/freelancer/edit" className="block w-full py-2.5 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition">
-              Edit Profile
-            </Link>
+            {isOwnProfile && (
+              <Link to="/profile/freelancer/edit" className="block w-full py-2.5 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition">
+                Edit Profile
+              </Link>
+            )}
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -84,7 +89,9 @@ export default function FreelancerView() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-bold text-gray-900">About Me</h2>
-              <Link to="/profile/freelancer/edit" className="text-sm text-orange-500 hover:underline">Edit</Link>
+              {isOwnProfile && (
+                <Link to="/profile/freelancer/edit" className="text-sm text-orange-500 hover:underline">Edit</Link>
+              )}
             </div>
             <p className="text-gray-600 leading-relaxed">
               {profile.bio || "No bio added yet."}

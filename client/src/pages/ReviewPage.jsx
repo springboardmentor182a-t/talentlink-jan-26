@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../features/hooks/useAuth';
-import './ReviewPage.css';
+import axiosInstance from '../services/axios';
+import '../assets/ReviewPage.css';
 
 const ReviewPage = () => {
   const { user, loading: authLoading } = useAuth();
@@ -9,16 +10,15 @@ const ReviewPage = () => {
   const [loading, setLoading] = useState(true);
 
   const categories = [
-    "4.0 Platform Usability",
-    "4.0 Client-Freelancer Communication",
-    "4.0 Payment Security",
-    "3.5 Project Matching Accuracy",
-    "3.0 Contract Flexibility"
+    "Platform Usability",
+    "Client-Freelancer Communication",
+    "Payment Security",
+    "Project Matching Accuracy",
+    "Contract Flexibility"
   ];
 
   useEffect(() => {
     const fetchData = async () => {
-      // Don't fetch if still checking auth or no valid user
       if (authLoading || !user?.id) {
         if (!authLoading && !user) setLoading(false);
         return;
@@ -26,16 +26,8 @@ const ReviewPage = () => {
 
       try {
         setLoading(true);
-        const envUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-        const baseUrl = envUrl.endsWith('/api') ? envUrl : `${envUrl.replace(/\/$/, '')}/api`;
+        const { data: fetchedReviews } = await axiosInstance.get(`/reviews/user/${user.id}`);
 
-        // Fetch using browser's native fetch directly
-        const response = await fetch(`${baseUrl}/reviews/user/${user.id}`);
-        if (!response.ok) throw new Error(`API Error: ${response.status}`);
-
-        const fetchedReviews = await response.json();
-
-        // Dynamically compute the exact stats needed by the new UI
         const totalCount = fetchedReviews.length;
         const dist = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
         let sum = 0;
@@ -64,18 +56,18 @@ const ReviewPage = () => {
     fetchData();
   }, [user?.id, authLoading]);
 
-  // Keep the consistent loading state and layout wrap
   if (authLoading || loading) {
     return (
       <div className="review-container">
-        <div style={{ textAlign: "center", marginTop: "50px", color: "var(--text-muted)" }}>Loading TalentLink Reviews...</div>
+        <div style={{ textAlign: "center", marginTop: "50px", color: "var(--text-muted)" }}>
+          Loading reviews...
+        </div>
       </div>
     );
   }
 
-  // Fallback to avoid error crashes if someone lands here without an account
   if (!user && !loading) {
-    return <div className="review-container">Please login to view your reviews.</div>
+    return <div className="review-container">Please login to view your reviews.</div>;
   }
 
   return (
@@ -85,7 +77,7 @@ const ReviewPage = () => {
         <p>Trusted feedback from verified clients and freelancers on TalentLink</p>
       </header>
 
-      {/* Summary Card - Values dynamically computed */}
+      {/* Summary Card */}
       <div className="summary-card">
         <div className="overall-score">
           <span className="big-score">{stats?.average_rating || '0.0'}</span>
@@ -112,7 +104,7 @@ const ReviewPage = () => {
         </div>
       </div>
 
-      {/* Category Chips - Added Here */}
+      {/* Category Chips */}
       <div className="category-row">
         {categories.map(cat => (
           <span key={cat} className="category-chip">{cat}</span>
@@ -146,7 +138,6 @@ const ReviewPage = () => {
           </div>
         )}
       </div>
-
     </div>
   );
 };

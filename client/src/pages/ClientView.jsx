@@ -1,26 +1,27 @@
 // client/src/pages/ClientView.jsx
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Briefcase, MapPin, Mail, Phone, Globe } from "lucide-react";
 import { getClientProfile } from "../services/api";
 
 export default function ClientView() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+
+  const viewingId = searchParams.get("id");
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        // 1. Get the real user ID from local storage
-        const storedUser = localStorage.getItem("user");
-        if (!storedUser) {
-          setLoading(false);
-          return;
-        }
-        const user = JSON.parse(storedUser);
-        const userId = user.id;
+        let userId = viewingId;
 
-        // 2. Fetch the client profile using dynamic ID
+        if (!userId) {
+          const storedUser = localStorage.getItem("user");
+          if (!storedUser) { setLoading(false); return; }
+          userId = JSON.parse(storedUser).id;
+        }
+
         const data = await getClientProfile(userId);
         setProfile(data);
       } catch (error) {
@@ -30,16 +31,20 @@ export default function ClientView() {
       }
     };
     fetchProfile();
-  }, []);
+  }, [viewingId]);
+
+  const isOwnProfile = !viewingId;
 
   if (loading) return <div className="p-10 text-center text-gray-500">Loading Company Profile...</div>;
 
   if (!profile) return (
     <div className="p-10 text-center">
       <p className="text-gray-500 mb-4">No company profile found.</p>
-      <Link to="/profile/client/edit" className="text-orange-500 font-bold hover:underline">
-        Create your company profile here
-      </Link>
+      {isOwnProfile && (
+        <Link to="/profile/client/edit" className="text-orange-500 font-bold hover:underline">
+          Create your company profile here
+        </Link>
+      )}
     </div>
   );
 
@@ -67,9 +72,11 @@ export default function ClientView() {
                   </div>
                 </div>
               </div>
-              <Link to="/profile/client/edit" className="px-4 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition shadow-sm">
-                Edit Profile
-              </Link>
+              {isOwnProfile && (
+                <Link to="/profile/client/edit" className="px-4 py-2 bg-orange-500 text-white font-medium rounded-lg hover:bg-orange-600 transition shadow-sm">
+                  Edit Profile
+                </Link>
+              )}
             </div>
           </div>
         </div>

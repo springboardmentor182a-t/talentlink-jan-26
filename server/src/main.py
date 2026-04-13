@@ -13,13 +13,14 @@ from src.database.core import engine, Base, get_db, SessionLocal
 
 # ── Entity registration — all tables picked up by Base.metadata.create_all ───
 import src.entities.user      # noqa: F401
-import src.entities.todo      # noqa: F401
-import src.entities.message   # noqa: F401
-import src.entities.contract  # noqa: F401
+import src.todos.models         # noqa: F401  2190 ORM merged from entities/todo.py (Session 7)
+import src.messages.models       # noqa: F401  ← ORM + Pydantic schemas (merged this session)
+import src.contracts.models  # noqa: F401
 import src.users.models       # noqa: F401
 import src.reviews.models     # noqa: F401
-import src.projects.models    # noqa: F401
-import src.entities.project   # noqa: F401
+import src.projects.models    # noqa: F401  ← single source of truth for Project table
+import src.proposals.models      # noqa: F401
+import src.saved_projects.models  # noqa: F401
 
 from src.rate_limiter import rate_limit_middleware
 from src.exceptions import error_handler_middleware
@@ -30,6 +31,8 @@ from src.messages.controller import router as messages_router
 from src.reviews.router import router as reviews_router
 from src.contracts.controller import router as contracts_router
 from src.projects.router import router as projects_router
+from src.proposals.router import router as proposals_router
+from src.saved_projects.router import router as saved_projects_router
 
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 
@@ -85,8 +88,9 @@ app.include_router(todos_router,     prefix="/api/todos",     tags=["Todos"])
 app.include_router(messages_router,  prefix="/api/messages",  tags=["Messages"])
 app.include_router(reviews_router)
 app.include_router(contracts_router, prefix="/api/contracts", tags=["Contracts"])
-app.include_router(projects_router,  prefix="/api",           tags=["Projects"])
-
+app.include_router(projects_router, prefix="/api/projects", tags=["Projects"])
+app.include_router(proposals_router,     prefix="/api/proposals",      tags=["Proposals"])
+app.include_router(saved_projects_router, prefix="/api/saved-projects", tags=["Saved Projects"])
 
 # ── WebSocket Connection Manager ──────────────────────────────────────────────
 class ConnectionManager:

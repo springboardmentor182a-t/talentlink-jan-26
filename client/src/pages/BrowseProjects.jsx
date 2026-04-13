@@ -10,7 +10,7 @@ const BrowseProjects = () => {
 
   useEffect(() => {
     axiosInstance.get("/projects/")
-      .then(res => setProjects(res.data))
+      .then(res => setProjects(res.data?.items ?? res.data ?? []))
       .catch(err => console.error("Error fetching projects:", err))
       .finally(() => setLoading(false));
   }, []);

@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ContractsService from '../features/services/contracts';
+import ReviewModal from '../components/ReviewModal';
+import { useAuth } from '../features/hooks/useAuth';
 import '../assets/contracts.css';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -44,17 +47,18 @@ function formatBudget(amount) {
 
 // ── New Contract Modal ─────────────────────────────────────────────────────
 
-function NewContractModal({ onClose, onCreate }) {
+function NewContractModal({ onClose, onCreate, prefill = {} }) {
   const [form, setForm] = useState({
-    proposal_id: '',
-    title:       '',
-    budget:      '',
+    proposal_id: prefill.proposal_id ?? '',
+    title:       prefill.title       ?? '',
+    budget:      prefill.budget      ?? '',
     terms:       '',
-    start_date:  '',
+    start_date:  prefill.start_date  ?? '',
     end_date:    '',
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError]           = useState(null);
+  const toIso = (d) => d ? `${d}T00:00:00` : null;
 
   const set = (field) => (e) => setForm(prev => ({ ...prev, [field]: e.target.value }));
 
@@ -71,8 +75,8 @@ function NewContractModal({ onClose, onCreate }) {
         title:       form.title.trim(),
         budget:      parseFloat(form.budget),
         terms:       form.terms.trim() || null,
-        start_date:  form.start_date || null,
-        end_date:    form.end_date || null,
+        start_date:  toIso(form.start_date),   // "2026-04-08" → "2026-04-08T00:00:00"
+        end_date:    toIso(form.end_date),
       });
     } catch (err) {
       setError(err.response?.data?.detail ?? 'Failed to create contract.');
@@ -95,16 +99,33 @@ function NewContractModal({ onClose, onCreate }) {
             </p>
           )}
 
-          <div className="new-contract-field">
-            <label className="new-contract-label">Proposal ID</label>
-            <input
-              className="new-contract-input"
-              type="number"
-              placeholder="Enter proposal ID"
-              value={form.proposal_id}
-              onChange={set('proposal_id')}
-            />
-          </div>
+          {prefill.proposal_id ? (
+            <div className="new-contract-field">
+              <label className="new-contract-label">Proposal</label>
+              <div style={{
+                padding: '8px 12px',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 13,
+                fontFamily: 'var(--font-text)',
+                color: 'var(--color-secondary)',
+              }}>
+                Proposal #{prefill.proposal_id} — {prefill.freelancer_name ?? 'Freelancer'}
+              </div>
+            </div>
+          ) : (
+            <div className="new-contract-field">
+              <label className="new-contract-label">Proposal ID</label>
+              <input
+                className="new-contract-input"
+                type="number"
+                placeholder="Enter proposal ID"
+                value={form.proposal_id}
+                onChange={set('proposal_id')}
+              />
+            </div>
+          )}
 
           <div className="new-contract-field">
             <label className="new-contract-label">Contract Title</label>
@@ -141,12 +162,22 @@ function NewContractModal({ onClose, onCreate }) {
           </div>
 
           <div className="new-contract-field">
-            <label className="new-contract-label">Terms (optional)</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <label className="new-contract-label">Terms</label>
+              <span style={{
+                fontSize: 11,
+                fontFamily: 'var(--font-text)',
+                color: form.terms.length >= 150 ? '#22c55e' : 'var(--color-tertiary)',
+              }}>
+                {form.terms.length} / 150 min
+              </span>
+            </div>
             <textarea
               className="new-contract-textarea"
-              placeholder="Describe scope, deliverables, payment schedule..."
+              placeholder="Describe the project scope, deliverables, revision rounds, and payment schedule. Must be at least 150 characters before sending."
               value={form.terms}
               onChange={set('terms')}
+              maxLength={5000}
             />
           </div>
         </div>
@@ -156,7 +187,7 @@ function NewContractModal({ onClose, onCreate }) {
           <button
             className="btn-primary btn-sm"
             onClick={handleSubmit}
-            disabled={submitting}
+            disabled={submitting || (error && error.includes('already exists'))}
           >
             {submitting ? 'Creating…' : 'Create Contract'}
           </button>
@@ -417,7 +448,7 @@ function ContractDetailModal({ contract, onClose }) {
 
 // ── Contract Row ───────────────────────────────────────────────────────────
 
-function ContractRow({ contract, onSend, onView, onCancel, onRenegotiate }) {
+function ContractRow({ contract, onSend, onView, onCancel, onRenegotiate, onReview, reviewedIds }) {
   const { status, progress } = contract;
 
   return (
@@ -457,9 +488,16 @@ function ContractRow({ contract, onSend, onView, onCancel, onRenegotiate }) {
 
       <div className="contract-row__actions">
         {status === 'draft' && (
-          <button className="btn-primary btn-sm" onClick={() => onSend(contract.id)}>
-            Send Contract
-          </button>
+          <>
+            {contract.terms && contract.terms.trim().length < 150 && (
+              <span style={{ fontSize: 12, color: '#f59e0b', fontFamily: 'var(--font-text)' }}>
+                Terms too short to send
+              </span>
+            )}
+            <button className="btn-primary btn-sm" onClick={() => onSend(contract.id)}>
+              Send Contract
+            </button>
+          </>
         )}
         {status === 'rejected' && (
           <button className="btn-outline btn-sm" onClick={() => onRenegotiate(contract)}>
@@ -477,9 +515,16 @@ function ContractRow({ contract, onSend, onView, onCancel, onRenegotiate }) {
           </>
         )}
         {status === 'completed' && (
-          <button className="btn-secondary btn-sm" onClick={() => onView(contract)}>
-            View Details
-          </button>
+          <>
+            <button className="btn-secondary btn-sm" onClick={() => onView(contract)}>
+              View Details
+            </button>
+            {!reviewedIds.has(contract.id) && (
+              <button className="btn-primary btn-sm" onClick={() => onReview(contract)}>
+                Leave a Review
+              </button>
+            )}
+          </>
         )}
         {status === 'pending_sign' && (
           <button className="btn-secondary btn-sm" onClick={() => onView(contract)}>
@@ -494,14 +539,21 @@ function ContractRow({ contract, onSend, onView, onCancel, onRenegotiate }) {
 // ── Main Page ──────────────────────────────────────────────────────────────
 
 const ContractsClient = () => {
+  const location = useLocation();
+  const navigate  = useNavigate();
+  const { user }  = useAuth();
+
   const [contracts, setContracts]       = useState([]);
   const [loading, setLoading]           = useState(true);
   const [error, setError]               = useState(null);
   const [activeFilter, setActiveFilter] = useState('all');
   const [search, setSearch]             = useState('');
   const [showNewModal, setShowNewModal] = useState(false);
+  const [modalPrefill, setModalPrefill] = useState({});
   const [renegotiateContract, setRenegotiateContract] = useState(null);
   const [actionError, setActionError]                  = useState(null);
+  const [reviewContract, setReviewContract]            = useState(null);
+  const [reviewedIds, setReviewedIds]                  = useState(new Set());
 
   useEffect(() => {
     const fetchContracts = async () => {
@@ -516,6 +568,23 @@ const ContractsClient = () => {
     };
     fetchContracts();
   }, []);
+
+  // Auto-open modal pre-filled when arriving from ClientProjects via
+  // navigate(`/contracts?proposal_id=X&prefill=true`)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const proposalId = params.get('proposal_id');
+    const prefill    = params.get('prefill');
+    if (proposalId && prefill === 'true') {
+      setModalPrefill({
+        proposal_id:    parseInt(proposalId, 10),
+        freelancer_name: decodeURIComponent(params.get('freelancer_name') ?? ''),
+      });
+      setShowNewModal(true);
+      // Clean the URL so a page refresh doesn't re-open the modal
+      navigate('/contracts', { replace: true });
+    }
+  }, [location.search, navigate]);
 
   // Filter tab counts are computed from the full array, not the search-filtered one
   const countFor = (tab) => tab === 'all' ? contracts.length : contracts.filter(c => c.status === tab).length;
@@ -599,7 +668,7 @@ const ContractsClient = () => {
               onChange={e => setSearch(e.target.value)}
             />
           </div>
-          <button className="btn-primary btn-sm" onClick={() => setShowNewModal(true)}>
+          <button className="btn-primary btn-sm" onClick={() => { setModalPrefill({}); setShowNewModal(true); }}>
             + New Contract
           </button>
         </div>
@@ -662,6 +731,8 @@ const ContractsClient = () => {
               onView={handleView}
               onCancel={(id) => setCancelTarget(id)}
               onRenegotiate={(c) => setRenegotiateContract(c)}
+              onReview={(c) => setReviewContract(c)}
+              reviewedIds={reviewedIds}
             />
           ))}
         </div>
@@ -669,8 +740,9 @@ const ContractsClient = () => {
 
       {showNewModal && (
         <NewContractModal
-          onClose={() => setShowNewModal(false)}
+          onClose={() => { setShowNewModal(false); setModalPrefill({}); }}
           onCreate={handleCreate}
+          prefill={modalPrefill}
         />
       )}
 
@@ -686,6 +758,18 @@ const ContractsClient = () => {
         <ContractDetailModal
           contract={detailContract}
           onClose={() => setDetailContract(null)}
+        />
+      )}
+
+      {reviewContract && user && (
+        <ReviewModal
+          contract={reviewContract}
+          currentUserId={user.id}
+          onClose={() => setReviewContract(null)}
+          onSubmitted={(contractId) => {
+            setReviewedIds(prev => new Set([...prev, contractId]));
+            setReviewContract(null);
+          }}
         />
       )}
     </div>
