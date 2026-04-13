@@ -1,19 +1,23 @@
 # Server (Backend)
 
-This folder contains the backend API.
+This folder contains the FastAPI backend.
 
 ## Tech Stack
 - FastAPI
 - SQLAlchemy
-- SQLite (default database)
+- PostgreSQL
 - JWT Authentication
+- WebSockets (real-time messaging)
+- Groq AI (AI features)
 
 ## Features
-- User registration
-- User login
-- Password hashing
-- Token-based authentication
-- Database integration
+- User registration & login
+- Google & GitHub OAuth
+- JWT token authentication
+- Password hashing with bcrypt
+- Real-time messaging via WebSockets
+- Real-time notifications
+- AI-powered features
 
 ## Installation
 
@@ -34,14 +38,15 @@ This folder contains the backend API.
 4. Install dependencies:
    pip install -r requirements.txt
 
-## Running the Server
+5. Create .env file:
+   DATABASE_URL=postgresql://user:password@localhost:5432/talentlink
+   SECRET_KEY=your_secret_key
+   GROQ_API_KEY=your_groq_key
+   FRONTEND_URL=http://localhost:3000
 
-Start the server with:
+## Running the Server
 
 uvicorn src.main:app --reload
 
-The backend runs on:
-http://localhost:8000
-
-API documentation:
-http://localhost:8000/docs
+Backend runs at:   http://localhost:8000
+API docs at:       http://localhost:8000/docs

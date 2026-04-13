@@ -1,14 +1,16 @@
-import { useEffect, useState, useContext, useRef } from "react";
+import { useEffect, useState, useContext, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import { NotificationContext } from "../../context/NotificationContext";
 import api from "../../utils/api";
 
 export default function Messages({ onNavigate }) {
-  const { user, role } = useContext(AuthContext);
-  const location       = useLocation();
-  const bottomRef      = useRef(null);
-  const inputRef       = useRef(null);
-  const wsRef          = useRef(null);
+  const { user, role }               = useContext(AuthContext);
+  const { enterMessages, leaveMessages } = useContext(NotificationContext);
+  const location                     = useLocation();
+  const bottomRef                    = useRef(null);
+  const inputRef                     = useRef(null);
+  const wsRef                        = useRef(null);
 
   const params         = new URLSearchParams(location.search);
   const initFreelancer = params.get("freelancer");
@@ -24,7 +26,15 @@ export default function Messages({ onNavigate }) {
   const [searchQuery, setSearchQuery]     = useState("");
   const [connected, setConnected]         = useState(false);
 
-  // ── Theme based on role ──────────────────────────────
+  // ✅ On mount: clear badge + stop incrementing + mark DB notifications as read
+  useEffect(() => {
+    enterMessages();
+    if (user?.id) {
+      api.patch(`/notifications/${user.id}/read-messages`).catch(() => {});
+    }
+    return () => leaveMessages();
+  }, [enterMessages, leaveMessages, user?.id]);
+
   const isFreelancer = role === "freelancer";
   const theme = isFreelancer
     ? {
@@ -60,8 +70,22 @@ export default function Messages({ onNavigate }) {
     if (onNavigate) onNavigate(theme.backPage);
   };
 
-  // ── Load conversations ───────────────────────────────
-  const loadConversations = async () => {
+  const updateConversationLocally = useCallback((msg) => {
+    setConversations(prev => {
+      const otherId = msg.sender_id === user.id ? msg.receiver_id : msg.sender_id;
+      const existing = prev.find(c => c.other_user_id === otherId);
+      if (existing) {
+        return prev.map(c =>
+          c.other_user_id === otherId
+            ? { ...c, last_message: msg.content, last_message_at: msg.created_at }
+            : c
+        );
+      }
+      return prev;
+    });
+  }, [user?.id]);
+
+  const loadConversations = useCallback(async () => {
     try {
       const res = await api.get(`/messages/conversations/${user.id}`);
       setConversations(res.data);
@@ -84,10 +108,9 @@ export default function Messages({ onNavigate }) {
     } finally {
       setLoadingConvs(false);
     }
-  };
+  }, [user?.id, initFreelancer, initName]);
 
-  // ── Load messages (initial load only) ───────────────
-  const loadMessages = async () => {
+  const loadMessages = useCallback(async () => {
     if (!activeConv?.other_user_id) return;
     try {
       setLoadingMsgs(true);
@@ -98,65 +121,41 @@ export default function Messages({ onNavigate }) {
     } finally {
       setLoadingMsgs(false);
     }
-  };
+  }, [user?.id, activeConv?.other_user_id]);
 
-  // ── WebSocket connect/disconnect on active conversation change ──
   useEffect(() => {
     if (!activeConv?.other_user_id || !user?.id) return;
+    if (wsRef.current) wsRef.current.close();
 
-    // Close previous WebSocket if any
-    if (wsRef.current) {
-      wsRef.current.close();
-    }
-
-    const wsUrl = `ws://localhost:8000/messages/ws/${user.id}/${activeConv.other_user_id}`;
-    const ws = new WebSocket(wsUrl);
+    const ws = new WebSocket(`ws://localhost:8000/messages/ws/${user.id}/${activeConv.other_user_id}`);
     wsRef.current = ws;
 
-    ws.onopen = () => {
-      setConnected(true);
-    };
-
+    ws.onopen = () => setConnected(true);
     ws.onmessage = (event) => {
       const msg = JSON.parse(event.data);
       setMessages(prev => {
-        // Avoid duplicate messages
         if (prev.find(m => m.id === msg.id)) return prev;
         return [...prev, msg];
       });
-      // Refresh conversation list to update last message
-      loadConversations();
+      updateConversationLocally(msg);
     };
+    ws.onclose  = () => setConnected(false);
+    ws.onerror  = (err) => { console.error("WebSocket error:", err); setConnected(false); };
 
-    ws.onclose = () => {
-      setConnected(false);
-    };
+    return () => ws.close();
+  }, [activeConv?.other_user_id, user?.id, updateConversationLocally]);
 
-    ws.onerror = (err) => {
-      console.error("WebSocket error:", err);
-      setConnected(false);
-    };
-
-    return () => {
-      ws.close();
-    };
-  }, [activeConv?.other_user_id, user?.id]);
-
-  useEffect(() => { if (user) loadConversations(); }, [user]);
-  useEffect(() => { if (activeConv) loadMessages(); }, [activeConv?.other_user_id]);
+  useEffect(() => { if (user) loadConversations(); }, [user, loadConversations]);
+  useEffect(() => { if (activeConv) loadMessages(); }, [activeConv?.other_user_id, loadMessages]);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
-  // ── Send message via WebSocket ───────────────────────
   const sendMessage = async () => {
     if (!text.trim() || !activeConv) return;
-
-    // Use WebSocket if connected
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify({ content: text.trim() }));
       setText("");
       inputRef.current?.focus();
     } else {
-      // Fallback to REST API if WebSocket not connected
       try {
         setSending(true);
         await api.post("/messages/", {
@@ -211,10 +210,8 @@ export default function Messages({ onNavigate }) {
   return (
     <div style={{ display: "flex", height: "100vh", fontFamily: "'Segoe UI',sans-serif", backgroundColor: "#f8fafc", overflow: "hidden" }}>
 
-      {/* ── Sidebar ── */}
+      {/* Sidebar */}
       <div style={{ width: 320, borderRight: "1px solid #e2e8f0", display: "flex", flexDirection: "column", backgroundColor: "#fff", flexShrink: 0 }}>
-
-        {/* Header */}
         <div style={{ background: theme.headerBg, padding: "24px 20px 20px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
             <div>
@@ -240,7 +237,6 @@ export default function Messages({ onNavigate }) {
           </div>
         </div>
 
-        {/* Conversation List */}
         <div style={{ flex: 1, overflowY: "auto" }}>
           {loadingConvs && (
             <div style={{ padding: 24, textAlign: "center", color: "#64748b", fontSize: 14 }}>Loading...</div>
@@ -299,7 +295,7 @@ export default function Messages({ onNavigate }) {
         </div>
       </div>
 
-      {/* ── Chat Area ── */}
+      {/* Chat Area */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
         {!activeConv ? (
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
@@ -309,7 +305,6 @@ export default function Messages({ onNavigate }) {
           </div>
         ) : (
           <>
-            {/* Chat Header */}
             <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #e2e8f0", padding: "16px 24px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
               <div style={{ width: 44, height: 44, borderRadius: "50%", background: getAvatarColor(activeConv.other_user_id), display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: 18, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
                 {getInitial(activeConv.other_name)}
@@ -325,7 +320,6 @@ export default function Messages({ onNavigate }) {
               </div>
             </div>
 
-            {/* Messages */}
             <div style={{ flex: 1, overflowY: "auto", padding: "24px", display: "flex", flexDirection: "column", gap: 4, backgroundColor: "#f8fafc" }}>
               {loadingMsgs && (
                 <div style={{ textAlign: "center", color: "#64748b", fontSize: 14, padding: 24 }}>Loading messages...</div>
@@ -380,7 +374,6 @@ export default function Messages({ onNavigate }) {
               <div ref={bottomRef} />
             </div>
 
-            {/* Input */}
             <div style={{ backgroundColor: "#fff", borderTop: "1px solid #e2e8f0", padding: "16px 24px", display: "flex", gap: 12, alignItems: "flex-end" }}>
               <textarea
                 ref={inputRef}

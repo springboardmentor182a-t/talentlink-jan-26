@@ -1,7 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
+import { NotificationProvider } from "./context/NotificationContext";
 import { LogOut } from "lucide-react";
+import Toast from "./components/Toast";
+import NotificationBell from "./components/NotificationBell";
+import AiChat from "./components/AiChat";
 
 // Auth
 import ChooseRole       from "./pages/auth/ChooseRole";
@@ -35,13 +39,13 @@ import Reviews          from "./pages/Reviews/Reviews";
 import "./App.css";
 
 const routeLabels = {
-  "/dashboard":    "Dashboard",
-  "/profile":      "Profile",
-  "/post-project": "Post Project",
-  "/projects":     "Project Management",
-  "/contracts":    "Contract Management",
-  "/messages":     "Messages",
-  "/reviews":      "Reviews",
+  "/dashboard":      "Dashboard",
+  "/profile":        "Profile",
+  "/post-project":   "Post Project",
+  "/projects":       "Project Management",
+  "/contracts":      "Contract Management",
+  "/messages":       "Messages",
+  "/reviews":        "Reviews",
   "/view-proposals": "View Proposals",
 };
 
@@ -80,14 +84,13 @@ function ClientTopbar() {
       zIndex:          100,
       boxShadow:       "0 1px 3px rgba(0,0,0,0.05)",
     }}>
-      {/* Left: page label */}
       <div style={{ display:"flex", alignItems:"center", gap:8 }}>
         <div style={{ width:8, height:8, borderRadius:"50%", background:"linear-gradient(135deg,#1e3a5f,#2563eb)" }} />
         <span style={{ fontWeight:700, fontSize:15, color:"#111827" }}>{label}</span>
       </div>
 
-      {/* Right: avatar + name + logout */}
       <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+        <NotificationBell theme="blue" />
         <div style={{ display:"flex", alignItems:"center", gap:10, backgroundColor:"#f8fafc", padding:"6px 14px", borderRadius:20, border:"1px solid #e2e8f0" }}>
           <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#1e3a5f,#2563eb)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:13, boxShadow:"0 2px 8px rgba(37,99,235,0.2)", flexShrink:0 }}>
             {(user?.name || "C").charAt(0).toUpperCase()}
@@ -122,9 +125,16 @@ function DashboardLayout({ children }) {
   );
 }
 
+// Only show AiChat when user is logged in
+function AiChatWrapper() {
+  const { user } = useContext(AuthContext);
+  if (!user) return null;
+  return <AiChat />;
+}
+
 function AppRoutes() {
   return (
-    <BrowserRouter>
+    <>
       <Routes>
         {/* Auth */}
         <Route path="/"                  element={<ChooseRole />} />
@@ -153,7 +163,7 @@ function AppRoutes() {
           <ProtectedRoute allowedRole="freelancer"><FreelancerDashboard defaultPage="messages" /></ProtectedRoute>
         } />
 
-        {/* Client — all inside DashboardLayout */}
+        {/* Client */}
         <Route path="/client/dashboard" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={
           <ProtectedRoute allowedRole="client">
@@ -198,10 +208,23 @@ function AppRoutes() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </BrowserRouter>
+
+      {/* AiChat floats over every page, only when logged in */}
+      <AiChatWrapper />
+    </>
   );
 }
 
 export default function App() {
-  return <AuthProvider><AppRoutes /></AuthProvider>;
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        {/* NotificationProvider is now INSIDE BrowserRouter so useLocation() works */}
+        <NotificationProvider>
+          <AppRoutes />
+          <Toast />
+        </NotificationProvider>
+      </BrowserRouter>
+    </AuthProvider>
+  );
 }

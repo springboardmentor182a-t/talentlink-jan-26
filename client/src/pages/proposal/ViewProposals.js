@@ -7,10 +7,15 @@ export default function ViewProposals() {
   const { projectId } = useParams();
   const { user, loading: authLoading } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [proposals, setProposals] = useState([]);
-  const [project, setProject]     = useState(null);
-  const [loading, setLoading]     = useState(true);
-  const [error, setError]         = useState("");
+  const [proposals, setProposals]       = useState([]);
+  const [project, setProject]           = useState(null);
+  const [loading, setLoading]           = useState(true);
+  const [error, setError]               = useState("");
+  const [matchScores, setMatchScores]   = useState({});
+  const [matchLoading, setMatchLoading] = useState({});
+  const [rankings, setRankings]         = useState([]);
+  const [rankLoading, setRankLoading]   = useState(false);
+  const [showRanked, setShowRanked]     = useState(false);
 
   const load = async () => {
     try {
@@ -40,6 +45,38 @@ export default function ViewProposals() {
     catch (err) { console.error("Reject error:", err.response?.data || err.message); }
   };
 
+  const checkMatchScore = async (freelancerId) => {
+    setMatchLoading(prev => ({ ...prev, [freelancerId]: true }));
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.get(`/ai/match-score-client/${projectId}/${freelancerId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMatchScores(prev => ({ ...prev, [freelancerId]: res.data }));
+    } catch (err) {
+      console.error("Match score error:", err.message);
+    } finally {
+      setMatchLoading(prev => ({ ...prev, [freelancerId]: false }));
+    }
+  };
+
+  const rankAllProposals = async () => {
+    setRankLoading(true);
+    setShowRanked(false);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.get(`/ai/rank-proposals/${projectId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setRankings(res.data);
+      setShowRanked(true);
+    } catch (err) {
+      console.error("Ranking error:", err.message);
+    } finally {
+      setRankLoading(false);
+    }
+  };
+
   if (authLoading) return <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"60vh" }}><p>Loading...</p></div>;
   if (!user) return <Navigate to="/client/login" replace />;
 
@@ -49,6 +86,8 @@ export default function ViewProposals() {
     accepted: proposals.filter(p => p.status === "accepted").length,
     rejected: proposals.filter(p => p.status === "rejected").length,
   };
+
+  const getRankInfo = (proposalId) => rankings.find(r => r.id === proposalId);
 
   return (
     <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#f8fafc", minHeight:"100vh" }}>
@@ -132,6 +171,47 @@ export default function ViewProposals() {
           </div>
         )}
 
+        {/* ✅ AI RANK ALL BUTTON */}
+        {proposals.length > 1 && (
+          <div style={{ backgroundColor:"#fff", borderRadius:12, padding:"20px 24px", marginBottom:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <div>
+              <div style={{ fontWeight:700, fontSize:15, color:"#111827" }}>📋 AI Proposal Ranking</div>
+              <div style={{ fontSize:13, color:"#64748b", marginTop:2 }}>Let AI rank all proposals by best fit for your project</div>
+            </div>
+            <button onClick={rankAllProposals} disabled={rankLoading}
+              style={{ padding:"10px 24px", background:"linear-gradient(135deg,#7c3aed,#a855f7)", color:"white", border:"none", borderRadius:10, cursor:"pointer", fontWeight:700, fontSize:14, boxShadow:"0 2px 8px rgba(124,58,237,0.3)", opacity: rankLoading ? 0.7 : 1 }}>
+              {rankLoading ? "⏳ Ranking..." : "🤖 Rank All Proposals"}
+            </button>
+          </div>
+        )}
+
+        {/* ✅ RANKED RESULTS */}
+        {showRanked && rankings.length > 0 && (
+          <div style={{ backgroundColor:"#faf5ff", borderRadius:16, padding:24, marginBottom:24, border:"1px solid #ddd6fe" }}>
+            <div style={{ fontSize:15, fontWeight:700, color:"#7c3aed", marginBottom:16 }}>🏆 AI Proposal Rankings</div>
+            {rankings.map((r, i) => (
+              <div key={r.id} style={{ display:"flex", alignItems:"center", gap:16, padding:"14px 16px", backgroundColor:"#fff", borderRadius:12, border:`2px solid ${i === 0 ? "#f59e0b" : i === 1 ? "#94a3b8" : i === 2 ? "#b45309" : "#e2e8f0"}`, marginBottom:10 }}>
+                <div style={{ width:40, height:40, borderRadius:12, background: i === 0 ? "linear-gradient(135deg,#f59e0b,#fbbf24)" : i === 1 ? "linear-gradient(135deg,#94a3b8,#cbd5e1)" : i === 2 ? "linear-gradient(135deg,#b45309,#d97706)" : "linear-gradient(135deg,#e2e8f0,#f1f5f9)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, fontSize:18, color:"white" }}>
+                  {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${r.rank}`}
+                </div>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontWeight:700, fontSize:14, color:"#111827" }}>{r.freelancer_name}</div>
+                  <div style={{ fontSize:12, color:"#64748b", marginTop:2 }}>{r.reason}</div>
+                  <div style={{ display:"flex", gap:12, marginTop:6 }}>
+                    <span style={{ fontSize:11, color: r.budget_fit === "good" ? "#16a34a" : r.budget_fit === "fair" ? "#d97706" : "#dc2626", fontWeight:600 }}>
+                      💰 Budget: {r.budget_fit}
+                    </span>
+                    <span style={{ fontSize:11, color: r.delivery_fit === "good" ? "#16a34a" : r.delivery_fit === "fair" ? "#d97706" : "#dc2626", fontWeight:600 }}>
+                      🕐 Delivery: {r.delivery_fit}
+                    </span>
+                  </div>
+                </div>
+                <div style={{ fontSize:24, fontWeight:800, color:"#7c3aed" }}>{r.score}%</div>
+              </div>
+            ))}
+          </div>
+        )}
+
         {error && (
           <div style={{ backgroundColor:"#fef2f2", border:"1.5px solid #fca5a5", borderRadius:10, padding:"12px 16px", fontSize:13, color:"#b91c1c", marginBottom:16 }}>
             ⚠️ {error}
@@ -150,8 +230,9 @@ export default function ViewProposals() {
 
         {proposals.map(p => {
           const freelancerName = p.freelancer_name || `Freelancer #${p.freelancer_id}`;
+          const rankInfo = getRankInfo(p.id);
           return (
-            <div key={p.id} style={{ backgroundColor:"#fff", borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}
+            <div key={p.id} style={{ backgroundColor:"#fff", borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border: rankInfo?.rank === 1 ? "2px solid #f59e0b" : "1px solid #e2e8f0" }}
               onMouseEnter={e => e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.1)"}
               onMouseLeave={e => e.currentTarget.style.boxShadow="0 1px 3px rgba(0,0,0,0.06)"}>
 
@@ -165,14 +246,21 @@ export default function ViewProposals() {
                     <div style={{ fontSize:12, color:"#64748b", marginTop:3 }}>Freelancer</div>
                   </div>
                 </div>
-                <span style={{
-                  padding:"6px 16px", borderRadius:20, fontSize:12, fontWeight:700,
-                  background: p.status==="pending" ? "linear-gradient(135deg,#f8fafc,#f1f5f9)" : p.status==="accepted" ? "linear-gradient(135deg,#f0fdf4,#dcfce7)" : "linear-gradient(135deg,#fef2f2,#fee2e2)",
-                  color: p.status==="pending" ? "#374151" : p.status==="accepted" ? "#166534" : "#dc2626",
-                  border:`1px solid ${p.status==="pending" ? "#e2e8f0" : p.status==="accepted" ? "#86efac" : "#fca5a5"}`
-                }}>
-                  {p.status}
-                </span>
+                <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                  {rankInfo && (
+                    <span style={{ padding:"4px 12px", borderRadius:20, fontSize:12, fontWeight:700, backgroundColor:"#faf5ff", color:"#7c3aed", border:"1px solid #ddd6fe" }}>
+                      #{rankInfo.rank} — {rankInfo.score}%
+                    </span>
+                  )}
+                  <span style={{
+                    padding:"6px 16px", borderRadius:20, fontSize:12, fontWeight:700,
+                    background: p.status==="pending" ? "linear-gradient(135deg,#f8fafc,#f1f5f9)" : p.status==="accepted" ? "linear-gradient(135deg,#f0fdf4,#dcfce7)" : "linear-gradient(135deg,#fef2f2,#fee2e2)",
+                    color: p.status==="pending" ? "#374151" : p.status==="accepted" ? "#166534" : "#dc2626",
+                    border:`1px solid ${p.status==="pending" ? "#e2e8f0" : p.status==="accepted" ? "#86efac" : "#fca5a5"}`
+                  }}>
+                    {p.status}
+                  </span>
+                </div>
               </div>
 
               {p.cover_letter && (
@@ -222,6 +310,39 @@ export default function ViewProposals() {
                   </button>
                 </div>
               )}
+
+              {/* ✅ AI MATCH SCORE BUTTON */}
+              <button onClick={() => checkMatchScore(p.freelancer_id)}
+                disabled={matchLoading[p.freelancer_id]}
+                style={{ width:"100%", padding:"12px", marginTop:12, backgroundColor:"#fff", color:"#2563eb", border:"1.5px solid #2563eb", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14, opacity: matchLoading[p.freelancer_id] ? 0.7 : 1 }}>
+                {matchLoading[p.freelancer_id] ? "⏳ Analyzing..." : "🤖 Check AI Match Score"}
+              </button>
+
+              {/* ✅ AI MATCH SCORE RESULT */}
+              {matchScores[p.freelancer_id] && (
+                <div style={{ marginTop:12, padding:16, backgroundColor:"#eff6ff", borderRadius:12, border:"1px solid #bfdbfe" }}>
+                  <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:10 }}>
+                    <div style={{ fontSize:32, fontWeight:800, color:"#2563eb" }}>{matchScores[p.freelancer_id].score}%</div>
+                    <div>
+                      <div style={{ fontSize:13, fontWeight:700, color:"#111827" }}>AI Match Score</div>
+                      <div style={{ fontSize:12, color:"#64748b" }}>{matchScores[p.freelancer_id].summary}</div>
+                    </div>
+                  </div>
+                  {matchScores[p.freelancer_id].matching_skills?.length > 0 && (
+                    <div style={{ marginBottom:6 }}>
+                      <span style={{ fontSize:12, fontWeight:600, color:"#16a34a" }}>✅ Matching: </span>
+                      <span style={{ fontSize:12, color:"#374151" }}>{matchScores[p.freelancer_id].matching_skills.join(", ")}</span>
+                    </div>
+                  )}
+                  {matchScores[p.freelancer_id].missing_skills?.length > 0 && (
+                    <div>
+                      <span style={{ fontSize:12, fontWeight:600, color:"#dc2626" }}>❌ Missing: </span>
+                      <span style={{ fontSize:12, color:"#374151" }}>{matchScores[p.freelancer_id].missing_skills.join(", ")}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
             </div>
           );
         })}

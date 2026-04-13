@@ -6,6 +6,7 @@ from .schema import ProposalCreate, ProposalResponse
 from src.projects.model import Project
 from src.entities.contract import Contract
 from src.entities.user import User
+from src.notifications.controller import create_and_send_notification
 
 router = APIRouter(tags=["Proposals"])
 
@@ -24,17 +25,32 @@ def enrich_proposal(proposal: Proposal, db: Session) -> dict:
 
 
 @router.post("/", response_model=ProposalResponse)
-def create_proposal(data: ProposalCreate, db: Session = Depends(get_db)):
+async def create_proposal(data: ProposalCreate, db: Session = Depends(get_db)):
     existing = db.query(Proposal).filter(
         Proposal.project_id    == data.project_id,
         Proposal.freelancer_id == data.freelancer_id
     ).first()
     if existing:
         raise HTTPException(status_code=400, detail="You have already submitted a proposal for this project.")
+
     proposal = Proposal(**data.dict())
     db.add(proposal)
     db.commit()
     db.refresh(proposal)
+
+    # ── Notify client about new proposal ─────────────────────
+    project    = db.query(Project).filter(Project.id == data.project_id).first()
+    freelancer = db.query(User).filter(User.id == data.freelancer_id).first()
+
+    if project and project.client_id and freelancer:
+        await create_and_send_notification(
+            db,
+            user_id = project.client_id,
+            title   = "New Proposal Received 📋",
+            message = f"{freelancer.name} submitted a proposal for '{project.title}'",
+            type    = "proposal"
+        )
+
     return enrich_proposal(proposal, db)
 
 
@@ -60,7 +76,7 @@ def complete_contract(project_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{proposal_id}/accept")
-def accept_proposal(proposal_id: int, db: Session = Depends(get_db)):
+async def accept_proposal(proposal_id: int, db: Session = Depends(get_db)):
     proposal = db.query(Proposal).filter(Proposal.id == proposal_id).first()
     if not proposal:
         raise HTTPException(status_code=404, detail="Proposal not found")
@@ -73,13 +89,13 @@ def accept_proposal(proposal_id: int, db: Session = Depends(get_db)):
 
     others = db.query(Proposal).filter(
         Proposal.project_id == proposal.project_id,
-        Proposal.id != proposal_id,
-        Proposal.status == "pending"
+        Proposal.id         != proposal_id,
+        Proposal.status     == "pending"
     ).all()
     for p in others:
         p.status = "rejected"
 
-    freelancer = db.query(User).filter(User.id == proposal.freelancer_id).first()
+    freelancer      = db.query(User).filter(User.id == proposal.freelancer_id).first()
     freelancer_name = freelancer.name if freelancer else f"Freelancer #{proposal.freelancer_id}"
 
     contract = Contract(
@@ -94,14 +110,61 @@ def accept_proposal(proposal_id: int, db: Session = Depends(get_db)):
     db.add(contract)
     db.commit()
 
+    # ── Notify freelancer — proposal accepted ─────────────────
+    if freelancer and project:
+        await create_and_send_notification(
+            db,
+            user_id = proposal.freelancer_id,
+            title   = "Proposal Accepted! 🎉",
+            message = f"Your proposal for '{project.title}' has been accepted. A contract has been created.",
+            type    = "proposal"
+        )
+
+    # ── Notify other freelancers — proposal rejected ──────────
+    for p in others:
+        rej_freelancer = db.query(User).filter(User.id == p.freelancer_id).first()
+        if rej_freelancer and project:
+            await create_and_send_notification(
+                db,
+                user_id = p.freelancer_id,
+                title   = "Proposal Not Selected",
+                message = f"Your proposal for '{project.title}' was not selected this time.",
+                type    = "proposal"
+            )
+
+    # ── Notify client — contract created ─────────────────────
+    if project and project.client_id:
+        await create_and_send_notification(
+            db,
+            user_id = project.client_id,
+            title   = "Contract Created 📄",
+            message = f"A contract with {freelancer_name} for '{project.title}' is now active.",
+            type    = "contract"
+        )
+
     return {"message": "Proposal accepted, project in-progress, contract created ✅"}
 
 
 @router.put("/{proposal_id}/reject")
-def reject_proposal(proposal_id: int, db: Session = Depends(get_db)):
+async def reject_proposal(proposal_id: int, db: Session = Depends(get_db)):
     proposal = db.query(Proposal).filter(Proposal.id == proposal_id).first()
     if not proposal:
         raise HTTPException(status_code=404, detail="Proposal not found")
+
     proposal.status = "rejected"
     db.commit()
+
+    # ── Notify freelancer — proposal rejected ─────────────────
+    project    = db.query(Project).filter(Project.id == proposal.project_id).first()
+    freelancer = db.query(User).filter(User.id == proposal.freelancer_id).first()
+
+    if freelancer and project:
+        await create_and_send_notification(
+            db,
+            user_id = proposal.freelancer_id,
+            title   = "Proposal Rejected",
+            message = f"Your proposal for '{project.title}' was not selected.",
+            type    = "proposal"
+        )
+
     return {"message": "Rejected"}

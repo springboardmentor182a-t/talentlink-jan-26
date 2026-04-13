@@ -42,8 +42,8 @@ export default function Contracts() {
     }
   };
 
-  const active    = projects.filter(p => p.status === "in-progress");
-  const completed = projects.filter(p => p.status === "completed");
+  const active      = projects.filter(p => p.status === "in-progress");
+  const completed   = projects.filter(p => p.status === "completed");
   const totalBudget = projects.reduce((a, p) => a + Number(p.budget || 0), 0);
 
   if (loading) return (
@@ -54,21 +54,14 @@ export default function Contracts() {
 
   return (
     <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#f8fafc", minHeight:"100vh" }}>
-
-      {/* Hero */}
       <div style={{ background:"linear-gradient(135deg,#1e3a5f 0%,#2563eb 50%,#3b82f6 100%)", padding:"32px 32px", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:-40, right:-40, width:200, height:200, borderRadius:"50%", background:"rgba(255,255,255,0.05)" }} />
-        <div style={{ position:"absolute", bottom:-30, left:300, width:150, height:150, borderRadius:"50%", background:"rgba(255,255,255,0.05)" }} />
-        <div style={{ display:"inline-flex", alignItems:"center", gap:8, backgroundColor:"rgba(255,255,255,0.15)", borderRadius:20, padding:"4px 14px", fontSize:12, color:"white", fontWeight:600, marginBottom:10 }}>
-          📄 Contracts
-        </div>
+        <div style={{ display:"inline-flex", alignItems:"center", gap:8, backgroundColor:"rgba(255,255,255,0.15)", borderRadius:20, padding:"4px 14px", fontSize:12, color:"white", fontWeight:600, marginBottom:10 }}>📄 Contracts</div>
         <h1 style={{ fontSize:28, fontWeight:800, color:"white", margin:"0 0 6px", letterSpacing:"-0.5px" }}>Contract Management</h1>
         <p style={{ fontSize:14, color:"rgba(255,255,255,0.75)", margin:0 }}>Track and manage your active and completed contracts</p>
       </div>
 
       <div style={{ padding:32 }}>
-
-        {/* Stats */}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginBottom:32 }}>
           {[
             { label:"Active Contracts",    val:active.length,                     icon:"⚡", color:"#2563eb", bg:"#eff6ff" },
@@ -85,20 +78,18 @@ export default function Contracts() {
           ))}
         </div>
 
-        {/* Empty State */}
         {projects.length === 0 && (
           <div style={{ backgroundColor:"#fff", borderRadius:16, padding:"60px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
             <div style={{ fontSize:56, marginBottom:16 }}>📄</div>
             <h3 style={{ fontSize:18, fontWeight:700, color:"#111827", marginBottom:8 }}>No contracts yet</h3>
             <p style={{ color:"#64748b", fontSize:14, marginBottom:20 }}>Contracts are created when you accept a freelancer proposal.</p>
             <button onClick={() => navigate("/projects")}
-              style={{ padding:"12px 28px", background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"white", border:"none", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14, boxShadow:"0 4px 12px rgba(37,99,235,0.3)" }}>
+              style={{ padding:"12px 28px", background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"white", border:"none", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14 }}>
               View Projects →
             </button>
           </div>
         )}
 
-        {/* Active Contracts */}
         {active.length > 0 && (
           <div style={{ marginBottom:32 }}>
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
@@ -112,7 +103,6 @@ export default function Contracts() {
           </div>
         )}
 
-        {/* Completed Contracts */}
         {completed.length > 0 && (
           <div style={{ marginBottom:32 }}>
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
@@ -131,17 +121,21 @@ export default function Contracts() {
 }
 
 function ContractCard({ p, proposals, navigate, onComplete }) {
-  const [completing, setCompleting] = useState(false);
-  const accepted = proposals.find(pr => pr.status === "accepted");
+  const [completing, setCompleting]   = useState(false);
+  const [risk, setRisk]               = useState(null);
+  const [riskLoading, setRiskLoading] = useState(false);
+  const [summary, setSummary]         = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [showRisk, setShowRisk]       = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
 
-  // Use freelancer_name from enriched proposal response
+  const accepted       = proposals.find(pr => pr.status === "accepted");
   const freelancerName = accepted?.freelancer_name || null;
-
-  const statusStyle = {
+  const statusStyle    = {
     "in-progress": { bg:"linear-gradient(135deg,#f59e0b,#f97316)", color:"white", label:"In Progress" },
     "completed":   { bg:"linear-gradient(135deg,#16a34a,#22c55e)", color:"white", label:"Completed" },
   };
-  const s = statusStyle[p.status] || statusStyle["in-progress"];
+  const s           = statusStyle[p.status] || statusStyle["in-progress"];
   const progressPct = p.status === "completed" ? 100 : 50;
 
   const handleComplete = async () => {
@@ -149,6 +143,65 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
     await onComplete();
     setCompleting(false);
   };
+
+  const fetchRisk = async () => {
+    if (risk) { setShowRisk(v => !v); return; }
+    setRiskLoading(true);
+    setShowRisk(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.post("/ai/contract-risk", {
+        title:                p.title,
+        description:          p.description || "",
+        skills:               p.skills || "",
+        budget:               p.budget,
+        deadline:             p.deadline || "",
+        proposed_budget:      accepted?.proposed_budget || "",
+        delivery_time:        accepted?.delivery_time || "",
+        freelancer_experience:"N/A",
+        freelancer_skills:    p.skills || "",
+        role:                 "client",
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      setRisk(res.data);
+    } catch (err) {
+      console.error("Risk error:", err.message);
+    } finally {
+      setRiskLoading(false);
+    }
+  };
+
+  const fetchSummary = async () => {
+    if (summary) { setShowSummary(v => !v); return; }
+    setSummaryLoading(true);
+    setShowSummary(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await api.post("/ai/contract-summary", {
+        title:           p.title,
+        description:     p.description || "",
+        skills:          p.skills || "",
+        budget:          p.budget,
+        deadline:        p.deadline || "",
+        status:          p.status,
+        freelancer_name: freelancerName || "N/A",
+        proposed_budget: accepted?.proposed_budget || "",
+        delivery_time:   accepted?.delivery_time || "",
+        role:            "client",
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      setSummary(res.data);
+    } catch (err) {
+      console.error("Summary error:", err.message);
+    } finally {
+      setSummaryLoading(false);
+    }
+  };
+
+  const riskColor = {
+    "Low":    { bg:"#f0fdf4", border:"#86efac", text:"#16a34a", badge:"#dcfce7", badgeText:"#16a34a" },
+    "Medium": { bg:"#fffbeb", border:"#fcd34d", text:"#d97706", badge:"#fef3c7", badgeText:"#d97706" },
+    "High":   { bg:"#fef2f2", border:"#fca5a5", text:"#dc2626", badge:"#fee2e2", badgeText:"#dc2626" },
+  };
+  const rc = riskColor[risk?.risk_level] || riskColor["Medium"];
 
   return (
     <div style={{ backgroundColor:"#fff", borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}
@@ -160,37 +213,28 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
         <div>
           <h3 style={{ fontSize:18, fontWeight:700, color:"#111827", margin:"0 0 6px" }}>{p.title}</h3>
           <p style={{ fontSize:13, color:"#64748b", margin:0, display:"flex", alignItems:"center", gap:6 }}>
-            <span style={{ fontSize:15 }}>👤</span>
-            {freelancerName ? (
-              <span style={{ fontWeight:600, color:"#374151" }}>{freelancerName}</span>
-            ) : (
-              <span>No freelancer assigned</span>
-            )}
+            <span>👤</span>
+            {freelancerName
+              ? <span style={{ fontWeight:600, color:"#374151" }}>{freelancerName}</span>
+              : <span>No freelancer assigned</span>}
           </p>
         </div>
-        <span style={{ padding:"6px 16px", borderRadius:20, fontSize:12, fontWeight:700, background:s.bg, color:s.color, whiteSpace:"nowrap" }}>
-          {s.label}
-        </span>
+        <span style={{ padding:"6px 16px", borderRadius:20, fontSize:12, fontWeight:700, background:s.bg, color:s.color, whiteSpace:"nowrap" }}>{s.label}</span>
       </div>
 
       {/* Stats */}
       <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:16, marginBottom:20 }}>
-        <div>
-          <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:4 }}>Budget</div>
-          <div style={{ fontWeight:700, color:"#111827", fontSize:16 }}>${p.budget}</div>
-        </div>
-        <div>
-          <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:4 }}>Deadline</div>
-          <div style={{ fontWeight:700, color:"#111827", fontSize:16 }}>{p.deadline || "—"}</div>
-        </div>
-        <div>
-          <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:4 }}>Proposals</div>
-          <div style={{ fontWeight:700, color:"#111827", fontSize:16 }}>{proposals.length}</div>
-        </div>
-        <div>
-          <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:4 }}>Progress</div>
-          <div style={{ fontWeight:700, color:"#111827", fontSize:16 }}>{progressPct}%</div>
-        </div>
+        {[
+          { label:"Budget",    val:`$${p.budget}` },
+          { label:"Deadline",  val:p.deadline || "—" },
+          { label:"Proposals", val:proposals.length },
+          { label:"Progress",  val:`${progressPct}%` },
+        ].map(item => (
+          <div key={item.label}>
+            <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:4 }}>{item.label}</div>
+            <div style={{ fontWeight:700, color:"#111827", fontSize:16 }}>{item.val}</div>
+          </div>
+        ))}
       </div>
 
       {/* Skills */}
@@ -215,29 +259,18 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
         </div>
       </div>
 
-      {/* Accepted proposal info */}
+      {/* Accepted Proposal Info */}
       {accepted && (
         <div style={{ backgroundColor:"#f8fafc", borderRadius:10, padding:"14px 16px", marginBottom:16, border:"1px solid #e2e8f0" }}>
           <div style={{ fontSize:12, fontWeight:700, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:8 }}>Accepted Proposal</div>
-          <div style={{ display:"flex", gap:24 }}>
-            <div>
-              <div style={{ fontSize:11, color:"#64748b" }}>Freelancer</div>
-              <div style={{ fontWeight:700, color:"#111827", fontSize:14 }}>{freelancerName || "—"}</div>
-            </div>
-            <div>
-              <div style={{ fontSize:11, color:"#64748b" }}>Proposed Budget</div>
-              <div style={{ fontWeight:700, color:"#111827", fontSize:14 }}>${accepted.proposed_budget}</div>
-            </div>
-            <div>
-              <div style={{ fontSize:11, color:"#64748b" }}>Delivery Time</div>
-              <div style={{ fontWeight:700, color:"#111827", fontSize:14 }}>{accepted.delivery_time}</div>
-            </div>
+          <div style={{ display:"flex", gap:24, flexWrap:"wrap" }}>
+            <div><div style={{ fontSize:11, color:"#64748b" }}>Freelancer</div><div style={{ fontWeight:700, color:"#111827", fontSize:14 }}>{freelancerName || "—"}</div></div>
+            <div><div style={{ fontSize:11, color:"#64748b" }}>Proposed Budget</div><div style={{ fontWeight:700, color:"#111827", fontSize:14 }}>${accepted.proposed_budget}</div></div>
+            <div><div style={{ fontSize:11, color:"#64748b" }}>Delivery Time</div><div style={{ fontWeight:700, color:"#111827", fontSize:14 }}>{accepted.delivery_time}</div></div>
             {accepted.cover_letter && (
               <div style={{ flex:1 }}>
                 <div style={{ fontSize:11, color:"#64748b" }}>Cover Letter</div>
-                <div style={{ fontSize:13, color:"#374151", lineHeight:1.5 }}>
-                  {accepted.cover_letter.length > 100 ? accepted.cover_letter.slice(0,100) + "..." : accepted.cover_letter}
-                </div>
+                <div style={{ fontSize:13, color:"#374151", lineHeight:1.5 }}>{accepted.cover_letter.length > 100 ? accepted.cover_letter.slice(0,100)+"..." : accepted.cover_letter}</div>
               </div>
             )}
           </div>
@@ -255,24 +288,119 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
         </div>
       )}
 
+      {/* ── AI RISK PREDICTION PANEL ── */}
+      {showRisk && (
+        <div style={{ backgroundColor: riskLoading ? "#f8fafc" : rc.bg, border:`1px solid ${riskLoading ? "#e2e8f0" : rc.border}`, borderRadius:12, padding:16, marginBottom:16 }}>
+          {riskLoading ? (
+            <div style={{ display:"flex", alignItems:"center", gap:8, color:"#64748b", fontSize:13 }}>
+              <span>⏳</span> Analyzing contract risk...
+            </div>
+          ) : risk && (
+            <>
+              <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
+                <span style={{ fontSize:20 }}>🔮</span>
+                <span style={{ fontWeight:700, color:"#111827", fontSize:14 }}>Contract Risk Analysis</span>
+                <span style={{ padding:"3px 12px", borderRadius:20, fontSize:12, fontWeight:700, backgroundColor:rc.badge, color:rc.badgeText }}>
+                  {risk.risk_level} Risk
+                </span>
+                <span style={{ marginLeft:"auto", fontSize:13, fontWeight:700, color:rc.text }}>Score: {risk.risk_score}/100</span>
+              </div>
+              {risk.risk_factors?.length > 0 && (
+                <div style={{ marginBottom:10 }}>
+                  <div style={{ fontSize:12, fontWeight:600, color:"#374151", marginBottom:4 }}>⚠️ Risk Factors</div>
+                  {risk.risk_factors.map((f, i) => (
+                    <div key={i} style={{ fontSize:12, color:"#64748b", padding:"3px 0", display:"flex", gap:6 }}>
+                      <span style={{ color:rc.text }}>•</span> {f}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {risk.positive_factors?.length > 0 && (
+                <div style={{ marginBottom:10 }}>
+                  <div style={{ fontSize:12, fontWeight:600, color:"#374151", marginBottom:4 }}>✅ Positive Factors</div>
+                  {risk.positive_factors.map((f, i) => (
+                    <div key={i} style={{ fontSize:12, color:"#64748b", padding:"3px 0", display:"flex", gap:6 }}>
+                      <span style={{ color:"#16a34a" }}>•</span> {f}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {risk.recommendation && (
+                <div style={{ backgroundColor:"rgba(255,255,255,0.6)", borderRadius:8, padding:"10px 12px", fontSize:12, color:"#374151", fontStyle:"italic" }}>
+                  💡 {risk.recommendation}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ── AI SUMMARY PANEL ── */}
+      {showSummary && (
+        <div style={{ backgroundColor: summaryLoading ? "#f8fafc" : "#f0f9ff", border:"1px solid #bae6fd", borderRadius:12, padding:16, marginBottom:16 }}>
+          {summaryLoading ? (
+            <div style={{ display:"flex", alignItems:"center", gap:8, color:"#64748b", fontSize:13 }}>
+              <span>⏳</span> Generating AI summary...
+            </div>
+          ) : summary && (
+            <>
+              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:12 }}>
+                <span style={{ fontSize:20 }}>🤖</span>
+                <span style={{ fontWeight:700, color:"#111827", fontSize:14 }}>AI Project Summary</span>
+              </div>
+              <p style={{ fontSize:13, color:"#374151", lineHeight:1.6, margin:"0 0 12px" }}>{summary.summary}</p>
+              {summary.next_steps?.length > 0 && (
+                <div style={{ marginBottom:10 }}>
+                  <div style={{ fontSize:12, fontWeight:600, color:"#0369a1", marginBottom:4 }}>📋 Next Steps</div>
+                  {summary.next_steps.map((s, i) => (
+                    <div key={i} style={{ fontSize:12, color:"#374151", padding:"3px 0", display:"flex", gap:6 }}>
+                      <span style={{ color:"#0369a1", fontWeight:700 }}>{i+1}.</span> {s}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {summary.tips?.length > 0 && (
+                <div>
+                  <div style={{ fontSize:12, fontWeight:600, color:"#0369a1", marginBottom:4 }}>💡 Tips</div>
+                  {summary.tips.map((t, i) => (
+                    <div key={i} style={{ fontSize:12, color:"#64748b", padding:"3px 0", display:"flex", gap:6 }}>
+                      <span style={{ color:"#0369a1" }}>•</span> {t}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
       {/* Actions */}
       <div style={{ display:"flex", gap:10, paddingTop:16, borderTop:"1px solid #f1f5f9", flexWrap:"wrap" }}>
         {onComplete && (
           <button onClick={handleComplete} disabled={completing}
-            style={{ padding:"10px 20px", background: completing ? "#cbd5e1" : "linear-gradient(135deg,#16a34a,#22c55e)", color:"white", border:"none", borderRadius:8, cursor: completing ? "not-allowed" : "pointer", fontWeight:600, fontSize:13, boxShadow:"0 2px 8px rgba(22,163,74,0.3)", display:"flex", alignItems:"center", gap:6 }}>
+            style={{ padding:"10px 20px", background: completing ? "#cbd5e1" : "linear-gradient(135deg,#16a34a,#22c55e)", color:"white", border:"none", borderRadius:8, cursor: completing ? "not-allowed" : "pointer", fontWeight:600, fontSize:13 }}>
             {completing ? "Completing..." : "✅ Mark Completed"}
           </button>
         )}
         <button onClick={() => navigate(`/view-proposals/${p.id}`)}
-          style={{ padding:"10px 20px", background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"white", border:"none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13, boxShadow:"0 2px 8px rgba(37,99,235,0.3)" }}>
+          style={{ padding:"10px 20px", background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"white", border:"none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}>
           👁 View Proposals
         </button>
         {accepted && (
           <button onClick={() => navigate(`/messages?freelancer=${accepted.freelancer_id}&name=${encodeURIComponent(freelancerName || "Freelancer")}`)}
-            style={{ padding:"10px 20px", background:"linear-gradient(135deg,#7c3aed,#a855f7)", color:"white", border:"none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13, boxShadow:"0 2px 8px rgba(124,58,237,0.3)", display:"flex", alignItems:"center", gap:6 }}>
+            style={{ padding:"10px 20px", background:"linear-gradient(135deg,#7c3aed,#a855f7)", color:"white", border:"none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}>
             💬 Message {freelancerName ? freelancerName.split(" ")[0] : "Freelancer"}
           </button>
         )}
+        {/* ── AI BUTTONS ── */}
+        <button onClick={fetchRisk}
+          style={{ padding:"10px 20px", background: showRisk ? "#fef3c7" : "linear-gradient(135deg,#f59e0b,#f97316)", color: showRisk ? "#d97706" : "white", border: showRisk ? "1.5px solid #fcd34d" : "none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13, display:"flex", alignItems:"center", gap:6 }}>
+          🔮 {showRisk ? "Hide Risk" : "Contract Risk"}
+        </button>
+        <button onClick={fetchSummary}
+          style={{ padding:"10px 20px", background: showSummary ? "#e0f2fe" : "linear-gradient(135deg,#0369a1,#0ea5e9)", color: showSummary ? "#0369a1" : "white", border: showSummary ? "1.5px solid #bae6fd" : "none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13, display:"flex", alignItems:"center", gap:6 }}>
+          🤖 {showSummary ? "Hide Summary" : "AI Summary"}
+        </button>
         <button onClick={() => navigate("/projects")}
           style={{ padding:"10px 20px", backgroundColor:"white", color:"#374151", border:"1.5px solid #e2e8f0", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}>
           📁 View Project

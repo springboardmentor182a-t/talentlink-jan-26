@@ -1,9 +1,30 @@
-pycache/
+# ── Python ──────────────────────────────
+__pycache__/
 *.pyc
 *.pyo
 *.pyd
-.env
+*.pdb
+*.egg-info/
+
+# ── Virtual Environment ──────────────────
 venv/
+env/
+.venv/
+
+# ── Environment Variables ────────────────
+.env
 .env.local
-.DS_Store
+
+# ── Database ─────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+
+# ── Testing ──────────────────────────────
 .pytest_cache/
+coverage/
+.coverage
+
+# ── Logs ─────────────────────────────────
+*.log
+logs/
