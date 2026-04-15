@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Header.css';
 import authService from '../../services/auth';
 
 const Header = () => {
+  const navigate = useNavigate();
   const [userName, setUserName] = useState('Freelancer');
 
   useEffect(() => {
@@ -14,6 +16,8 @@ const Header = () => {
         const token = authService.getToken();
         if (!token) {
           setUserName('Freelancer');
+          authService.logout();
+          navigate('/login', { replace: true });
           return;
         }
 
@@ -25,6 +29,10 @@ const Header = () => {
         });
 
         if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+            authService.logout();
+            navigate('/login', { replace: true });
+          }
           return;
         }
 
@@ -46,7 +54,7 @@ const Header = () => {
     fetchUser();
 
     return () => controller.abort();
-  }, []);
+  }, [navigate]);
 
   return (
     <header className="freelancer-header">
