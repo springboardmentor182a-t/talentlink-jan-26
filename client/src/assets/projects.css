@@ -1,0 +1,824 @@
+/* =============================================================================
+   projects.css — shared styles for all project-related pages and components
+   Covers: FindProjects, ClientProjects, ProjectCard, ProjectFilters
+   ============================================================================= */
+
+/* ── Tokens ─────────────────────────────────────────────────────────────────── */
+:root {
+  --orange:        #f97316;
+  --orange-dark:   #ea6c0a;
+  --orange-light:  #fff7ed;
+  --orange-border: #fdba74;
+  --orange-muted:  #fed7aa;
+
+  --gray-50:  #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-700: #374151;
+  --gray-900: #111827;
+
+  --green-bg:    #dcfce7;
+  --green-text:  #166534;
+  --yellow-bg:   #fef9c3;
+  --yellow-text: #854d0e;
+  --blue-bg:     #dbeafe;
+  --blue-text:   #1e40af;
+  --red-bg:      #fee2e2;
+  --red-text:    #991b1b;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 14px;
+  --radius-full: 999px;
+}
+
+/* ── Find Projects page ─────────────────────────────────────────────────────── */
+
+.find-projects-container {
+  padding: 24px;
+  background: #ffffff;
+}
+
+.find-projects-header h1 {
+  color: var(--gray-900);
+  font-size: 28px;
+  margin: 0 0 4px;
+}
+
+.find-projects-header p {
+  color: var(--gray-500);
+  margin-bottom: 20px;
+}
+
+.find-projects-status {
+  color: var(--gray-500);
+  padding: 20px 0;
+}
+
+.find-projects-error {
+  color: #dc2626;
+  background: #fef2f2;
+  padding: 12px;
+  border-radius: var(--radius-md);
+}
+
+.find-projects-empty {
+  color: var(--gray-500);
+  padding: 40px 0;
+  text-align: center;
+}
+
+.projects-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Filters bar ────────────────────────────────────────────────────────────── */
+
+.filters-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.filters-bar input,
+.filters-bar select {
+  padding: 10px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.filters-bar input:focus,
+.filters-bar select:focus {
+  border-color: var(--orange);
+}
+
+.search-btn {
+  background: var(--orange);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: background 0.15s;
+}
+
+.search-btn:hover {
+  background: var(--orange-dark);
+}
+
+/* ── Project Card ───────────────────────────────────────────────────────────── */
+
+.project-card {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  background: #fff;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.project-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border-color: var(--orange-border);
+}
+
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.project-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.match-badge {
+  background: var(--green-bg);
+  color: var(--green-text);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.company-name {
+  color: var(--orange);
+  font-size: 14px;
+  margin: 4px 0 8px;
+}
+
+.project-description {
+  margin-bottom: 12px;
+  color: #4b5563;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.skills span {
+  background: var(--gray-100);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--gray-700);
+}
+
+.project-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--gray-100);
+}
+
+.budget {
+  font-weight: 700;
+  color: var(--orange);
+  font-size: 14px;
+  margin: 0;
+}
+
+.duration {
+  font-size: 12px;
+  color: var(--gray-500);
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.apply-btn {
+  background: var(--orange);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.apply-btn:hover:not(:disabled) {
+  background: var(--orange-dark);
+}
+
+.apply-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.save-btn {
+  background: var(--gray-100);
+  color: var(--gray-700);
+  border: 1px solid var(--gray-200);
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.save-btn:hover:not(:disabled) {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+.save-btn--saved {
+  background: var(--orange-light);
+  color: var(--orange);
+  border-color: var(--orange);
+}
+
+.save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Client Projects page ───────────────────────────────────────────────────── */
+
+.cp-layout {
+  display: flex;
+  height: calc(100vh - 64px);
+  overflow: hidden;
+  background: var(--gray-50);
+}
+
+/* Left rail */
+.cp-rail {
+  display: flex;
+  flex-direction: column;
+  background: var(--gray-50);
+  border-right: 1px solid var(--gray-200);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              min-width 0.3s,
+              max-width 0.3s;
+  overflow: hidden;
+}
+
+.cp-rail--full {
+  width: 100%;
+}
+
+.cp-rail--narrow {
+  width: 340px;
+  min-width: 290px;
+  max-width: 400px;
+  flex-shrink: 0;
+}
+
+.cp-rail-header {
+  flex-shrink: 0;
+}
+
+.cp-rail-header--full   { padding: 28px 28px 16px; }
+.cp-rail-header--narrow { padding: 20px 14px 12px; }
+
+.cp-rail-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.cp-rail-header-row--narrow {
+  margin-bottom: 10px;
+}
+
+.cp-title {
+  font-weight: 800;
+  color: var(--gray-900);
+  margin: 0;
+  transition: font-size 0.3s;
+}
+
+.cp-title--full   { font-size: 24px; }
+.cp-title--narrow { font-size: 16px; }
+
+.cp-subtitle {
+  font-size: 13px;
+  color: var(--gray-400);
+  margin: 4px 0 0;
+}
+
+/* Post new project button */
+.cp-post-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.cp-post-btn:hover { background: var(--orange-dark); }
+
+.cp-post-btn--full   { padding: 8px 16px; }
+.cp-post-btn--narrow { padding: 8px 10px; }
+
+/* Error banner */
+.cp-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+/* Status tab pills */
+.cp-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.cp-tab {
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1.5px solid var(--gray-200);
+  background: #fff;
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.cp-tab:hover { border-color: #fb923c; }
+
+.cp-tab--active {
+  border-color: var(--orange);
+  background: var(--orange);
+  color: #fff;
+}
+
+.cp-tab-count {
+  margin-left: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+}
+
+.cp-tab-count--active {
+  background: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.cp-tab-count--inactive {
+  background: var(--gray-100);
+  color: var(--gray-400);
+}
+
+/* Search input */
+.cp-search {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--gray-200);
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+  background: #fff;
+  transition: border-color 0.15s;
+}
+
+.cp-search:focus { border-color: var(--orange); }
+
+/* Project list */
+.cp-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.cp-list--full   { padding: 0 20px 20px; }
+.cp-list--narrow { padding: 0 10px 16px; }
+
+/* Empty state */
+.cp-empty {
+  text-align: center;
+  padding: 48px 16px;
+  color: var(--gray-400);
+}
+
+.cp-empty p {
+  font-size: 14px;
+  margin: 0 0 12px;
+}
+
+.cp-empty-btn {
+  padding: 8px 20px;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Project card in rail */
+.cp-proj-card {
+  border-radius: var(--radius-lg);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.cp-proj-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-color: var(--orange-border) !important;
+}
+
+.cp-proj-card--full   { padding: 18px 20px; }
+.cp-proj-card--narrow { padding: 12px 14px; }
+
+.cp-proj-selected-bar {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 32px;
+  background: var(--orange);
+  border-radius: 0 3px 3px 0;
+}
+
+.cp-proj-title {
+  font-weight: 700;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.cp-proj-title--full   { font-size: 15px; }
+.cp-proj-title--narrow { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+
+.cp-proj-desc {
+  font-size: 12px;
+  color: var(--gray-500);
+  margin: 0 0 10px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Status badge */
+.cp-status-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+/* Proposal count pill */
+.cp-prop-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: var(--radius-full);
+}
+
+.cp-prop-count--has  { color: var(--green-text); background: var(--green-bg); }
+.cp-prop-count--none { color: var(--gray-400);   background: var(--gray-100); }
+
+/* ── Right panel — Proposals inbox ─────────────────────────────────────────── */
+
+.cp-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  overflow: hidden;
+  animation: cp-slide-in 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes cp-slide-in {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.cp-panel-header {
+  padding: 20px 28px 16px;
+  border-bottom: 1px solid var(--gray-100);
+  flex-shrink: 0;
+}
+
+.cp-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gray-500);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  transition: background 0.15s;
+}
+
+.cp-back-btn:hover { background: var(--gray-100); }
+
+.cp-panel-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--gray-900);
+  margin: 0 0 6px;
+}
+
+.cp-panel-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.cp-panel-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--gray-500);
+}
+
+.cp-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 28px;
+}
+
+/* Loading spinner */
+.cp-spinner-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cp-spinner {
+  border: 3px solid var(--orange-muted);
+  border-top-color: var(--orange);
+  border-radius: 50%;
+  animation: cp-spin 0.8s linear infinite;
+}
+
+@keyframes cp-spin { to { transform: rotate(360deg); } }
+
+/* Panel empty state */
+.cp-panel-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--gray-400);
+}
+
+.cp-panel-empty p:first-of-type {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gray-500);
+  margin: 0 0 6px;
+}
+
+.cp-panel-empty p:last-of-type {
+  font-size: 13px;
+  margin: 0;
+}
+
+/* ── Proposal card ──────────────────────────────────────────────────────────── */
+
+.cp-proposal-card {
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-xl);
+  padding: 20px 22px;
+  margin-bottom: 12px;
+}
+
+.cp-proposal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.cp-proposal-name {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--orange);
+  margin: 0;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.cp-proposal-name:hover { opacity: 0.8; }
+
+.cp-proposal-date {
+  font-size: 12px;
+  color: var(--gray-400);
+  margin: 3px 0 0;
+}
+
+.cp-proposal-stats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 14px;
+}
+
+.cp-proposal-stat-label {
+  font-size: 11px;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 2px;
+}
+
+.cp-proposal-stat-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--gray-900);
+  margin: 0;
+}
+
+.cp-proposal-letter {
+  font-size: 13.5px;
+  color: #4b5563;
+  line-height: 1.65;
+  border-top: 1px solid var(--gray-100);
+  padding-top: 14px;
+  margin: 0;
+}
+
+.cp-proposal-error {
+  margin-top: 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-size: 13px;
+  color: #dc2626;
+}
+
+.cp-proposal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--gray-100);
+}
+
+.cp-accept-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.cp-accept-btn:hover:not(:disabled) { background: var(--orange-dark); }
+
+.cp-accept-btn:disabled {
+  background: var(--orange-muted);
+  cursor: not-allowed;
+}
+
+.cp-reject-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: #fff;
+  color: var(--gray-500);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.cp-reject-btn:hover:not(:disabled) {
+  background: var(--gray-50);
+  border-color: #9ca3af;
+}
+
+.cp-reject-btn:disabled { cursor: not-allowed; }
+
+/* ── Confirm modal ──────────────────────────────────────────────────────────── */
+
+.cp-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cp-modal {
+  background: #fff;
+  border-radius: var(--radius-2xl);
+  padding: 28px 28px 24px;
+  max-width: 380px;
+  width: calc(100% - 32px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.cp-modal h3 {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--gray-900);
+  margin: 0 0 8px;
+}
+
+.cp-modal p {
+  font-size: 13.5px;
+  color: var(--gray-500);
+  margin: 0 0 24px;
+  line-height: 1.6;
+}
+
+.cp-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.cp-modal-cancel {
+  padding: 8px 18px;
+  background: #fff;
+  color: var(--gray-500);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.cp-modal-confirm {
+  padding: 8px 20px;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.cp-modal-confirm:hover { opacity: 0.9; }
+
+.cp-modal-confirm--accept { background: var(--orange); }
+.cp-modal-confirm--reject { background: #ef4444; }

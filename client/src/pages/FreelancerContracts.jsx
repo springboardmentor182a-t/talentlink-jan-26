@@ -21,10 +21,9 @@ export default function FreelancerContracts() {
           return;
         }
         const user = JSON.parse(storedUser);
-        const userId = user.id;
 
         // 2. Fetch proposals using the dynamic ID
-        const data = await getMyProposals(userId);
+        const data = await getMyProposals();
         setProposals(data);
       } catch (err) {
         setError("Failed to load proposals.");

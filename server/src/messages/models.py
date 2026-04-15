@@ -2,6 +2,35 @@ from pydantic import BaseModel, Field
 from datetime import datetime, timezone
 from typing import Optional
 
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Index
+from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
+from src.database.core import Base
+
+
+# ── ORM model ─────────────────────────────────────────────────────────────────
+
+class Message(Base):
+    __tablename__ = "messages"
+
+    id          = Column(Integer, primary_key=True, index=True)
+    sender_id   = Column(Integer, ForeignKey("users.id"), nullable=False)
+    receiver_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    content     = Column(String, nullable=False)
+    is_read     = Column(Boolean, default=False, server_default="false", nullable=False)
+    timestamp   = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    sender   = relationship("User", foreign_keys=[sender_id])
+    receiver = relationship("User", foreign_keys=[receiver_id])
+
+    __table_args__ = (
+        Index("ix_messages_sender_receiver", "sender_id", "receiver_id"),
+        Index("ix_messages_receiver_unread", "receiver_id", "is_read"),
+    )
+
+
+# ── Pydantic schemas ───────────────────────────────────────────────────────────
+
 
 def _utc(dt: datetime | None) -> datetime | None:
     """Attach UTC tzinfo to a naive datetime from the DB so Pydantic serialises it with Z."""

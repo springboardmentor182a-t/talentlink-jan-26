@@ -3,30 +3,25 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from src.database.core import get_db
+from src.auth.dependencies import get_current_user
+from src.entities.user import User
 from src.users import schemas, service
-from typing import List
 
 router = APIRouter()
 
 
-@router.post("/", response_model=schemas.UserResponse)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    """Register a new user via the users module"""
-    db_user = service.UserService.get_user_by_email(db, email=user.email)
-    if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    return service.UserService.create_user(db=db, user=user)
-
-
 @router.get("/", response_model=list[schemas.UserResponse])
-def get_all_users(db: Session = Depends(get_db)):
-    """Get all users (admin use)"""
+def get_all_users(
+    db: Session = Depends(get_db),
+    _: User = Depends(get_current_user),       # auth required; underscore = unused but fires
+):
+    """Get all users — authenticated only."""
     return service.UserService.get_all_users(db)
 
 
 @router.get("/{user_id}", response_model=schemas.UserResponse)
 def get_user(user_id: int, db: Session = Depends(get_db)):
-    """Get a specific user by ID"""
+    """Get a specific user by ID — public (used by profile view pages)."""
     user = service.UserService.get_user_by_id(db, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -37,77 +32,47 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 def create_freelancer_profile(
     user_id: int,
     profile: schemas.FreelancerProfileCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
+    """Create or update a freelancer profile — only the owning user may do this."""
+    if current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="You can only edit your own profile")
     return service.UserService.create_freelancer_profile(db=db, user_id=user_id, profile=profile)
 
 
 @router.post("/{user_id}/client-profile", response_model=schemas.ClientProfileResponse)
 def create_client_profile(
-    user_id: int, 
-    profile: schemas.ClientProfileCreate, 
-    db: Session = Depends(get_db)
+    user_id: int,
+    profile: schemas.ClientProfileCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    """Create or update a client profile dynamically using the UserService"""
+    """Create or update a client profile — only the owning user may do this."""
+    if current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="You can only edit your own profile")
     return service.UserService.create_client_profile(db=db, user_id=user_id, profile=profile)
 
 
-# 4. Get Freelancer Profile (THE MISSING FUNCTION)
 @router.get("/{user_id}/freelancer_profile", response_model=schemas.FreelancerProfileResponse)
 def get_freelancer_profile(user_id: int, db: Session = Depends(get_db)):
-    from . import models
-    profile = db.query(models.FreelancerProfile).filter(models.FreelancerProfile.user_id == user_id).first()
+    """Get a freelancer profile by user ID — public (used by client view pages)."""
+    from src.users import models
+    profile = db.query(models.FreelancerProfile).filter(
+        models.FreelancerProfile.user_id == user_id
+    ).first()
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
     return profile
 
 
-# 5. Get Client Profile (THE MISSING FUNCTION)
 @router.get("/{user_id}/client_profile", response_model=schemas.ClientProfileResponse)
 def get_client_profile(user_id: int, db: Session = Depends(get_db)):
-    from . import models
-    profile = db.query(models.ClientProfile).filter(models.ClientProfile.user_id == user_id).first()
+    """Get a client profile by user ID — public (used by freelancer view pages)."""
+    from src.users import models
+    profile = db.query(models.ClientProfile).filter(
+        models.ClientProfile.user_id == user_id
+    ).first()
     if not profile:
         raise HTTPException(status_code=404, detail="Profile not found")
     return profile
-
-
-# 6. Create a Proposal (Submit Application)
-@router.post("/{user_id}/proposals", response_model=schemas.ProposalResponse)
-def create_proposal(user_id: int, proposal: schemas.ProposalCreate, db: Session = Depends(get_db)):
-    from . import models
-    import logging
-    logger = logging.getLogger(__name__)
-    
-    # 1. Find the freelancer profile for this user
-    freelancer = db.query(models.FreelancerProfile).filter(models.FreelancerProfile.user_id == user_id).first()
-    
-    if not freelancer:
-        logger.warning(f"User {user_id} attempted to apply without a freelancer profile.")
-        raise HTTPException(status_code=404, detail="You must have a Freelancer Profile to apply.")
-    
-    # 2. PREVENT DUPLICATES: Check if this freelancer already applied to this specific project
-    existing_proposal = db.query(models.Proposal).filter(
-        models.Proposal.freelancer_id == freelancer.id,
-        models.Proposal.project_id == proposal.project_id
-    ).first()
-    
-    if existing_proposal:
-        logger.warning(f"Freelancer {freelancer.id} attempted duplicate proposal submission for project {proposal.project_id}.")
-        raise HTTPException(
-            status_code=400, 
-            detail="You have already submitted a proposal for this project."
-        )
-    
-    # 3. Create proposal linked to that freelancer
-    logger.info(f"Initiating proposal creation for freelancer {freelancer.id} on project {proposal.project_id}.")
-    return service.create_proposal(db=db, proposal=proposal, freelancer_id=freelancer.id)
-
-# 7. Get My Proposals (View Application History)
-@router.get("/{user_id}/proposals", response_model=List[schemas.ProposalResponse])
-def get_my_proposals(user_id: int, db: Session = Depends(get_db)):
-    from . import models
-    freelancer = db.query(models.FreelancerProfile).filter(models.FreelancerProfile.user_id == user_id).first()
-    if not freelancer:
-        return [] # Return empty list if no profile
-    return freelancer.proposals

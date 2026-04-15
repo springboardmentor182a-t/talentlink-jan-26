@@ -11,7 +11,7 @@ function timeAgo(dateStr) {
   return `${Math.floor(diff / 86400)}d`;
 }
 
-const ConversationsList = ({ conversations = [], selectedUserId, onSelect, onNewChat }) => {
+const ConversationsList = ({ conversations = [], selectedUserId, onSelect, onNewChat, onlineUsers = {} }) => {
   const [search, setSearch] = useState('');
 
   const filtered = conversations.filter(c =>
@@ -68,7 +68,12 @@ const ConversationsList = ({ conversations = [], selectedUserId, onSelect, onNew
                 className={isActive ? 'conv-item conv-item--active' : 'conv-item'}
               >
                 <div className="conv-avatar-wrap">
-                  <UserAvatar username={conv.username} size={42} />
+                  <UserAvatar
+                    username={conv.username}
+                    size={42}
+                    showOnline={true}
+                    isOnline={!!onlineUsers[conv.user_id]}
+                  />
                   {conv.unread_count > 0 && (
                     <span className="conv-unread-badge">
                       {conv.unread_count > 9 ? '9+' : conv.unread_count}

@@ -1,37 +1,51 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './features/hooks/useAuth';
-import Layout from "./layout/PageContainer";
-import "./assets/theme.css";
+import Layout from './layout/PageContainer';
+import './assets/theme.css';
 
-// --- PROFILE & PROPOSAL PAGES ---
-import FreelancerProfile from "./pages/FreelancerProfile";
-import ClientProfile from "./pages/ClientProfile";
-import FreelancerView from "./pages/FreelancerView";
-import ClientView from "./pages/ClientView";
-import SubmitProposal from "./pages/SubmitProposal";
-import PostProject from "./pages/PostProject";
-import ProjectFeed from "./pages/ProjectFeed";
-import FindProjects from './pages/FindProjects';
-
-// --- AUTH & TEAM PAGES ---
-import RoleSelection from './pages/RoleSelection';
-import Login from './pages/Login';
+// ── Auth ──────────────────────────────────────────────────────────────────────
+import RoleSelection    from './pages/RoleSelection';
+import Login            from './pages/Login';
 import SignupFreelancer from './pages/SignupFreelancer';
-import SignupClient from './pages/SignupClient';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import OAuthCallback from './pages/OAuthCallback';
-import Dashboard from './pages/Dashboard';
+import SignupClient     from './pages/SignupClient';
+import ForgotPassword   from './pages/ForgotPassword';
+import ResetPassword    from './pages/ResetPassword';
+import OAuthCallback    from './pages/OAuthCallback';
+
+// ── Dashboards ────────────────────────────────────────────────────────────────
+import FreelancerDashboard from './pages/FreelancerDashboard';
+import Dashboard           from './pages/Dashboard';
+
+// ── Projects ──────────────────────────────────────────────────────────────────
+import FindProjects   from './pages/FindProjects';
+import BrowseProjects from './pages/BrowseProjects';
+import ClientProjects from './pages/ClientProjects';
+import PostProject    from './pages/PostProject';
+import ProjectDetail  from './pages/ProjectDetail';
+
+// ── Contracts ─────────────────────────────────────────────────────────────────
+import ContractsFreelancer from './pages/ContractsFreelancer';
+import ContractsClient     from './pages/ContractsClient';
+import FreelancerContracts from './pages/FreelancerContracts';
+
+// ── Messages ──────────────────────────────────────────────────────────────────
 import Messages from './pages/Messages';
 
-// --- CONTRACTS & REVIEWS ---
-import ContractsClient from './pages/ContractsClient';
-import ContractsFreelancer from './pages/ContractsFreelancer';
-import ReviewPage from './pages/ReviewPage';
+// ── Profiles ──────────────────────────────────────────────────────────────────
+import FreelancerProfile from './pages/FreelancerProfile';
+import FreelancerView    from './pages/FreelancerView';
+import ClientProfile     from './pages/ClientProfile';
+import ClientView        from './pages/ClientView';
+import Profile           from './pages/Profile';
 
-/**
- * ProtectedRoute: Redirects unauthenticated users to /login.
- */
+// ── Proposals ─────────────────────────────────────────────────────────────────
+import SubmitProposal from './pages/SubmitProposal';
+
+// ── Reviews ───────────────────────────────────────────────────────────────────
+import ReviewPage from './pages/ReviewPage';
+import ContractSummary from './pages/ContractSummary';
+
+// ── Route guards ──────────────────────────────────────────────────────────────
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return null;
@@ -42,56 +56,74 @@ const PublicOnlyRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return null;
   if (!user) return children;
-  if (user.role === 'freelancer') return <Navigate to="/freelancer/dashboard" replace />;
-  if (user.role === 'client') return <Navigate to="/client/dashboard" replace />;
-  return <Navigate to="/dashboard" replace />;
+  return user.role === 'client'
+    ? <Navigate to="/client/dashboard" replace />
+    : <Navigate to="/freelancer/dashboard" replace />;
 };
 
+// Splits /contracts by role at render time so the URL stays clean
 const ContractsRoute = () => {
   const { user } = useAuth();
   return user?.role === 'client' ? <ContractsClient /> : <ContractsFreelancer />;
 };
 
+
+// ── App ───────────────────────────────────────────────────────────────────────
+
 export default function App() {
   return (
     <Router>
       <Routes>
-        {/* ── Public auth flow ───────────────────────────────────────── */}
-        <Route path="/" element={<PublicOnlyRoute><RoleSelection /></PublicOnlyRoute>} />
-        <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
-        <Route path="/signup/freelancer" element={<PublicOnlyRoute><SignupFreelancer /></PublicOnlyRoute>} />
-        <Route path="/signup/client" element={<PublicOnlyRoute><SignupClient /></PublicOnlyRoute>} />
-        <Route path="/forgot-password" element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
+
+        {/* ── Public auth flow ──────────────────────────────────────── */}
+        <Route path="/"                      element={<PublicOnlyRoute><RoleSelection /></PublicOnlyRoute>} />
+        <Route path="/login"                 element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
+        <Route path="/signup/freelancer"     element={<PublicOnlyRoute><SignupFreelancer /></PublicOnlyRoute>} />
+        <Route path="/signup/client"         element={<PublicOnlyRoute><SignupClient /></PublicOnlyRoute>} />
+        <Route path="/forgot-password"       element={<PublicOnlyRoute><ForgotPassword /></PublicOnlyRoute>} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/auth/callback" element={<OAuthCallback />} />
+        <Route path="/auth/callback"         element={<OAuthCallback />} />
 
-        {/* ── Protected routes — require login ──────────────────────── */}
+        {/* ── Protected — inside the shared sidebar layout ──────────── */}
         <Route element={<Layout />}>
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/freelancer/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/client/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          
-          <Route path="/reviews" element={<ProtectedRoute><ReviewPage /></ProtectedRoute>} />
 
-          {/* Marketplace Core */}
-          <Route path="/projects" element={<ProtectedRoute><ProjectFeed /></ProtectedRoute>} />
-          <Route path="/post-project" element={<ProtectedRoute><PostProject /></ProtectedRoute>} />
-          <Route path="/find-projects" element={<ProtectedRoute><FindProjects /></ProtectedRoute>} />
 
-          {/* Profile pages */}
-          <Route path="/profile/freelancer" element={<ProtectedRoute><FreelancerView /></ProtectedRoute>} />
-          <Route path="/profile/freelancer/edit" element={<ProtectedRoute><FreelancerProfile /></ProtectedRoute>} />
-          <Route path="/profile/client" element={<ProtectedRoute><ClientView /></ProtectedRoute>} />
-          <Route path="/profile/client/edit" element={<ProtectedRoute><ClientProfile /></ProtectedRoute>} />
+          {/* Dashboards */}
+          <Route path="/freelancer/dashboard" element={<ProtectedRoute><FreelancerDashboard /></ProtectedRoute>} />
+          <Route path="/client/dashboard"     element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/dashboard"            element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
-          {/* Proposals & Contracts */}
-          <Route path="/projects/:projectId/apply" element={<ProtectedRoute><SubmitProposal /></ProtectedRoute>} />
-          <Route path="/contracts" element={<ProtectedRoute><ContractsRoute /></ProtectedRoute>} />
+          {/* Projects */}
+          <Route path="/find-projects"   element={<ProtectedRoute><FindProjects /></ProtectedRoute>} />
+          <Route path="/browse-projects" element={<ProtectedRoute><BrowseProjects /></ProtectedRoute>} />
+          <Route path="/jobs"            element={<ProtectedRoute><FindProjects /></ProtectedRoute>} />
+          <Route path="/my-projects"           element={<ProtectedRoute><ClientProjects /></ProtectedRoute>} />
+          <Route path="/my-projects/new"       element={<ProtectedRoute><PostProject /></ProtectedRoute>} />
+          <Route path="/my-projects/:id"       element={<ProtectedRoute><ProjectDetail /></ProtectedRoute>} />
+
+          {/* Contracts */}
+          <Route path="/contracts"             element={<ProtectedRoute><ContractsRoute /></ProtectedRoute>} />
+          <Route path="/contracts/freelancer"  element={<ProtectedRoute><FreelancerContracts /></ProtectedRoute>} />
+          <Route path="/contracts/:contractId/summary" element={<ProtectedRoute><ContractSummary /></ProtectedRoute>} />
 
           {/* Messages */}
           <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+
+          {/* Profiles */}
+          <Route path="/profile"                 element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/profile/freelancer"      element={<ProtectedRoute><FreelancerView /></ProtectedRoute>} />
+          <Route path="/profile/freelancer/edit" element={<ProtectedRoute><FreelancerProfile /></ProtectedRoute>} />
+          <Route path="/profile/client"          element={<ProtectedRoute><ClientView /></ProtectedRoute>} />
+          <Route path="/profile/client/edit"     element={<ProtectedRoute><ClientProfile /></ProtectedRoute>} />
+
+          {/* Proposals */}
+          <Route path="/projects/:projectId/apply" element={<ProtectedRoute><SubmitProposal /></ProtectedRoute>} />
+
+          {/* Reviews */}
+          <Route path="/reviews" element={<ProtectedRoute><ReviewPage /></ProtectedRoute>} />
+
         </Route>
-        
+
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

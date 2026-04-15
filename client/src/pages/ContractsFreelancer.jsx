@@ -1,29 +1,32 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ContractsService from '../features/services/contracts';
+import ReviewModal from '../components/ReviewModal';
+import { useAuth } from '../features/hooks/useAuth';
 import '../assets/contracts.css';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 const STATUS_LABELS = {
-  all:          'All',
-  active:       'Active',
-  draft:        'Draft',
+  all: 'All',
+  active: 'Active',
+  draft: 'Draft',
   pending_sign: 'Pending',
-  completed:    'Completed',
-  rejected:     'Rejected',
-  cancelled:    'Cancelled',
+  completed: 'Completed',
+  rejected: 'Rejected',
+  cancelled: 'Cancelled',
 };
 
 const FILTER_TABS = ['all', 'active', 'pending_sign', 'completed', 'draft'];
 
 function StatusBadge({ status }) {
   const modMap = {
-    active:       'active',
-    draft:        'draft',
+    active: 'active',
+    draft: 'draft',
     pending_sign: 'pending',
-    completed:    'completed',
-    rejected:     'rejected',
-    cancelled:    'cancelled',
+    completed: 'completed',
+    rejected: 'rejected',
+    cancelled: 'cancelled',
   };
   return (
     <span className={`status-badge status-badge--${modMap[status] ?? 'draft'}`}>
@@ -46,7 +49,7 @@ function formatBudget(amount) {
 
 function ContractDetailModal({ contract, onClose, onMilestoneToggle }) {
   const [localContract, setLocalContract] = useState(contract);
-  const [toggling, setToggling]           = useState(null); // milestone id being toggled
+  const [toggling, setToggling] = useState(null); // milestone id being toggled
 
   useEffect(() => setLocalContract(contract), [contract]);
 
@@ -270,7 +273,8 @@ function EditTermsModal({ contract, onClose, onSubmit }) {
 
 // ── Contract Card ──────────────────────────────────────────────────────────
 
-function ContractCard({ contract, onSign, onEditTerms, onView }) {
+function ContractCard({ contract, onSign, onEditTerms, onView, onReview, reviewedIds }) {
+  const navigate = useNavigate();
   const { status } = contract;
 
   return (
@@ -328,10 +332,25 @@ function ContractCard({ contract, onSign, onEditTerms, onView }) {
             </button>
           </>
         )}
-        {(status === 'active' || status === 'completed' || status === 'draft' || status === 'rejected') && (
+        {(status === 'active' || status === 'draft' || status === 'rejected') && (
           <button className="btn-secondary btn-sm" onClick={() => onView(contract)}>
             View Details
           </button>
+        )}
+        <button className="btn-outline btn-sm" style={{ borderColor: '#ff7a00', color: '#ff7a00' }} onClick={() => navigate(`/contracts/${contract.id}/summary`)}>
+          Simplify with AI ✨
+        </button>
+        {status === 'completed' && (
+          <>
+            <button className="btn-secondary btn-sm" onClick={() => onView(contract)}>
+              View Details
+            </button>
+            {!reviewedIds.has(contract.id) && (
+              <button className="btn-primary btn-sm" onClick={() => onReview(contract)}>
+                Leave a Review
+              </button>
+            )}
+          </>
         )}
       </div>
     </div>
@@ -341,12 +360,17 @@ function ContractCard({ contract, onSign, onEditTerms, onView }) {
 // ── Main Page ──────────────────────────────────────────────────────────────
 
 const ContractsFreelancer = () => {
+  const navigate = useNavigate();
+  const { user }                              = useAuth();
   const [contracts, setContracts]             = useState([]);
   const [loading, setLoading]                 = useState(true);
   const [error, setError]                     = useState(null);
   const [activeFilter, setActiveFilter]       = useState('all');
   const [editingContract, setEditingContract] = useState(null);
   const [detailContract, setDetailContract]   = useState(null);
+  const [actionError, setActionError]         = useState(null);
+  const [reviewContract, setReviewContract]   = useState(null);
+  const [reviewedIds, setReviewedIds]         = useState(new Set());
 
   useEffect(() => {
     const fetchContracts = async () => {
@@ -371,7 +395,7 @@ const ContractsFreelancer = () => {
       const res = await ContractsService.sign(id);
       setContracts(prev => prev.map(c => c.id === id ? res.data : c));
     } catch (err) {
-      alert(err.response?.data?.detail ?? 'Failed to sign contract');
+      setActionError(err.response?.data?.detail ?? 'Failed to sign contract.');
     }
   };
 
@@ -381,7 +405,7 @@ const ContractsFreelancer = () => {
       setContracts(prev => prev.map(c => c.id === id ? res.data : c));
       setEditingContract(null);
     } catch (err) {
-      alert(err.response?.data?.detail ?? 'Failed to submit edits');
+      setActionError(err.response?.data?.detail ?? 'Failed to submit edits.');
     }
   };
 
@@ -397,7 +421,7 @@ const ContractsFreelancer = () => {
       setDetailContract(updated);
       return updated;
     } catch (err) {
-      alert(err.response?.data?.detail ?? 'Failed to update milestone');
+      setActionError(err.response?.data?.detail ?? 'Failed to update milestone.');
       return null;
     }
   };
@@ -408,6 +432,12 @@ const ContractsFreelancer = () => {
 
   return (
     <div className="contracts-page">
+      {actionError && (
+        <div style={{ margin: '0 0 16px', padding: '12px 16px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, color: '#dc2626', fontSize: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>⚠️ {actionError}</span>
+          <button onClick={() => setActionError(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#dc2626', fontWeight: 'bold', fontSize: 16, lineHeight: 1 }}>✕</button>
+        </div>
+      )}
       <div className="contracts-header">
         <h1 className="contracts-header__title">My Contracts</h1>
       </div>
@@ -449,8 +479,8 @@ const ContractsFreelancer = () => {
         <div className="contracts-empty">
           <div className="contracts-empty__icon">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="1.6">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
             </svg>
           </div>
           <p className="contracts-empty__title">No contracts yet</p>
@@ -471,6 +501,8 @@ const ContractsFreelancer = () => {
               onSign={handleSign}
               onEditTerms={setEditingContract}
               onView={handleView}
+              onReview={(c) => setReviewContract(c)}
+              reviewedIds={reviewedIds}
             />
           ))}
         </div>
@@ -489,6 +521,18 @@ const ContractsFreelancer = () => {
           contract={detailContract}
           onClose={() => setDetailContract(null)}
           onMilestoneToggle={handleMilestoneToggle}
+        />
+      )}
+
+      {reviewContract && user && (
+        <ReviewModal
+          contract={reviewContract}
+          currentUserId={user.id}
+          onClose={() => setReviewContract(null)}
+          onSubmitted={(contractId) => {
+            setReviewedIds(prev => new Set([...prev, contractId]));
+            setReviewContract(null);
+          }}
         />
       )}
     </div>

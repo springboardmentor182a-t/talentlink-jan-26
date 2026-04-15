@@ -14,10 +14,11 @@ const MAX_RECONNECT_TRIES = 5;
 // Derive WS base URL from the existing Vite env var.
 //   http://localhost:8000  →  ws://localhost:8000
 //   https://api.example.com → wss://api.example.com
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-const WS_BASE = API_URL
-  .replace(/\/api$/, '')      // strip trailing /api
-  .replace(/^http/, 'ws');    // http → ws, https → wss
+// Derive WS base from the current page origin so it works correctly
+// whether accessed via the Vite dev server proxy or a production host.
+// The vite.config.js proxy forwards /ws → ws://server:8000, so we just
+// need the browser origin with the protocol swapped to ws/wss.
+const WS_BASE = window.location.origin.replace(/^http/, 'ws');
 
 
 // ─────────────────────────────────────────────────────────────────────────────

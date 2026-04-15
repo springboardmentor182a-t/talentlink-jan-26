@@ -7,7 +7,8 @@ from src.database.core import get_db
 from src.auth.dependencies import get_current_user
 from src.entities.user import User
 from src.users.models import FreelancerProfile, Proposal
-from src.proposals import models # Keeping your project/contract models
+from src.entities.contract import Contract
+from src.projects.models import Project
 
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
@@ -34,9 +35,9 @@ def get_dashboard_stats(
         Proposal.status == "accepted"
     ).scalar() or 0.0
 
-    # 3. Get Active Projects and Contracts (From your original code)
-    active_projects_count = db.query(models.Project).count()
-    active_contract = db.query(models.Contract).filter(models.Contract.status == "Active").first()
+    # 3. Get Active Projects and Contracts (Using real entities)
+    active_projects_count = db.query(Project).count()
+    active_contract = db.query(Contract).filter(Contract.status == "active").first()
     
     # 4. Return the fully dynamic data!
     return {
@@ -49,8 +50,8 @@ def get_dashboard_stats(
         },
         "active_contract": {
             "title": active_contract.title if active_contract else "No active contracts",
-            "due": active_contract.due if active_contract else "N/A",
-            "progress": active_contract.progress if active_contract else 0
+            "due": "N/A", # Due dates are inside milestones in the new architecture
+            "progress": 0
         } if active_contract else {
             "title": "No active contracts",
             "due": "N/A",

@@ -2,6 +2,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, Enum, Text, DECIMAL, JSON, DateTime, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from src.proposals.models import Proposal  # noqa: F401
 
 from src.database.core import Base
 
@@ -35,8 +36,8 @@ class FreelancerProfile(Base):
     twitter = Column(String, nullable=True)
     
     # Back link to User
-    user = relationship("User", back_populates="freelancer_profile")
-    proposals = relationship("Proposal", back_populates="freelancer")
+    user      = relationship("User", back_populates="freelancer_profile")
+    proposals = relationship("Proposal", back_populates="freelancer", cascade="all, delete-orphan")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
@@ -71,31 +72,6 @@ class ClientProfile(Base):
     
     # Back link to User
     user = relationship("User", back_populates="client_profile")
-
-# 5. The Proposal Table
-class Proposal(Base):
-    __tablename__ = "proposals"
-    id = Column(Integer, primary_key=True, index=True)
-    
-    # LINK TO TEAMMATE'S PROJECT
-    project_id = Column(Integer, index=True) 
-
-    # LINK TO YOUR FREELANCER
-    freelancer_id = Column(Integer, ForeignKey("profiles_freelancer.id"))
-    
-    cover_letter = Column(String)
-    bid_amount = Column(Float)
-    estimated_days = Column(Integer)
-    status = Column(String, default="pending") # pending, accepted, rejected
-    
-    # Relationship to Freelancer
-    freelancer = relationship("FreelancerProfile", back_populates="proposals")
-
-    rating = Column(DECIMAL(3, 2), default=0.0)
-    projects_posted = Column(Integer, default=0)
-
-    # Let the database handle the date automatically!
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
 # --- NEW SKILL TABLE ADDED HERE ---

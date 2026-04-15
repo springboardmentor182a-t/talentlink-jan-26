@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from src.entities.contract import Contract, ContractMilestone
+from src.contracts.models import Contract, ContractMilestone
 from src.contracts.models import ContractCreate, ContractEditTerms
 
 
@@ -28,13 +28,13 @@ def _resolve_parties(db: Session, contract: Contract) -> tuple[int, int]:
     1. Proposal.freelancer_id is profiles_freelancer.id, NOT users.id.
        FreelancerProfile lookup translates it to FreelancerProfile.user_id.
 
-    2. Project.client_id is profiles_client.id, NOT users.id.
-       ClientProfile lookup translates it to ClientProfile.user_id.
+    2. Project.client_id is users.id (FK → users.id confirmed in projects/models.py).
+       ClientProfile lookup uses ClientProfile.user_id == project.client_id.
 
     Without both lookups every permission check silently compares the wrong
     ID space and produces incorrect 403/200 responses.
     """
-    from src.users.models import Proposal      # noqa: PLC0415
+    from src.proposals.models import Proposal      # noqa: PLC0415
     from src.projects.models import Project        # noqa: PLC0415
     from src.users.models import FreelancerProfile  # noqa: PLC0415
     from src.users.models import ClientProfile      # noqa: PLC0415
@@ -52,9 +52,9 @@ def _resolve_parties(db: Session, contract: Contract) -> tuple[int, int]:
             detail="Proposal is linked to a missing project -- data integrity error",
         )
 
-    # project.client_id is profiles_client.id — resolve to users.id
+    # project.client_id is users.id (FK → users.id) — resolve to ClientProfile
     client_profile = db.query(ClientProfile).filter(
-        ClientProfile.id == project.client_id
+        ClientProfile.user_id == project.client_id
     ).first()
     if not client_profile:
         raise HTTPException(
@@ -92,7 +92,7 @@ class ContractService:
     @staticmethod
     def create_contract(db: Session, data: ContractCreate, client_id: int) -> dict:
         """Client only. Validates proposal ownership, creates contract in draft."""
-        from src.users.models import Proposal  # noqa: PLC0415
+        from src.proposals.models import Proposal  # noqa: PLC0415
         from src.projects.models import Project    # noqa: PLC0415
 
         proposal = db.query(Proposal).filter(Proposal.id == data.proposal_id).first()
@@ -100,6 +100,8 @@ class ContractService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Proposal not found")
 
         project = db.query(Project).filter(Project.id == proposal.project_id).first()
+        # project.client_id is users.id (FK → users.id in projects/models.py)
+        # client_id arg is also users.id (from current_user.id) — compare directly
         if not project or project.client_id != client_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -112,8 +114,8 @@ class ContractService:
                 detail="A contract already exists for this proposal",
             )
 
-        # Belt-and-suspenders: also check directly in case the ORM relationship
-        # isn't wired yet (proposal→contract back-ref is commented out pending merge).
+        # Belt-and-suspenders: also check directly via DB in case the ORM
+        # relationship cache hasn't flushed within this session.
         existing = db.query(Contract).filter(Contract.proposal_id == data.proposal_id).first()
         if existing:
             raise HTTPException(
@@ -156,11 +158,14 @@ class ContractService:
         For the freelancer branch we must join through FreelancerProfile because
         Proposal.freelancer_id is profiles_freelancer.id, not users.id.
         """
-        from src.users.models import Proposal      # noqa: PLC0415
-        from src.projects.models import Project        # noqa: PLC0415
+        from src.proposals.models import Proposal           # noqa: PLC0415
+        from src.projects.models import Project         # noqa: PLC0415
         from src.users.models import FreelancerProfile  # noqa: PLC0415
+        from src.users.models import ClientProfile      # noqa: PLC0415
 
         if role == "client":
+            # Project.client_id is users.id (FK → users.id).
+            # Filter directly — no join through ClientProfile needed.
             contracts = (
                 db.query(Contract)
                 .join(Proposal, Proposal.id == Contract.proposal_id)
@@ -206,6 +211,12 @@ class ContractService:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Cannot send a contract with status '{contract.status}' — must be 'draft'",
+            )
+
+        if not contract.terms or len(contract.terms.strip()) < 150:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Terms must be at least 150 characters before sending. Describe the scope, deliverables, and expectations clearly.",
             )
 
         contract.status = "pending_sign"
@@ -390,17 +401,44 @@ class ContractService:
         """Serialize a Contract ORM object to a dict matching ContractResponse.
 
         progress is computed here — it is never stored as a DB column.
+
+        project_id, client_user_id, freelancer_user_id are included so the
+        frontend can construct a review submission (POST /api/reviews/) without
+        any additional API calls. The frontend uses current_user.id to determine
+        which party is the reviewee.
+
+        freelancer_user_id requires two joins:
+          Contract.proposal_id → Proposal.freelancer_id (profiles_freelancer.id)
+          → FreelancerProfile.user_id (users.id)
+        This is the same resolution done in _resolve_parties(). We resolve here
+        directly from the already-loaded ORM relationships to avoid a second DB
+        round trip.
         """
+        proposal = contract.proposal
+        project_id        = proposal.project_id if proposal else None
+        client_user_id    = None
+        freelancer_user_id = None
+
+        if proposal and proposal.project:
+            client_user_id = proposal.project.client_id  # users.id directly
+
+        if proposal and proposal.freelancer:
+            # proposal.freelancer is FreelancerProfile; .user_id is users.id
+            freelancer_user_id = proposal.freelancer.user_id
+
         return {
-            "id":          contract.id,
-            "proposal_id": contract.proposal_id,
-            "title":       contract.title,
-            "budget":      contract.budget,
-            "terms":       contract.terms,
-            "start_date":  contract.start_date,
-            "end_date":    contract.end_date,
-            "status":      contract.status,
-            "milestones":  contract.milestones,
-            "progress":    _calc_progress(contract),
-            "created_at":  contract.created_at,
+            "id":                  contract.id,
+            "proposal_id":         contract.proposal_id,
+            "title":               contract.title,
+            "budget":              contract.budget,
+            "terms":               contract.terms,
+            "start_date":          contract.start_date,
+            "end_date":            contract.end_date,
+            "status":              contract.status,
+            "milestones":          contract.milestones,
+            "progress":            _calc_progress(contract),
+            "created_at":          contract.created_at,
+            "project_id":          project_id,
+            "client_user_id":      client_user_id,
+            "freelancer_user_id":  freelancer_user_id,
         }

@@ -23,9 +23,9 @@ def create_project(
     client_id = current_user.id
     logger.info(f"Client {client_id} attempting to post a new project: {project.title}")
     
-    # Optional logic: we could verify the client_id actually exists in `profiles_client`
+    # Verify the user has a ClientProfile — filter by user_id, not profile pk
     from src.users.models import ClientProfile
-    client_profile = db.query(ClientProfile).filter(ClientProfile.id == client_id).first()
+    client_profile = db.query(ClientProfile).filter(ClientProfile.user_id == client_id).first()
     
     if not client_profile:
         logger.warning(f"Client {client_id} attempted to post a project without a valid client profile.")
@@ -39,7 +39,8 @@ def get_projects(
     limit: int = 10,
     search: str | None = None,
     min_budget: float | None = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Retrieve open projects from the marketplace with optional filtering."""
     logger.info(f"Fetching projects - skip:{skip}, limit:{limit}, search:'{search}', min_budget:{min_budget}")
@@ -50,3 +51,14 @@ def get_projects(
         search=search,
         min_budget=min_budget
     )
+
+
+@router.get("/{project_id}", response_model=schemas.ProjectResponse)
+def get_project(
+    project_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Fetch a single project by ID."""
+    logger.info(f"Fetching project {project_id}")
+    return ProjectService.get_project_by_id(db=db, project_id=project_id)

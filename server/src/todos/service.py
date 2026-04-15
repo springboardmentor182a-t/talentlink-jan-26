@@ -2,8 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from typing import List
 
-from src.entities.todo import Todo
-from src.todos.models import TodoCreate, TodoUpdate
+from src.todos.models import Todo, TodoCreate, TodoUpdate
 
 
 class TodoService:
