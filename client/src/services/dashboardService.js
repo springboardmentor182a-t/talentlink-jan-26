@@ -18,10 +18,19 @@ export const fetchDashboardData = async () => {
       throw new Error("Failed to fetch dashboard data");
     }
 
-    return await response.json();
+    const data = await response.json();
+
+    // ✅ DEBUG (VERY IMPORTANT)
+    console.log("✅ Dashboard API Response:", data);
+
+    // ✅ Always return data safely
+    return data || {};
+    
   } catch (error) {
-    console.error("Error fetching dashboard data:", error);
-    throw error;
+    console.error("❌ Error fetching dashboard data:", error);
+
+    // ✅ Prevent frontend crash
+    return {};
   }
 };
 
@@ -43,9 +52,13 @@ export const createProject = async (projectData) => {
       throw new Error(errorData.detail || "Failed to create project");
     }
 
-    return await response.json();
+    const data = await response.json();
+
+    console.log("✅ Project Created:", data);
+
+    return data;
   } catch (error) {
-    console.error("Error creating project:", error);
+    console.error("❌ Error creating project:", error);
     throw error;
   }
 };

@@ -1,7 +1,8 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Text
 from sqlalchemy.orm import relationship
-from src.database.core import Base
+from src.database import Base   # ✅ FIXED IMPORT
 from datetime import datetime
+
 
 class User(Base):
     __tablename__ = "users"
@@ -14,11 +15,22 @@ class User(Base):
     role = Column(String, default="Client")
     rating = Column(Float, default=0.0)
     created_at = Column(DateTime, default=datetime.utcnow)
-    
+
     # Relationships
-    projects_client = relationship("Project", back_populates="client", foreign_keys="[Project.client_id]")
-    contracts_freelancer = relationship("Contract", back_populates="freelancer", foreign_keys="[Contract.freelancer_id]")
+    projects_client = relationship(
+        "Project",
+        back_populates="client",
+        foreign_keys="Project.client_id"   # ✅ FIXED
+    )
+
+    contracts_freelancer = relationship(
+        "Contract",
+        back_populates="freelancer",
+        foreign_keys="Contract.freelancer_id"   # ✅ FIXED
+    )
+
     activities = relationship("ActivityLog", back_populates="user")
+
 
 class Project(Base):
     __tablename__ = "projects"
@@ -32,14 +44,20 @@ class Project(Base):
     deadline = Column(DateTime)
     budget_spent = Column(Float, default=0.0)
     created_at = Column(DateTime, default=datetime.utcnow)
-    
+
     client_id = Column(Integer, ForeignKey("users.id"))
-    
+
     # Relationships
-    client = relationship("User", back_populates="projects_client", foreign_keys=[client_id])
+    client = relationship(
+        "User",
+        back_populates="projects_client",
+        foreign_keys=[client_id]
+    )
+
     contracts = relationship("Contract", back_populates="project")
     payments = relationship("Payment", back_populates="project")
     activities = relationship("ActivityLog", back_populates="project")
+
 
 class Contract(Base):
     __tablename__ = "contracts"
@@ -48,14 +66,21 @@ class Contract(Base):
     amount = Column(Float)
     status = Column(String, default="Active")
     created_at = Column(DateTime, default=datetime.utcnow)
-    
+
     project_id = Column(Integer, ForeignKey("projects.id"))
     freelancer_id = Column(Integer, ForeignKey("users.id"))
-    
+
     # Relationships
     project = relationship("Project", back_populates="contracts")
-    freelancer = relationship("User", back_populates="contracts_freelancer", foreign_keys=[freelancer_id])
+
+    freelancer = relationship(
+        "User",
+        back_populates="contracts_freelancer",
+        foreign_keys=[freelancer_id]
+    )
+
     payments = relationship("Payment", back_populates="contract")
+
 
 class Payment(Base):
     __tablename__ = "payments"
@@ -64,12 +89,13 @@ class Payment(Base):
     amount = Column(Float, nullable=False)
     status = Column(String, default="Completed")
     payment_date = Column(DateTime, default=datetime.utcnow)
-    
+
     contract_id = Column(Integer, ForeignKey("contracts.id"))
     project_id = Column(Integer, ForeignKey("projects.id"))
-    
+
     contract = relationship("Contract", back_populates="payments")
     project = relationship("Project", back_populates="payments")
+
 
 class ActivityLog(Base):
     __tablename__ = "activity_logs"
@@ -80,7 +106,7 @@ class ActivityLog(Base):
     description = Column(String, nullable=False)
     activity_type = Column(String)  # proposal, payment, job_post
     created_at = Column(DateTime, default=datetime.utcnow)
-    
+
     user = relationship("User", back_populates="activities")
     project = relationship("Project", back_populates="activities")
 
