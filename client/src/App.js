@@ -12,6 +12,7 @@ import ClientDashboard from "./pages/ClientDashboard";
 import ClientProfile from "./components/profile/ClientProfile";
 import FreelancerProfile from "./components/profile/FreelancerProfile";
 import ReceivedProposals from "./pages/client/ReceivedProposals";
+import ClientMessages from "./pages/client/ClientMessages";
 import { FreelancerRoutes } from "./pages/freelancer/FreelancerRoutes";
 
 import Login from "./pages/login";
@@ -161,6 +162,14 @@ function App() {
             }
           />
 
+          <Route
+            path="/client/messages"
+            element={
+              <PrivateRoute>
+                <ClientMessages />
+              </PrivateRoute>
+            }
+          />
           <Route
             path="/freelancer/*"
             element={
