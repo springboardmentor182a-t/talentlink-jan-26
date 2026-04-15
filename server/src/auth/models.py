@@ -43,11 +43,17 @@ class RegisterResponse(BaseModel):
 # created_at is omitted — the frontend has no use for it at login time,
 # and trimming the surface area reduces accidental data exposure if a
 # response_model is ever accidentally loosened in future.
+from src.users.schemas.freelancer import FreelancerProfileResponse
+from src.users.schemas.client import ClientProfileResponse
+
+
 class LoginUserResponse(BaseModel):
     id: int
     email: str
     username: str
     role: str
+    freelancer_profile: Optional[FreelancerProfileResponse] = None
+    client_profile: Optional[ClientProfileResponse] = None
 
     class Config:
         from_attributes = True

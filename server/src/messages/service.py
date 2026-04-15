@@ -4,9 +4,9 @@ from fastapi import HTTPException, status
 from sqlalchemy import or_, and_, func, case
 from sqlalchemy.orm import Session
 
-from src.entities.message import Message
 from src.entities.user import User
-from src.messages.models import MessageSend
+from src.messages.models import Message, MessageSend
+from src.users.models import FreelancerProfile, ClientProfile
 
 
 def _sanitize(text: str) -> str:
@@ -264,9 +264,16 @@ class MessageService:
             partner  = partner_map[partner_id]
             last_row = last_msgs.get(partner_id)
 
+            if partner.role == "freelancer":
+                profile = db.query(FreelancerProfile).filter(FreelancerProfile.user_id == partner.id).first()
+                display_name = profile.full_name if profile and profile.full_name else partner.username
+            else:
+                profile = db.query(ClientProfile).filter(ClientProfile.user_id == partner.id).first()
+                display_name = profile.company_name if profile and profile.company_name else partner.username
+
             conversations.append({
                 "user_id":           partner.id,
-                "username":          partner.username,
+                "username":          display_name,
                 "role":              partner.role,
                 "last_message":      last_row.content if last_row else None,
                 "last_message_time": last_row.last_ts if last_row else None,

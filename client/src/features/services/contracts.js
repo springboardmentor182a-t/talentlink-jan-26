@@ -10,6 +10,8 @@ const ContractsService = {
   cancel:    (id)         => axiosInstance.post(`/contracts/${id}/cancel`),
   updateMilestone: (id, is_completed) =>
     axiosInstance.patch(`/contracts/milestones/${id}`, { is_completed }),
+  renegotiate: (id, data) =>
+    axiosInstance.patch(`/contracts/${id}/renegotiate`, data),
 };
 
 export default ContractsService;
