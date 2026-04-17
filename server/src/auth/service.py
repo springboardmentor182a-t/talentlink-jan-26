@@ -1,32 +1,67 @@
-from sqlalchemy.orm import Session
 from passlib.context import CryptContext
-from jose import jwt
-from datetime import datetime, timedelta
+from jose import jwt, JWTError
+from datetime import datetime, timedelta, timezone
+from dotenv import load_dotenv
+import os
 
 from src.entities.user import User
 
-SECRET_KEY = "talentlink-secret"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+# Load environment variables
+load_dotenv()
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY not set in .env file!")
 
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
+
+# Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def hash_password(password: str):
-    return pwd_context.hash(password)
+# ----------------------
+# Password Utilities
+# ----------------------
+def hash_password(password: str) -> str:
+    """Hash password for storage (truncate to 72 bytes for bcrypt safety)."""
+    return pwd_context.hash(password[:72])
 
 
-def verify_password(password, hashed):
-    return pwd_context.verify(password, hashed)
+def verify_password(plain: str, hashed: str) -> bool:
+    """Verify a plain password against the stored hash."""
+    return pwd_context.verify(plain[:72], hashed)
 
 
-def create_token(data: dict):
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    data.update({"exp": expire})
-    return jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
+# ----------------------
+# JWT Token Utilities
+# ----------------------
+def create_token(data: dict, expire_minutes: int = ACCESS_TOKEN_EXPIRE_MINUTES) -> str:
+    """Create a JWT token with expiration."""
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + timedelta(minutes=expire_minutes)
+    to_encode.update({"exp": expire})
+
+    try:
+        token = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+        return token
+    except JWTError as e:
+        raise RuntimeError(f"Failed to create JWT token: {e}")
 
 
-def register_user(db: Session, name, email, password, role):
+def decode_token(token: str) -> dict:
+    """Decode a JWT token and return payload, raises error if invalid/expired."""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except JWTError as e:
+        raise RuntimeError(f"Invalid or expired token: {e}")
+
+
+# ----------------------
+# User Utilities
+# ----------------------
+def register_user(db, name: str, email: str, password: str, role: str):
+    """Register a new user if email does not exist."""
     existing = db.query(User).filter(User.email == email).first()
     if existing:
         return None
@@ -35,7 +70,7 @@ def register_user(db: Session, name, email, password, role):
         name=name,
         email=email,
         password=hash_password(password),
-        role=role
+        role=role,
     )
     db.add(user)
     db.commit()
@@ -43,12 +78,9 @@ def register_user(db: Session, name, email, password, role):
     return user
 
 
-def authenticate_user(db: Session, email, password):
+def authenticate_user(db, email: str, password: str):
+    """Authenticate user by email and password."""
     user = db.query(User).filter(User.email == email).first()
-    if not user:
+    if not user or not verify_password(password, user.password):
         return None
-
-    if not verify_password(password, user.password):
-        return None
-
     return user
