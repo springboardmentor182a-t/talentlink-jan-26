@@ -48,29 +48,29 @@ export default function Contracts() {
 
   if (loading) return (
     <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh" }}>
-      <p style={{ color:"#64748b" }}>Loading contracts...</p>
+      <p style={{ color:"var(--text-muted)" }}>Loading contracts...</p>
     </div>
   );
 
   return (
-    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#f8fafc", minHeight:"100vh" }}>
-      <div style={{ background:"linear-gradient(135deg,#1e3a5f 0%,#2563eb 50%,#3b82f6 100%)", padding:"32px 32px", position:"relative", overflow:"hidden" }}>
+    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"var(--page-bg)", minHeight:"100vh" }}>
+      <div style={{ background:"linear-gradient(135deg,#1e3a5f 0%,#2563eb 50%,#3b82f6 100%)", padding:"24px 16px", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:-40, right:-40, width:200, height:200, borderRadius:"50%", background:"rgba(255,255,255,0.05)" }} />
         <div style={{ display:"inline-flex", alignItems:"center", gap:8, backgroundColor:"rgba(255,255,255,0.15)", borderRadius:20, padding:"4px 14px", fontSize:12, color:"white", fontWeight:600, marginBottom:10 }}>📄 Contracts</div>
         <h1 style={{ fontSize:28, fontWeight:800, color:"white", margin:"0 0 6px", letterSpacing:"-0.5px" }}>Contract Management</h1>
         <p style={{ fontSize:14, color:"rgba(255,255,255,0.75)", margin:0 }}>Track and manage your active and completed contracts</p>
       </div>
 
-      <div style={{ padding:32 }}>
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginBottom:32 }}>
+      <div style={{ padding:"20px 16px" }}>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(160px, 1fr))", gap:16, marginBottom:32 }}>
           {[
             { label:"Active Contracts",    val:active.length,                     icon:"⚡", color:"#2563eb", bg:"#eff6ff" },
             { label:"Completed Contracts", val:completed.length,                  icon:"✅", color:"#16a34a", bg:"#f0fdf4" },
             { label:"Total Investment",    val:`$${totalBudget.toLocaleString()}`, icon:"💰", color:"#7c3aed", bg:"#f5f3ff" },
           ].map(s => (
-            <div key={s.label} style={{ backgroundColor:"#fff", borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <div key={s.label} style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div>
-                <div style={{ fontSize:12, color:"#64748b", marginBottom:6, textTransform:"uppercase", letterSpacing:"0.5px" }}>{s.label}</div>
+                <div style={{ fontSize:12, color:"var(--text-muted)", marginBottom:6, textTransform:"uppercase", letterSpacing:"0.5px" }}>{s.label}</div>
                 <div style={{ fontSize:28, fontWeight:800, color:s.color }}>{s.val}</div>
               </div>
               <div style={{ width:48, height:48, borderRadius:14, backgroundColor:s.bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24 }}>{s.icon}</div>
@@ -79,10 +79,10 @@ export default function Contracts() {
         </div>
 
         {projects.length === 0 && (
-          <div style={{ backgroundColor:"#fff", borderRadius:16, padding:"60px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+          <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"60px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
             <div style={{ fontSize:56, marginBottom:16 }}>📄</div>
-            <h3 style={{ fontSize:18, fontWeight:700, color:"#111827", marginBottom:8 }}>No contracts yet</h3>
-            <p style={{ color:"#64748b", fontSize:14, marginBottom:20 }}>Contracts are created when you accept a freelancer proposal.</p>
+            <h3 style={{ fontSize:18, fontWeight:700, color:"var(--text-primary)", marginBottom:8 }}>No contracts yet</h3>
+            <p style={{ color:"var(--text-muted)", fontSize:14, marginBottom:20 }}>Contracts are created when you accept a freelancer proposal.</p>
             <button onClick={() => navigate("/projects")}
               style={{ padding:"12px 28px", background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"white", border:"none", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14 }}>
               View Projects →
@@ -94,7 +94,7 @@ export default function Contracts() {
           <div style={{ marginBottom:32 }}>
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
               <div style={{ width:10, height:10, borderRadius:"50%", backgroundColor:"#f59e0b" }} />
-              <h2 style={{ fontSize:18, fontWeight:700, color:"#111827", margin:0 }}>Active Contracts</h2>
+              <h2 style={{ fontSize:18, fontWeight:700, color:"var(--text-primary)", margin:0 }}>Active Contracts</h2>
               <span style={{ backgroundColor:"#fef3c7", color:"#d97706", borderRadius:20, padding:"2px 10px", fontSize:12, fontWeight:600 }}>{active.length}</span>
             </div>
             {active.map(p => (
@@ -107,7 +107,7 @@ export default function Contracts() {
           <div style={{ marginBottom:32 }}>
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
               <div style={{ width:10, height:10, borderRadius:"50%", backgroundColor:"#16a34a" }} />
-              <h2 style={{ fontSize:18, fontWeight:700, color:"#111827", margin:0 }}>Completed Contracts</h2>
+              <h2 style={{ fontSize:18, fontWeight:700, color:"var(--text-primary)", margin:0 }}>Completed Contracts</h2>
               <span style={{ backgroundColor:"#dcfce7", color:"#16a34a", borderRadius:20, padding:"2px 10px", fontSize:12, fontWeight:600 }}>{completed.length}</span>
             </div>
             {completed.map(p => (
@@ -204,18 +204,18 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
   const rc = riskColor[risk?.risk_level] || riskColor["Medium"];
 
   return (
-    <div style={{ backgroundColor:"#fff", borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}
+    <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}
       onMouseEnter={e => e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.1)"}
       onMouseLeave={e => e.currentTarget.style.boxShadow="0 1px 3px rgba(0,0,0,0.06)"}>
 
       {/* Header */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:20 }}>
         <div>
-          <h3 style={{ fontSize:18, fontWeight:700, color:"#111827", margin:"0 0 6px" }}>{p.title}</h3>
-          <p style={{ fontSize:13, color:"#64748b", margin:0, display:"flex", alignItems:"center", gap:6 }}>
+          <h3 style={{ fontSize:18, fontWeight:700, color:"var(--text-primary)", margin:"0 0 6px" }}>{p.title}</h3>
+          <p style={{ fontSize:13, color:"var(--text-muted)", margin:0, display:"flex", alignItems:"center", gap:6 }}>
             <span>👤</span>
             {freelancerName
-              ? <span style={{ fontWeight:600, color:"#374151" }}>{freelancerName}</span>
+              ? <span style={{ fontWeight:600, color:"var(--text-secondary)" }}>{freelancerName}</span>
               : <span>No freelancer assigned</span>}
           </p>
         </div>
@@ -223,7 +223,7 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
       </div>
 
       {/* Stats */}
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:16, marginBottom:20 }}>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(100px, 1fr))", gap:16, marginBottom:20 }}>
         {[
           { label:"Budget",    val:`$${p.budget}` },
           { label:"Deadline",  val:p.deadline || "—" },
@@ -231,8 +231,8 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
           { label:"Progress",  val:`${progressPct}%` },
         ].map(item => (
           <div key={item.label}>
-            <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:4 }}>{item.label}</div>
-            <div style={{ fontWeight:700, color:"#111827", fontSize:16 }}>{item.val}</div>
+            <div style={{ fontSize:11, color:"var(--text-muted)", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:4 }}>{item.label}</div>
+            <div style={{ fontWeight:700, color:"var(--text-primary)", fontSize:16 }}>{item.val}</div>
           </div>
         ))}
       </div>
@@ -251,26 +251,26 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
       {/* Progress Bar */}
       <div style={{ marginBottom:20 }}>
         <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
-          <span style={{ fontSize:12, color:"#64748b", fontWeight:600 }}>Project Progress</span>
+          <span style={{ fontSize:12, color:"var(--text-muted)", fontWeight:600 }}>Project Progress</span>
           <span style={{ fontSize:12, color: p.status === "completed" ? "#16a34a" : "#2563eb", fontWeight:700 }}>{progressPct}%</span>
         </div>
-        <div style={{ height:8, backgroundColor:"#f1f5f9", borderRadius:20, overflow:"hidden" }}>
+        <div style={{ height:8, backgroundColor:"var(--input-background)", borderRadius:20, overflow:"hidden" }}>
           <div style={{ width:`${progressPct}%`, height:"100%", background: p.status === "completed" ? "linear-gradient(135deg,#16a34a,#22c55e)" : "linear-gradient(135deg,#2563eb,#3b82f6)", borderRadius:20, transition:"width 0.5s ease" }} />
         </div>
       </div>
 
       {/* Accepted Proposal Info */}
       {accepted && (
-        <div style={{ backgroundColor:"#f8fafc", borderRadius:10, padding:"14px 16px", marginBottom:16, border:"1px solid #e2e8f0" }}>
-          <div style={{ fontSize:12, fontWeight:700, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:8 }}>Accepted Proposal</div>
+        <div style={{ backgroundColor:"var(--page-bg)", borderRadius:10, padding:"14px 16px", marginBottom:16, border:"1px solid var(--border)" }}>
+          <div style={{ fontSize:12, fontWeight:700, color:"var(--text-muted)", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:8 }}>Accepted Proposal</div>
           <div style={{ display:"flex", gap:24, flexWrap:"wrap" }}>
-            <div><div style={{ fontSize:11, color:"#64748b" }}>Freelancer</div><div style={{ fontWeight:700, color:"#111827", fontSize:14 }}>{freelancerName || "—"}</div></div>
-            <div><div style={{ fontSize:11, color:"#64748b" }}>Proposed Budget</div><div style={{ fontWeight:700, color:"#111827", fontSize:14 }}>${accepted.proposed_budget}</div></div>
-            <div><div style={{ fontSize:11, color:"#64748b" }}>Delivery Time</div><div style={{ fontWeight:700, color:"#111827", fontSize:14 }}>{accepted.delivery_time}</div></div>
+            <div><div style={{ fontSize:11, color:"var(--text-muted)" }}>Freelancer</div><div style={{ fontWeight:700, color:"var(--text-primary)", fontSize:14 }}>{freelancerName || "—"}</div></div>
+            <div><div style={{ fontSize:11, color:"var(--text-muted)" }}>Proposed Budget</div><div style={{ fontWeight:700, color:"var(--text-primary)", fontSize:14 }}>${accepted.proposed_budget}</div></div>
+            <div><div style={{ fontSize:11, color:"var(--text-muted)" }}>Delivery Time</div><div style={{ fontWeight:700, color:"var(--text-primary)", fontSize:14 }}>{accepted.delivery_time}</div></div>
             {accepted.cover_letter && (
               <div style={{ flex:1 }}>
-                <div style={{ fontSize:11, color:"#64748b" }}>Cover Letter</div>
-                <div style={{ fontSize:13, color:"#374151", lineHeight:1.5 }}>{accepted.cover_letter.length > 100 ? accepted.cover_letter.slice(0,100)+"..." : accepted.cover_letter}</div>
+                <div style={{ fontSize:11, color:"var(--text-muted)" }}>Cover Letter</div>
+                <div style={{ fontSize:13, color:"var(--text-secondary)", lineHeight:1.5 }}>{accepted.cover_letter.length > 100 ? accepted.cover_letter.slice(0,100)+"..." : accepted.cover_letter}</div>
               </div>
             )}
           </div>
@@ -292,14 +292,14 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
       {showRisk && (
         <div style={{ backgroundColor: riskLoading ? "#f8fafc" : rc.bg, border:`1px solid ${riskLoading ? "#e2e8f0" : rc.border}`, borderRadius:12, padding:16, marginBottom:16 }}>
           {riskLoading ? (
-            <div style={{ display:"flex", alignItems:"center", gap:8, color:"#64748b", fontSize:13 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:8, color:"var(--text-muted)", fontSize:13 }}>
               <span>⏳</span> Analyzing contract risk...
             </div>
           ) : risk && (
             <>
               <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:12 }}>
                 <span style={{ fontSize:20 }}>🔮</span>
-                <span style={{ fontWeight:700, color:"#111827", fontSize:14 }}>Contract Risk Analysis</span>
+                <span style={{ fontWeight:700, color:"var(--text-primary)", fontSize:14 }}>Contract Risk Analysis</span>
                 <span style={{ padding:"3px 12px", borderRadius:20, fontSize:12, fontWeight:700, backgroundColor:rc.badge, color:rc.badgeText }}>
                   {risk.risk_level} Risk
                 </span>
@@ -307,9 +307,9 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
               </div>
               {risk.risk_factors?.length > 0 && (
                 <div style={{ marginBottom:10 }}>
-                  <div style={{ fontSize:12, fontWeight:600, color:"#374151", marginBottom:4 }}>⚠️ Risk Factors</div>
+                  <div style={{ fontSize:12, fontWeight:600, color:"var(--text-secondary)", marginBottom:4 }}>⚠️ Risk Factors</div>
                   {risk.risk_factors.map((f, i) => (
-                    <div key={i} style={{ fontSize:12, color:"#64748b", padding:"3px 0", display:"flex", gap:6 }}>
+                    <div key={i} style={{ fontSize:12, color:"var(--text-muted)", padding:"3px 0", display:"flex", gap:6 }}>
                       <span style={{ color:rc.text }}>•</span> {f}
                     </div>
                   ))}
@@ -317,16 +317,16 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
               )}
               {risk.positive_factors?.length > 0 && (
                 <div style={{ marginBottom:10 }}>
-                  <div style={{ fontSize:12, fontWeight:600, color:"#374151", marginBottom:4 }}>✅ Positive Factors</div>
+                  <div style={{ fontSize:12, fontWeight:600, color:"var(--text-secondary)", marginBottom:4 }}>✅ Positive Factors</div>
                   {risk.positive_factors.map((f, i) => (
-                    <div key={i} style={{ fontSize:12, color:"#64748b", padding:"3px 0", display:"flex", gap:6 }}>
+                    <div key={i} style={{ fontSize:12, color:"var(--text-muted)", padding:"3px 0", display:"flex", gap:6 }}>
                       <span style={{ color:"#16a34a" }}>•</span> {f}
                     </div>
                   ))}
                 </div>
               )}
               {risk.recommendation && (
-                <div style={{ backgroundColor:"rgba(255,255,255,0.6)", borderRadius:8, padding:"10px 12px", fontSize:12, color:"#374151", fontStyle:"italic" }}>
+                <div style={{ backgroundColor:"rgba(255,255,255,0.6)", borderRadius:8, padding:"10px 12px", fontSize:12, color:"var(--text-secondary)", fontStyle:"italic" }}>
                   💡 {risk.recommendation}
                 </div>
               )}
@@ -339,21 +339,21 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
       {showSummary && (
         <div style={{ backgroundColor: summaryLoading ? "#f8fafc" : "#f0f9ff", border:"1px solid #bae6fd", borderRadius:12, padding:16, marginBottom:16 }}>
           {summaryLoading ? (
-            <div style={{ display:"flex", alignItems:"center", gap:8, color:"#64748b", fontSize:13 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:8, color:"var(--text-muted)", fontSize:13 }}>
               <span>⏳</span> Generating AI summary...
             </div>
           ) : summary && (
             <>
               <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:12 }}>
                 <span style={{ fontSize:20 }}>🤖</span>
-                <span style={{ fontWeight:700, color:"#111827", fontSize:14 }}>AI Project Summary</span>
+                <span style={{ fontWeight:700, color:"var(--text-primary)", fontSize:14 }}>AI Project Summary</span>
               </div>
-              <p style={{ fontSize:13, color:"#374151", lineHeight:1.6, margin:"0 0 12px" }}>{summary.summary}</p>
+              <p style={{ fontSize:13, color:"var(--text-secondary)", lineHeight:1.6, margin:"0 0 12px" }}>{summary.summary}</p>
               {summary.next_steps?.length > 0 && (
                 <div style={{ marginBottom:10 }}>
                   <div style={{ fontSize:12, fontWeight:600, color:"#0369a1", marginBottom:4 }}>📋 Next Steps</div>
                   {summary.next_steps.map((s, i) => (
-                    <div key={i} style={{ fontSize:12, color:"#374151", padding:"3px 0", display:"flex", gap:6 }}>
+                    <div key={i} style={{ fontSize:12, color:"var(--text-secondary)", padding:"3px 0", display:"flex", gap:6 }}>
                       <span style={{ color:"#0369a1", fontWeight:700 }}>{i+1}.</span> {s}
                     </div>
                   ))}
@@ -363,7 +363,7 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
                 <div>
                   <div style={{ fontSize:12, fontWeight:600, color:"#0369a1", marginBottom:4 }}>💡 Tips</div>
                   {summary.tips.map((t, i) => (
-                    <div key={i} style={{ fontSize:12, color:"#64748b", padding:"3px 0", display:"flex", gap:6 }}>
+                    <div key={i} style={{ fontSize:12, color:"var(--text-muted)", padding:"3px 0", display:"flex", gap:6 }}>
                       <span style={{ color:"#0369a1" }}>•</span> {t}
                     </div>
                   ))}
@@ -375,7 +375,7 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
       )}
 
       {/* Actions */}
-      <div style={{ display:"flex", gap:10, paddingTop:16, borderTop:"1px solid #f1f5f9", flexWrap:"wrap" }}>
+      <div style={{ display:"flex", gap:10, paddingTop:16, borderTop:"1px solid var(--border-light)", flexWrap:"wrap" }}>
         {onComplete && (
           <button onClick={handleComplete} disabled={completing}
             style={{ padding:"10px 20px", background: completing ? "#cbd5e1" : "linear-gradient(135deg,#16a34a,#22c55e)", color:"white", border:"none", borderRadius:8, cursor: completing ? "not-allowed" : "pointer", fontWeight:600, fontSize:13 }}>
@@ -402,7 +402,7 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
           🤖 {showSummary ? "Hide Summary" : "AI Summary"}
         </button>
         <button onClick={() => navigate("/projects")}
-          style={{ padding:"10px 20px", backgroundColor:"white", color:"#374151", border:"1.5px solid #e2e8f0", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}>
+          style={{ padding:"10px 20px", backgroundColor:"white", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}>
           📁 View Project
         </button>
       </div>

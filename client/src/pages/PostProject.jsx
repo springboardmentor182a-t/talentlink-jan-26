@@ -101,7 +101,7 @@ export default function PostProject() {
     }
   };
 
-  if (authLoading) return <div style={{ padding:32 }}>Loading...</div>;
+  if (authLoading) return <div style={{ padding:"20px 16px" }}>Loading...</div>;
   if (!user) return <Navigate to="/client/login" replace />;
 
   const completionScore = [
@@ -115,10 +115,10 @@ export default function PostProject() {
   const completionPercent = (completionScore / 5) * 100;
 
   return (
-    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#f8fafc", minHeight:"100vh" }}>
+    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"var(--page-bg)", minHeight:"100vh" }}>
 
       {/* Hero Banner */}
-      <div style={{ background:"linear-gradient(135deg,#1e3a5f 0%,#2563eb 50%,#3b82f6 100%)", padding:"32px 32px", position:"relative", overflow:"hidden" }}>
+      <div style={{ background:"linear-gradient(135deg,#1e3a5f 0%,#2563eb 50%,#3b82f6 100%)", padding:"24px 16px", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:-50, right:-50, width:200, height:200, borderRadius:"50%", background:"rgba(255,255,255,0.05)" }} />
         <div style={{ display:"inline-flex", alignItems:"center", gap:8, backgroundColor:"rgba(255,255,255,0.15)", borderRadius:20, padding:"4px 14px", fontSize:12, color:"white", fontWeight:600, marginBottom:10 }}>
           📋 New Project
@@ -127,19 +127,19 @@ export default function PostProject() {
         <p style={{ fontSize:14, color:"rgba(255,255,255,0.75)", margin:0 }}>Connect with top freelancers and bring your vision to life</p>
       </div>
 
-      <div style={{ padding:32 }}>
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 360px", gap:28, alignItems:"start" }}>
+      <div style={{ padding:"20px 16px" }}>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap:28, alignItems:"start" }}>
 
           {/* Left - Form */}
           <div>
 
             {/* Progress Bar */}
-            <div style={{ backgroundColor:"#fff", borderRadius:12, padding:"20px 24px", marginBottom:20, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+            <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:12, padding:"20px 24px", marginBottom:20, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
-                <span style={{ fontSize:13, fontWeight:600, color:"#374151" }}>Form Completeness</span>
+                <span style={{ fontSize:13, fontWeight:600, color:"var(--text-secondary)" }}>Form Completeness</span>
                 <span style={{ fontSize:13, fontWeight:700, color: completionPercent === 100 ? "#16a34a" : "#2563eb" }}>{completionPercent}%</span>
               </div>
-              <div style={{ backgroundColor:"#f1f5f9", borderRadius:20, height:8, overflow:"hidden" }}>
+              <div style={{ backgroundColor:"var(--input-background)", borderRadius:20, height:8, overflow:"hidden" }}>
                 <div style={{ height:"100%", borderRadius:20, width:`${completionPercent}%`, background: completionPercent === 100 ? "linear-gradient(135deg,#16a34a,#22c55e)" : "linear-gradient(135deg,#2563eb,#3b82f6)", transition:"width 0.4s ease" }} />
               </div>
               <div style={{ display:"flex", gap:16, marginTop:12 }}>
@@ -159,7 +159,7 @@ export default function PostProject() {
             </div>
 
             {/* Form Card */}
-            <div style={{ backgroundColor:"#fff", borderRadius:16, padding:32, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+            <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:32, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
 
               {error && (
                 <div style={{ background:"#fef2f2", border:"1px solid #fca5a5", color:"#b91c1c", borderRadius:10, padding:"12px 16px", marginBottom:20, fontSize:13 }}>
@@ -188,7 +188,7 @@ export default function PostProject() {
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
                     <label style={{ ...lbl, margin:0 }}>
                       Project Description <span style={{ color:"#ef4444" }}>*</span>
-                      <span style={{ fontSize:11, color:"#9ca3af", fontWeight:400, marginLeft:8 }}>Min. 50 characters</span>
+                      <span style={{ fontSize:11, color:"var(--text-faint)", fontWeight:400, marginLeft:8 }}>Min. 50 characters</span>
                     </label>
                     {/* ✅ AI GENERATE DESCRIPTION BUTTON */}
                     <button type="button" onClick={generateDescription} disabled={descLoading || !form.title}
@@ -229,7 +229,7 @@ export default function PostProject() {
                 <div style={{ marginBottom:24 }}>
                   <label style={lbl}>
                     Required Skills <span style={{ color:"#ef4444" }}>*</span>
-                    <span style={{ fontSize:11, color:"#9ca3af", fontWeight:400, marginLeft:8 }}>Press Enter to add</span>
+                    <span style={{ fontSize:11, color:"var(--text-faint)", fontWeight:400, marginLeft:8 }}>Press Enter to add</span>
                   </label>
                   <div onClick={() => document.getElementById("skill-inp").focus()}
                     style={{ ...inp, display:"flex", flexWrap:"wrap", gap:8, height:"auto", minHeight:48, padding:"10px 14px", cursor:"text", borderColor: skillTags.length > 0 ? "#2563eb" : "#e2e8f0" }}>
@@ -251,17 +251,17 @@ export default function PostProject() {
                 </div>
 
                 {/* Budget + Deadline */}
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20, marginBottom:32 }}>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(160px, 1fr))", gap:20, marginBottom:32 }}>
                   <div>
                     <label style={lbl}>Budget (USD) <span style={{ color:"#ef4444" }}>*</span></label>
                     <div style={{ position:"relative" }}>
-                      <span style={{ position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", color:"#64748b", fontWeight:600 }}>$</span>
+                      <span style={{ position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", color:"var(--text-muted)", fontWeight:600 }}>$</span>
                       <input required type="number" min="1" placeholder="5000"
                         value={form.budget} onChange={e => setForm({ ...form, budget:e.target.value })}
                         style={{ ...inp, paddingLeft:28, borderColor: form.budget ? "#2563eb" : "#e2e8f0" }} />
                     </div>
                     <button type="button" onClick={estimateBudget} disabled={budgetLoading}
-                      style={{ marginTop:8, padding:"8px 16px", backgroundColor:"#fff", color:"#2563eb", border:"1.5px solid #2563eb", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:12, opacity: budgetLoading ? 0.7 : 1 }}>
+                      style={{ marginTop:8, padding:"8px 16px", backgroundColor:"var(--card)" /* TODO-DARK */, color:"#2563eb", border:"1.5px solid #2563eb", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:12, opacity: budgetLoading ? 0.7 : 1 }}>
                       {budgetLoading ? "⏳ Estimating..." : "🤖 AI Estimate Budget"}
                     </button>
 
@@ -269,11 +269,11 @@ export default function PostProject() {
                       <div style={{ marginTop:10, padding:12, backgroundColor:"#eff6ff", borderRadius:10, border:"1px solid #bfdbfe" }}>
                         <div style={{ fontSize:12, fontWeight:700, color:"#1d4ed8", marginBottom:6 }}>🤖 AI Budget Suggestion</div>
                         <div style={{ display:"flex", gap:12, marginBottom:6 }}>
-                          <div style={{ fontSize:12, color:"#374151" }}><span style={{ color:"#64748b" }}>Min: </span><strong style={{ color:"#16a34a" }}>${budgetEstimate.min}</strong></div>
-                          <div style={{ fontSize:12, color:"#374151" }}><span style={{ color:"#64748b" }}>Max: </span><strong style={{ color:"#dc2626" }}>${budgetEstimate.max}</strong></div>
-                          <div style={{ fontSize:12, color:"#374151" }}><span style={{ color:"#64748b" }}>Rec: </span><strong style={{ color:"#2563eb" }}>${budgetEstimate.recommended}</strong></div>
+                          <div style={{ fontSize:12, color:"var(--text-secondary)" }}><span style={{ color:"var(--text-muted)" }}>Min: </span><strong style={{ color:"#16a34a" }}>${budgetEstimate.min}</strong></div>
+                          <div style={{ fontSize:12, color:"var(--text-secondary)" }}><span style={{ color:"var(--text-muted)" }}>Max: </span><strong style={{ color:"#dc2626" }}>${budgetEstimate.max}</strong></div>
+                          <div style={{ fontSize:12, color:"var(--text-secondary)" }}><span style={{ color:"var(--text-muted)" }}>Rec: </span><strong style={{ color:"#2563eb" }}>${budgetEstimate.recommended}</strong></div>
                         </div>
-                        <div style={{ fontSize:11, color:"#64748b" }}>{budgetEstimate.reason}</div>
+                        <div style={{ fontSize:11, color:"var(--text-muted)" }}>{budgetEstimate.reason}</div>
                       </div>
                     )}
                   </div>
@@ -285,9 +285,9 @@ export default function PostProject() {
                   </div>
                 </div>
 
-                <div style={{ display:"flex", gap:12, justifyContent:"flex-end", paddingTop:24, borderTop:"1px solid #f1f5f9" }}>
+                <div style={{ display:"flex", gap:12, justifyContent:"flex-end", paddingTop:24, borderTop:"1px solid var(--border-light)" }}>
                   <button type="button" onClick={() => navigate("/projects")}
-                    style={{ padding:"11px 24px", background:"#fff", border:"1.5px solid #e2e8f0", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14, color:"#64748b", fontFamily:"inherit" }}>
+                    style={{ padding:"11px 24px", background:"#fff", border:"1.5px solid var(--border)", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14, color:"var(--text-muted)", fontFamily:"inherit" }}>
                     Cancel
                   </button>
                   <button type="submit" disabled={posting || completionPercent < 100}
@@ -303,12 +303,12 @@ export default function PostProject() {
           <div style={{ display:"flex", flexDirection:"column", gap:16, position:"sticky", top:80 }}>
 
             {/* Live Preview */}
-            <div style={{ backgroundColor:"#fff", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+            <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
               <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:16 }}>
                 <div style={{ width:8, height:8, borderRadius:"50%", backgroundColor:"#16a34a" }} />
-                <h3 style={{ fontSize:14, fontWeight:700, color:"#111827", margin:0 }}>Live Preview</h3>
+                <h3 style={{ fontSize:14, fontWeight:700, color:"var(--text-primary)", margin:0 }}>Live Preview</h3>
               </div>
-              <div style={{ backgroundColor:"#f8fafc", borderRadius:10, padding:16, border:"1px solid #e2e8f0" }}>
+              <div style={{ backgroundColor:"var(--page-bg)", borderRadius:10, padding:16, border:"1px solid var(--border)" }}>
                 <h4 style={{ fontSize:14, fontWeight:700, color: form.title ? "#111827" : "#9ca3af", margin:"0 0 8px" }}>
                   {form.title || "Your project title..."}
                 </h4>
@@ -322,18 +322,18 @@ export default function PostProject() {
                     ))}
                   </div>
                 )}
-                <div style={{ display:"flex", gap:16, paddingTop:12, borderTop:"1px solid #e2e8f0" }}>
-                  {form.budget && <span style={{ fontSize:12, color:"#374151", fontWeight:600 }}>💰 ${form.budget}</span>}
-                  {form.deadline && <span style={{ fontSize:12, color:"#374151", fontWeight:600 }}>📅 {form.deadline}</span>}
+                <div style={{ display:"flex", gap:16, paddingTop:12, borderTop:"1px solid var(--border)" }}>
+                  {form.budget && <span style={{ fontSize:12, color:"var(--text-secondary)", fontWeight:600 }}>💰 ${form.budget}</span>}
+                  {form.deadline && <span style={{ fontSize:12, color:"var(--text-secondary)", fontWeight:600 }}>📅 {form.deadline}</span>}
                 </div>
               </div>
             </div>
 
             {/* Tips */}
-            <div style={{ backgroundColor:"#fff", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+            <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
               <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:16 }}>
                 <span style={{ fontSize:18 }}>💡</span>
-                <h3 style={{ fontSize:14, fontWeight:700, color:"#111827", margin:0 }}>Pro Tips</h3>
+                <h3 style={{ fontSize:14, fontWeight:700, color:"var(--text-primary)", margin:0 }}>Pro Tips</h3>
               </div>
               {[
                 { icon:"✍️", text:"Be specific — detailed projects get 3x more proposals" },
@@ -342,7 +342,7 @@ export default function PostProject() {
                 { icon:"📅", text:"Give a reasonable deadline for quality work" },
                 { icon:"⚡", text:"Respond quickly to proposals to hire faster" },
               ].map((t, i) => (
-                <div key={i} style={{ display:"flex", gap:10, marginBottom:12, fontSize:13, color:"#374151", lineHeight:1.5 }}>
+                <div key={i} style={{ display:"flex", gap:10, marginBottom:12, fontSize:13, color:"var(--text-secondary)", lineHeight:1.5 }}>
                   <span style={{ flexShrink:0 }}>{t.icon}</span>{t.text}
                 </div>
               ))}
@@ -370,5 +370,5 @@ export default function PostProject() {
   );
 }
 
-const lbl = { display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 };
-const inp = { width:"100%", padding:"10px 14px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", backgroundColor:"#fff", boxSizing:"border-box", transition:"border-color 0.2s" };
+const lbl = { display:"block", fontSize:13, fontWeight:600, color:"var(--text-secondary)", marginBottom:6 };
+const inp = { width:"100%", padding:"10px 14px", border:"1.5px solid var(--border)", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", backgroundColor:"var(--card)" /* TODO-DARK */, boxSizing:"border-box", transition:"border-color 0.2s" };

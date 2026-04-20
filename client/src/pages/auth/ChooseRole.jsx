@@ -86,8 +86,7 @@ export default function ChooseRole() {
         </div>
 
         {/* Direct sign in links */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginRight: 4 }}>Sign in as</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <button className="nav-link-blue" style={navLinkStyle} onClick={() => navigate("/client/login")}>
             💼 Client
           </button>

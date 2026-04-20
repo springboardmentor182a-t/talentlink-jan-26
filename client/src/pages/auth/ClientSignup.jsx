@@ -47,8 +47,8 @@ export default function ClientSignup() {
     } finally { setLoading(false); }
   };
 
-  const inp = { width:"100%", padding:"12px 16px", border:"1.5px solid #e5e7eb", borderRadius:10, fontSize:14, backgroundColor:"#f9fafb", outline:"none", boxSizing:"border-box", marginBottom:16, transition:"all 0.2s", color:"#111827" };
-  const lbl = { display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 };
+  const inp = { width:"100%", padding:"12px 16px", border:"1.5px solid #e5e7eb", borderRadius:10, fontSize:14, backgroundColor:"var(--page-bg)", outline:"none", boxSizing:"border-box", marginBottom:16, transition:"all 0.2s", color:"var(--text-primary)" };
+  const lbl = { display:"block", fontSize:13, fontWeight:600, color:"var(--text-secondary)", marginBottom:6 };
 
   return (
     <div style={{ minHeight:"100vh", background:"linear-gradient(135deg,#0a0520 0%,#0f0c29 30%,#1a0845 60%,#0d1b3e 100%)", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Segoe UI',sans-serif", position:"relative", overflow:"hidden" }}>
@@ -64,7 +64,7 @@ export default function ClientSignup() {
       <div style={{ position:"fixed", top:50, right:-100, width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle, rgba(59,130,246,0.5) 0%, transparent 70%)", pointerEvents:"none", animation:"pulse 6s ease-in-out infinite 1s", filter:"blur(25px)" }} />
       <div style={{ position:"fixed", top:"40%", left:-80, width:350, height:350, borderRadius:"50%", background:"radial-gradient(circle, rgba(168,85,247,0.5) 0%, transparent 70%)", pointerEvents:"none", animation:"pulse 5s ease-in-out infinite 2s", filter:"blur(25px)" }} />
 
-      <div style={{ ...fadeUp, position:"relative", zIndex:10, backgroundColor:"#ffffff", borderRadius:24, padding:"44px 40px", width:"100%", maxWidth:440, boxShadow:"0 20px 60px rgba(0,0,0,0.4)", border:"1px solid rgba(255,255,255,0.2)" }}>
+      <div style={{ ...fadeUp, position:"relative", zIndex:10, backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:24, padding:"44px 40px", width:"100%", maxWidth:440, boxShadow:"0 20px 60px rgba(0,0,0,0.4)", border:"1px solid rgba(255,255,255,0.2)" }}>
 
         <button onClick={() => navigate("/")}
           style={{ background:"none", border:"none", fontSize:14, color:"#2563eb", cursor:"pointer", padding:"4px 0", marginBottom:20, display:"flex", alignItems:"center", gap:6, fontWeight:500 }}>
@@ -76,12 +76,12 @@ export default function ClientSignup() {
           <span style={{ fontWeight:800, fontSize:22, background:"linear-gradient(135deg,#2563eb,#7c3aed)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>TalentLink</span>
         </div>
 
-        <h2 style={{ fontSize:24, fontWeight:800, color:"#111827", marginBottom:6, textAlign:"center", letterSpacing:"-0.5px" }}>Create Client Account</h2>
-        <p style={{ fontSize:14, color:"#6b7280", marginBottom:28, textAlign:"center" }}>Sign up to post projects and hire top freelancers</p>
+        <h2 style={{ fontSize:24, fontWeight:800, color:"var(--text-primary)", marginBottom:6, textAlign:"center", letterSpacing:"-0.5px" }}>Create Client Account</h2>
+        <p style={{ fontSize:14, color:"var(--text-faint)", marginBottom:28, textAlign:"center" }}>Sign up to post projects and hire top freelancers</p>
 
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:20 }}>
           <button className="social-hover" onClick={() => alert("Google signup coming soon!")}
-            style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:12, border:"1.5px solid #e5e7eb", borderRadius:10, cursor:"pointer", backgroundColor:"white", fontSize:14, fontWeight:600, color:"#374151", transition:"all 0.2s" }}>
+            style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:12, border:"1.5px solid #e5e7eb", borderRadius:10, cursor:"pointer", backgroundColor:"white", fontSize:14, fontWeight:600, color:"var(--text-secondary)", transition:"all 0.2s" }}>
             <GoogleIcon /> Google
           </button>
           <button className="social-hover" onClick={() => alert("GitHub signup coming soon!")}
@@ -90,7 +90,7 @@ export default function ClientSignup() {
           </button>
         </div>
 
-        <div style={{ display:"flex", alignItems:"center", gap:12, margin:"20px 0", color:"#9ca3af", fontSize:12 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:12, margin:"20px 0", color:"var(--text-faint)", fontSize:12 }}>
           <div style={{ flex:1, height:1, backgroundColor:"#e5e7eb" }} />
           or continue with email
           <div style={{ flex:1, height:1, backgroundColor:"#e5e7eb" }} />
@@ -116,10 +116,10 @@ export default function ClientSignup() {
           {loading ? "Creating Account..." : "Create Account →"}
         </button>
 
-        <p style={{ fontSize:12, color:"#9ca3af", textAlign:"center", marginTop:16, lineHeight:1.5 }}>
+        <p style={{ fontSize:12, color:"var(--text-faint)", textAlign:"center", marginTop:16, lineHeight:1.5 }}>
           By signing up, you agree to our Terms of Service and Privacy Policy
         </p>
-        <div style={{ textAlign:"center", marginTop:10, fontSize:13, color:"#6b7280" }}>
+        <div style={{ textAlign:"center", marginTop:10, fontSize:13, color:"var(--text-faint)" }}>
           Already have an account?{" "}
           <Link to="/client/login" style={{ color:"#2563eb", fontWeight:700, textDecoration:"none" }}>Sign in</Link>
         </div>

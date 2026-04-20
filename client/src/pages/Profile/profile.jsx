@@ -99,7 +99,7 @@ export default function Profile({ onNavigate }) {
 
   if (loading) return (
     <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"60vh" }}>
-      <p style={{ color:"#64748b" }}>Loading profile...</p>
+      <p style={{ color:"var(--text-muted)" }}>Loading profile...</p>
     </div>
   );
 
@@ -108,10 +108,10 @@ export default function Profile({ onNavigate }) {
   const editSkillList = (form.skills || "").split(",").map(s => s.trim()).filter(Boolean);
 
   return (
-    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#f8fafc", minHeight:"100vh" }}>
+    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"var(--page-bg)", minHeight:"100vh" }}>
 
       {/* Hero */}
-      <div style={{ background:theme.headerBg, padding:"32px 32px", position:"relative", overflow:"hidden" }}>
+      <div style={{ background:theme.headerBg, padding:"24px 16px", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:-40, right:-40, width:200, height:200, borderRadius:"50%", background:"rgba(255,255,255,0.05)" }} />
         <div style={{ display:"inline-flex", alignItems:"center", gap:8, backgroundColor:"rgba(255,255,255,0.15)", borderRadius:20, padding:"4px 14px", fontSize:12, color:"white", fontWeight:600, marginBottom:10 }}>
           👤 {isFreelancer ? "Freelancer Profile" : "Company Profile"}
@@ -124,7 +124,7 @@ export default function Profile({ onNavigate }) {
         </p>
       </div>
 
-      <div style={{ padding:32, maxWidth:900, margin:"0 auto" }}>
+      <div style={{ padding:"20px 16px", maxWidth:900, margin:"0 auto" }}>
 
         {/* Banners */}
         {success && (
@@ -141,16 +141,16 @@ export default function Profile({ onNavigate }) {
         )}
 
         {/* Profile Card */}
-        <div style={{ backgroundColor:"#fff", borderRadius:16, padding:32, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+        <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:32, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
 
           {/* Avatar row */}
-          <div style={{ display:"flex", alignItems:"center", gap:20, marginBottom:28, paddingBottom:24, borderBottom:"1px solid #f1f5f9" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:20, marginBottom:28, paddingBottom:24, borderBottom:"1px solid var(--border-light)" }}>
             <div style={{ width:80, height:80, borderRadius:"50%", background:theme.btn, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:800, fontSize:32, boxShadow:`0 4px 16px ${theme.shadow}`, flexShrink:0 }}>
               {initials}
             </div>
             <div style={{ flex:1 }}>
-              <div style={{ fontSize:22, fontWeight:800, color:"#111827" }}>{profile?.name}</div>
-              <div style={{ fontSize:13, color:"#64748b", marginTop:4 }}>{profile?.email}</div>
+              <div style={{ fontSize:22, fontWeight:800, color:"var(--text-primary)" }}>{profile?.name}</div>
+              <div style={{ fontSize:13, color:"var(--text-muted)", marginTop:4 }}>{profile?.email}</div>
               <span style={{ display:"inline-block", marginTop:6, padding:"3px 12px", borderRadius:20, fontSize:12, fontWeight:700, background:theme.accentLight, color:theme.accent }}>
                 {isFreelancer ? "Freelancer" : "Client"}
               </span>
@@ -166,7 +166,7 @@ export default function Profile({ onNavigate }) {
           {/* FREELANCER VIEW MODE */}
           {isFreelancer && !editing && (
             <div style={{ display:"grid", gap:20 }}>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20 }}>
                 <ViewField label="Full Name" icon="👤" value={profile?.name} />
                 <ViewField label="Email"     icon="📧" value={profile?.email} />
               </div>
@@ -177,11 +177,11 @@ export default function Profile({ onNavigate }) {
                   ? <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>{skillList.map(s => <Tag key={s} label={s} theme={theme} />)}</div>
                   : <ViewBox value={null} />}
               </div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20 }}>
                 <ViewField label="Experience"    icon="💼" value={profile?.experience} />
                 <ViewField label="Location"      icon="📍" value={profile?.location} />
               </div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20 }}>
                 <ViewField label="Phone"         icon="📞" value={profile?.phone} />
                 <ViewField label="Portfolio URL" icon="🌐" value={profile?.portfolio} />
               </div>
@@ -191,7 +191,7 @@ export default function Profile({ onNavigate }) {
           {/* FREELANCER EDIT MODE */}
           {isFreelancer && editing && (
             <div style={{ display:"grid", gap:20 }}>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20 }}>
                 <EditField label="Full Name" icon="👤" value={form.name}  onChange={v => set("name", v)}  placeholder="Your full name" theme={theme} />
                 <ViewField label="Email"     icon="📧" value={profile?.email} />
               </div>
@@ -207,11 +207,11 @@ export default function Profile({ onNavigate }) {
                   </div>
                 )}
               </div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20 }}>
                 <EditField label="Experience"    icon="💼" value={form.experience} onChange={v => set("experience", v)} placeholder="e.g. 3 years" theme={theme} />
                 <EditField label="Location"      icon="📍" value={form.location}   onChange={v => set("location", v)}   placeholder="City, Country" theme={theme} />
               </div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20 }}>
                 <EditField label="Phone"         icon="📞" value={form.phone}     onChange={v => set("phone", v)}     placeholder="+1 234 567 8900" theme={theme} />
                 <EditField label="Portfolio URL" icon="🌐" value={form.portfolio} onChange={v => set("portfolio", v)} placeholder="https://yourportfolio.com" theme={theme} />
               </div>
@@ -221,15 +221,15 @@ export default function Profile({ onNavigate }) {
           {/* CLIENT VIEW MODE */}
           {!isFreelancer && !editing && (
             <div style={{ display:"grid", gap:20 }}>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20 }}>
                 <ViewField label="Company Name" icon="🏢" value={profile?.name} />
                 <ViewField label="Industry"     icon="🏭" value={profile?.industry} />
               </div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20 }}>
                 <ViewField label="Website"  icon="🌐" value={profile?.website} />
                 <ViewField label="Location" icon="📍" value={profile?.location} />
               </div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20 }}>
                 <ViewField label="Phone" icon="📞" value={profile?.phone} />
                 <ViewField label="Email" icon="📧" value={profile?.email} />
               </div>
@@ -240,15 +240,15 @@ export default function Profile({ onNavigate }) {
           {/* CLIENT EDIT MODE */}
           {!isFreelancer && editing && (
             <div style={{ display:"grid", gap:20 }}>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20 }}>
                 <EditField label="Company Name" icon="🏢" value={form.name}     onChange={v => set("name", v)}     placeholder="Your company name" theme={theme} />
                 <EditField label="Industry"     icon="🏭" value={form.industry} onChange={v => set("industry", v)} placeholder="e.g. Technology" theme={theme} />
               </div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20 }}>
                 <EditField label="Website"  icon="🌐" value={form.website}  onChange={v => set("website", v)}  placeholder="https://yourcompany.com" theme={theme} />
                 <EditField label="Location" icon="📍" value={form.location} onChange={v => set("location", v)} placeholder="City, Country" theme={theme} />
               </div>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20 }}>
                 <EditField label="Phone" icon="📞" value={form.phone} onChange={v => set("phone", v)} placeholder="+1 (555) 123-4567" theme={theme} />
                 <ViewField label="Email" icon="📧" value={profile?.email} />
               </div>
@@ -258,13 +258,13 @@ export default function Profile({ onNavigate }) {
 
           {/* Save / Cancel */}
           {editing && (
-            <div style={{ display:"flex", gap:12, marginTop:28, paddingTop:24, borderTop:"1px solid #f1f5f9" }}>
+            <div style={{ display:"flex", gap:12, marginTop:28, paddingTop:24, borderTop:"1px solid var(--border-light)" }}>
               <button onClick={handleSave} disabled={saving}
                 style={{ display:"flex", alignItems:"center", gap:8, padding:"12px 32px", background:saving ? "#cbd5e1" : theme.btn, color:"white", border:"none", borderRadius:10, cursor:saving ? "not-allowed" : "pointer", fontWeight:700, fontSize:14, boxShadow:saving ? "none" : `0 4px 12px ${theme.shadow}` }}>
                 💾 {saving ? "Saving..." : "Save Changes"}
               </button>
               <button onClick={handleCancel}
-                style={{ padding:"12px 24px", backgroundColor:"white", color:"#374151", border:"1.5px solid #e2e8f0", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14 }}>
+                style={{ padding:"12px 24px", backgroundColor:"white", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14 }}>
                 Cancel
               </button>
             </div>
@@ -277,7 +277,7 @@ export default function Profile({ onNavigate }) {
 
 function FieldLabel({ icon, label }) {
   return (
-    <div style={{ display:"flex", alignItems:"center", gap:6, fontSize:13, fontWeight:600, color:"#374151", marginBottom:8 }}>
+    <div style={{ display:"flex", alignItems:"center", gap:6, fontSize:13, fontWeight:600, color:"var(--text-secondary)", marginBottom:8 }}>
       <span>{icon}</span>{label}
     </div>
   );
@@ -285,7 +285,7 @@ function FieldLabel({ icon, label }) {
 
 function ViewBox({ value }) {
   return (
-    <div style={{ fontSize:14, color:value ? "#111827" : "#94a3b8", padding:"10px 14px", backgroundColor:"#f8fafc", borderRadius:8, border:"1px solid #e2e8f0", lineHeight:1.6, minHeight:42 }}>
+    <div style={{ fontSize:14, color:value ? "#111827" : "#94a3b8", padding:"10px 14px", backgroundColor:"var(--page-bg)", borderRadius:8, border:"1px solid var(--border)", lineHeight:1.6, minHeight:42 }}>
       {value || "—"}
     </div>
   );
@@ -324,7 +324,7 @@ function Tag({ label, theme }) {
 }
 
 const inp = {
-  width:"100%", padding:"10px 14px", border:"1.5px solid #e2e8f0",
+  width:"100%", padding:"10px 14px", border:"1.5px solid var(--border)",
   borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit",
-  backgroundColor:"#fff", boxSizing:"border-box", transition:"border-color 0.2s",
+  backgroundColor:"var(--input-background)", boxSizing:"border-box", transition:"border-color 0.2s",
 };

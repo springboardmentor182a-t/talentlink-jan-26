@@ -112,42 +112,42 @@ export default function SubmitProposal() {
   const projectLabel = project?.title || `Project #${projectId}`;
 
   return (
-    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#f8fafc", minHeight:"100vh" }}>
+    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"var(--page-bg)", minHeight:"100vh" }}>
 
       {/* Topbar */}
-      <div style={{ backgroundColor:"#fff", padding:"0 32px", display:"flex", justifyContent:"space-between", alignItems:"center", borderBottom:"1px solid #e2e8f0", height:64, position:"sticky", top:0, zIndex:100, boxShadow:"0 1px 3px rgba(0,0,0,0.05)" }}>
+      <div style={{ backgroundColor:"var(--card)", padding:"0 32px", display:"flex", justifyContent:"space-between", alignItems:"center", borderBottom:"1px solid var(--border)", height:64, position:"sticky", top:0, zIndex:100, boxShadow:"0 1px 3px rgba(0,0,0,0.05)" }}>
         <div style={{ display:"flex", alignItems:"center", gap:12 }}>
           <button onClick={() => navigate("/proposal-tracking")}
-            style={{ background:"none", border:"none", fontSize:14, color:"#64748b", cursor:"pointer", display:"flex", alignItems:"center", gap:6, padding:"6px 12px", borderRadius:8 }}
+            style={{ background:"none", border:"none", fontSize:14, color:"var(--text-muted)", cursor:"pointer", display:"flex", alignItems:"center", gap:6, padding:"6px 12px", borderRadius:8 }}
             onMouseEnter={e => e.currentTarget.style.backgroundColor="#f1f5f9"}
             onMouseLeave={e => e.currentTarget.style.backgroundColor="transparent"}>
             ← Back
           </button>
-          <div style={{ width:1, height:24, backgroundColor:"#e2e8f0" }} />
+          <div style={{ width:1, height:24, backgroundColor:"var(--border)" }} />
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <div style={{ width:8, height:8, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)" }} />
-            <span style={{ fontSize:15, fontWeight:700, color:"#111827" }}>Submit Proposal</span>
+            <span style={{ fontSize:15, fontWeight:700, color:"var(--text-primary)" }}>Submit Proposal</span>
           </div>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:10, backgroundColor:"#f8fafc", padding:"6px 14px", borderRadius:20, border:"1px solid #e2e8f0" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:10, backgroundColor:"var(--page-bg)", padding:"6px 14px", borderRadius:20, border:"1px solid var(--border)" }}>
             <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:13 }}>
               {(user?.name || "F").charAt(0).toUpperCase()}
             </div>
             <div>
-              <div style={{ fontWeight:600, fontSize:13, color:"#111827" }}>{user.name}</div>
-              <div style={{ fontSize:11, color:"#64748b", textTransform:"capitalize" }}>{role}</div>
+              <div style={{ fontWeight:600, fontSize:13, color:"var(--text-primary)" }}>{user.name}</div>
+              <div style={{ fontSize:11, color:"var(--text-muted)", textTransform:"capitalize" }}>{role}</div>
             </div>
           </div>
           <button onClick={() => { logout(); navigate("/"); }}
-            style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid #e2e8f0", borderRadius:8, cursor:"pointer", fontSize:13, color:"#64748b", background:"white" }}>
+            style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid var(--border)", borderRadius:8, cursor:"pointer", fontSize:13, color:"var(--text-muted)", background:"white" }}>
             Logout
           </button>
         </div>
       </div>
 
       {/* Hero */}
-      <div style={{ background:"linear-gradient(135deg,#2d1b69 0%,#7c3aed 50%,#a855f7 100%)", padding:"32px 32px", position:"relative", overflow:"hidden" }}>
+      <div style={{ background:"linear-gradient(135deg,#2d1b69 0%,#7c3aed 50%,#a855f7 100%)", padding:"24px 16px", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:-40, right:-40, width:180, height:180, borderRadius:"50%", background:"rgba(255,255,255,0.05)" }} />
         <div style={{ display:"inline-flex", alignItems:"center", gap:8, backgroundColor:"rgba(255,255,255,0.15)", borderRadius:20, padding:"4px 14px", fontSize:12, color:"white", fontWeight:600, marginBottom:10 }}>
           🚀 Apply Now
@@ -156,17 +156,17 @@ export default function SubmitProposal() {
         <p style={{ fontSize:14, color:"rgba(255,255,255,0.75)", margin:0 }}>{projectLabel} — Fill in your details to apply</p>
       </div>
 
-      <div style={{ padding:32, maxWidth:800, margin:"0 auto" }}>
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 300px", gap:24, alignItems:"start" }}>
+      <div style={{ padding:"20px 16px", maxWidth:800, margin:"0 auto" }}>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%,280px), 1fr))", gap:24, alignItems:"start" }}>
 
           {/* Form */}
-          <div style={{ backgroundColor:"#fff", borderRadius:16, padding:32, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+          <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:32, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
 
             <div style={{ marginBottom:24 }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
                 <label style={lbl}>
                   Cover Letter <span style={{ color:"#ef4444" }}>*</span>
-                  <span style={{ fontSize:11, color:"#9ca3af", fontWeight:400, marginLeft:8 }}>Describe your experience and approach</span>
+                  <span style={{ fontSize:11, color:"var(--text-faint)", fontWeight:400, marginLeft:8 }}>Describe your experience and approach</span>
                 </label>
                 <button onClick={generateCoverLetter} disabled={aiLoading}
                   style={{ padding:"6px 14px", backgroundColor:"#faf5ff", color:"#7c3aed", border:"1.5px solid #ddd6fe", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:12, opacity: aiLoading ? 0.7 : 1, whiteSpace:"nowrap" }}>
@@ -191,7 +191,7 @@ export default function SubmitProposal() {
                 <div style={{ marginTop:12, padding:14, backgroundColor:"#faf5ff", borderRadius:10, border:"1px solid #ddd6fe" }}>
                   <div style={{ fontSize:12, fontWeight:700, color:"#7c3aed", marginBottom:8 }}>✨ AI Key Points Used</div>
                   {keyPoints.map((point, i) => (
-                    <div key={i} style={{ fontSize:12, color:"#374151", marginBottom:4, display:"flex", gap:6 }}>
+                    <div key={i} style={{ fontSize:12, color:"var(--text-secondary)", marginBottom:4, display:"flex", gap:6 }}>
                       <span style={{ color:"#7c3aed" }}>•</span> {point}
                     </div>
                   ))}
@@ -199,7 +199,7 @@ export default function SubmitProposal() {
               )}
             </div>
 
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20, marginBottom:8 }}>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:20, marginBottom:8 }}>
               <div>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
                   <label style={lbl}>
@@ -212,7 +212,7 @@ export default function SubmitProposal() {
                   </button>
                 </div>
                 <div style={{ position:"relative" }}>
-                  <span style={{ position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", color:"#64748b", fontWeight:600 }}>$</span>
+                  <span style={{ position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", color:"var(--text-muted)", fontWeight:600 }}>$</span>
                   <input style={{ ...inp, paddingLeft:26, borderColor: budget ? "#7c3aed" : "#e2e8f0" }} type="number" min="1" placeholder="5000" value={budget} onChange={e => setBudget(e.target.value)} />
                 </div>
                 {errors.budget && <p style={{ fontSize:12, color:"#ef4444", marginTop:4 }}>{errors.budget}</p>}
@@ -222,10 +222,10 @@ export default function SubmitProposal() {
                   <div style={{ marginTop:8, padding:10, backgroundColor:"#f0fdf4", borderRadius:8, border:"1px solid #86efac" }}>
                     <div style={{ fontSize:11, fontWeight:700, color:"#16a34a", marginBottom:4 }}>🤖 AI Budget Suggestion</div>
                     <div style={{ display:"flex", gap:10, marginBottom:4 }}>
-                      <span style={{ fontSize:11, color:"#374151" }}>Min: <strong style={{ color:"#16a34a" }}>${budgetEstimate.min}</strong></span>
-                      <span style={{ fontSize:11, color:"#374151" }}>Max: <strong style={{ color:"#dc2626" }}>${budgetEstimate.max}</strong></span>
+                      <span style={{ fontSize:11, color:"var(--text-secondary)" }}>Min: <strong style={{ color:"#16a34a" }}>${budgetEstimate.min}</strong></span>
+                      <span style={{ fontSize:11, color:"var(--text-secondary)" }}>Max: <strong style={{ color:"#dc2626" }}>${budgetEstimate.max}</strong></span>
                     </div>
-                    <div style={{ fontSize:11, color:"#64748b" }}>{budgetEstimate.reason}</div>
+                    <div style={{ fontSize:11, color:"var(--text-muted)" }}>{budgetEstimate.reason}</div>
                   </div>
                 )}
               </div>
@@ -238,7 +238,7 @@ export default function SubmitProposal() {
               </div>
             </div>
 
-            <div style={{ paddingTop:24, marginTop:16, borderTop:"1px solid #f1f5f9" }}>
+            <div style={{ paddingTop:24, marginTop:16, borderTop:"1px solid var(--border-light)" }}>
               <button onClick={handleSubmit} disabled={loading}
                 style={{ width:"100%", padding:14, background: loading ? "#cbd5e1" : "linear-gradient(135deg,#7c3aed,#a855f7)", color:"white", border:"none", borderRadius:10, cursor: loading ? "not-allowed" : "pointer", fontWeight:700, fontSize:15, boxShadow: loading ? "none" : "0 4px 15px rgba(124,58,237,0.4)", transition:"all 0.2s" }}>
                 {loading ? "Submitting..." : "🚀 Submit Proposal →"}
@@ -248,10 +248,10 @@ export default function SubmitProposal() {
 
           {/* Tips Panel */}
           <div style={{ display:"flex", flexDirection:"column", gap:16, position:"sticky", top:80 }}>
-            <div style={{ backgroundColor:"#fff", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+            <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
               <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:16 }}>
                 <span style={{ fontSize:18 }}>💡</span>
-                <h3 style={{ fontSize:14, fontWeight:700, color:"#111827", margin:0 }}>Tips for Winning</h3>
+                <h3 style={{ fontSize:14, fontWeight:700, color:"var(--text-primary)", margin:0 }}>Tips for Winning</h3>
               </div>
               {[
                 { icon:"✍️", text:"Personalize your cover letter for each project" },
@@ -260,7 +260,7 @@ export default function SubmitProposal() {
                 { icon:"📋", text:"Mention specific skills relevant to the project" },
                 { icon:"🤝", text:"Show enthusiasm and professionalism" },
               ].map((t, i) => (
-                <div key={i} style={{ display:"flex", gap:10, marginBottom:12, fontSize:13, color:"#374151", lineHeight:1.5 }}>
+                <div key={i} style={{ display:"flex", gap:10, marginBottom:12, fontSize:13, color:"var(--text-secondary)", lineHeight:1.5 }}>
                   <span style={{ flexShrink:0 }}>{t.icon}</span>
                   {t.text}
                 </div>
@@ -315,5 +315,5 @@ export default function SubmitProposal() {
   );
 }
 
-const lbl = { display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:0 };
-const inp = { width:"100%", padding:"10px 14px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", backgroundColor:"#fff", boxSizing:"border-box", transition:"border-color 0.2s" };
+const lbl = { display:"block", fontSize:13, fontWeight:600, color:"var(--text-secondary)", marginBottom:0 };
+const inp = { width:"100%", padding:"10px 14px", border:"1.5px solid var(--border)", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", backgroundColor:"var(--input-background)", boxSizing:"border-box", transition:"border-color 0.2s" };

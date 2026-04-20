@@ -104,7 +104,7 @@ export default function ClientLogin() {
       <div style={{ position:"fixed", top:50, right:-100, width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle, rgba(59,130,246,0.5) 0%, transparent 70%)", pointerEvents:"none", animation:"pulse 6s ease-in-out infinite 1s", filter:"blur(25px)" }} />
       <div style={{ position:"fixed", top:"40%", left:-80, width:350, height:350, borderRadius:"50%", background:"radial-gradient(circle, rgba(168,85,247,0.5) 0%, transparent 70%)", pointerEvents:"none", animation:"pulse 5s ease-in-out infinite 2s", filter:"blur(25px)" }} />
 
-      <div style={{ ...fadeUp, position:"relative", zIndex:10, backgroundColor:"#ffffff", borderRadius:24, padding:"44px 40px", width:"100%", maxWidth:440, boxShadow:"0 20px 60px rgba(0,0,0,0.4)", border:"1px solid rgba(255,255,255,0.2)" }}>
+      <div style={{ ...fadeUp, position:"relative", zIndex:10, backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:24, padding:"44px 40px", width:"100%", maxWidth:440, boxShadow:"0 20px 60px rgba(0,0,0,0.4)", border:"1px solid rgba(255,255,255,0.2)" }}>
 
         <button onClick={() => navigate("/")}
           style={{ background:"none", border:"none", fontSize:14, color:"#2563eb", cursor:"pointer", padding:"4px 0", marginBottom:20, display:"flex", alignItems:"center", gap:6, fontWeight:500 }}>
@@ -116,13 +116,13 @@ export default function ClientLogin() {
           <span style={{ fontWeight:800, fontSize:22, background:"linear-gradient(135deg,#2563eb,#7c3aed)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>TalentLink</span>
         </div>
 
-        <h2 style={{ fontSize:24, fontWeight:800, color:"#111827", marginBottom:6, textAlign:"center", letterSpacing:"-0.5px" }}>Client Login</h2>
-        <p style={{ fontSize:14, color:"#6b7280", marginBottom:28, textAlign:"center" }}>Access your dashboard to manage projects and freelancers</p>
+        <h2 style={{ fontSize:24, fontWeight:800, color:"var(--text-primary)", marginBottom:6, textAlign:"center", letterSpacing:"-0.5px" }}>Client Login</h2>
+        <p style={{ fontSize:14, color:"var(--text-faint)", marginBottom:28, textAlign:"center" }}>Access your dashboard to manage projects and freelancers</p>
 
         {/* Social buttons */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:20 }}>
           <button className="social-hover" onClick={() => googleLogin()}
-            style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:12, border:"1.5px solid #e5e7eb", borderRadius:10, cursor:"pointer", backgroundColor:"white", fontSize:14, fontWeight:600, color:"#374151", transition:"all 0.2s" }}>
+            style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:12, border:"1.5px solid #e5e7eb", borderRadius:10, cursor:"pointer", backgroundColor:"white", fontSize:14, fontWeight:600, color:"var(--text-secondary)", transition:"all 0.2s" }}>
             <GoogleIcon /> Google
           </button>
           <button className="social-hover" onClick={handleGitHub}
@@ -131,7 +131,7 @@ export default function ClientLogin() {
           </button>
         </div>
 
-        <div style={{ display:"flex", alignItems:"center", gap:12, margin:"20px 0", color:"#9ca3af", fontSize:12 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:12, margin:"20px 0", color:"var(--text-faint)", fontSize:12 }}>
           <div style={{ flex:1, height:1, backgroundColor:"#e5e7eb" }} />
           or continue with email
           <div style={{ flex:1, height:1, backgroundColor:"#e5e7eb" }} />
@@ -143,26 +143,26 @@ export default function ClientLogin() {
           </div>
         )}
 
-        <label style={{ display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 }}>Email</label>
+        <label style={{ display:"block", fontSize:13, fontWeight:600, color:"var(--text-secondary)", marginBottom:6 }}>Email</label>
         <input className="inp-focus" type="email" placeholder="client@company.com"
           value={email} onChange={e => setEmail(e.target.value)}
-          style={{ width:"100%", padding:"12px 16px", border:"1.5px solid #e5e7eb", borderRadius:10, fontSize:14, backgroundColor:"#f9fafb", outline:"none", boxSizing:"border-box", marginBottom:16, transition:"all 0.2s", color:"#111827" }} />
+          style={{ width:"100%", padding:"12px 16px", border:"1.5px solid #e5e7eb", borderRadius:10, fontSize:14, backgroundColor:"var(--page-bg)", outline:"none", boxSizing:"border-box", marginBottom:16, transition:"all 0.2s", color:"var(--text-primary)" }} />
 
-        <label style={{ display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 }}>Password</label>
+        <label style={{ display:"block", fontSize:13, fontWeight:600, color:"var(--text-secondary)", marginBottom:6 }}>Password</label>
         <input className="inp-focus" type="password" placeholder="••••••••"
           value={password} onChange={e => setPassword(e.target.value)}
           onKeyDown={e => e.key === "Enter" && handleSubmit()}
-          style={{ width:"100%", padding:"12px 16px", border:"1.5px solid #e5e7eb", borderRadius:10, fontSize:14, backgroundColor:"#f9fafb", outline:"none", boxSizing:"border-box", marginBottom:24, transition:"all 0.2s", color:"#111827" }} />
+          style={{ width:"100%", padding:"12px 16px", border:"1.5px solid #e5e7eb", borderRadius:10, fontSize:14, backgroundColor:"var(--page-bg)", outline:"none", boxSizing:"border-box", marginBottom:24, transition:"all 0.2s", color:"var(--text-primary)" }} />
 
         <button className="btn-hover" onClick={handleSubmit} disabled={loading}
           style={{ width:"100%", padding:14, background: loading ? "#cbd5e1" : "linear-gradient(135deg,#2563eb,#7c3aed)", color:"white", border:"none", borderRadius:10, cursor: loading ? "not-allowed" : "pointer", fontWeight:700, fontSize:15, boxShadow:"0 4px 15px rgba(37,99,235,0.4)", transition:"all 0.2s" }}>
           {loading ? "Signing in..." : "Sign In →"}
         </button>
 
-        <div style={{ textAlign:"center", marginTop:16, fontSize:13, color:"#6b7280" }}>
+        <div style={{ textAlign:"center", marginTop:16, fontSize:13, color:"var(--text-faint)" }}>
           <Link to="/forgot-password" style={{ color:"#2563eb", fontWeight:600, textDecoration:"none" }}>Forgot Password?</Link>
         </div>
-        <div style={{ textAlign:"center", marginTop:10, fontSize:13, color:"#6b7280" }}>
+        <div style={{ textAlign:"center", marginTop:10, fontSize:13, color:"var(--text-faint)" }}>
           Don't have an account?{" "}
           <Link to="/client/signup" style={{ color:"#2563eb", fontWeight:700, textDecoration:"none" }}>Sign up</Link>
         </div>

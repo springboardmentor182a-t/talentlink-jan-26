@@ -215,7 +215,7 @@ const styles = {
     position: "fixed",
     bottom: "96px",
     right: "28px",
-    width: "360px",
+    width: "min(360px, calc(100vw - 56px))",
     height: "500px",
     borderRadius: "16px",
     background: "#fff",

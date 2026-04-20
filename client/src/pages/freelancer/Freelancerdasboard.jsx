@@ -63,12 +63,23 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
     return null;
   };
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div style={{ display:"flex", minHeight:"100vh", fontFamily:"'Segoe UI',sans-serif" }}>
 
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div onClick={() => setSidebarOpen(false)}
+          style={{ position:"fixed", inset:0, backgroundColor:"rgba(0,0,0,0.4)", zIndex:199 }} />
+      )}
+
       {/* Sidebar */}
-      <aside style={{ width:250, minHeight:"100vh", position:"fixed", left:0, top:0, backgroundColor:"#fff", borderRight:"1px solid #e5e7eb", display:"flex", flexDirection:"column" }}>
-        <div style={{ padding:"20px", borderBottom:"1px solid #e5e7eb", display:"flex", alignItems:"center", gap:10 }}>
+      <aside style={{ width:250, height:"100vh", position:"fixed", left:0, top:0, backgroundColor:"var(--sidebar-bg)", borderRight:"1px solid var(--border)", display:"flex", flexDirection:"column",
+        transform: sidebarOpen ? "translateX(0)" : undefined,
+        zIndex:200,
+      }} className={`freelancer-sidebar${sidebarOpen ? " sidebar-open" : ""}`}>
+        <div style={{ padding:"20px", borderBottom:"1px solid var(--border)", display:"flex", alignItems:"center", gap:10 }}>
           <div style={{ width:36, height:36, background:"linear-gradient(135deg,#7c3aed,#a855f7)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", boxShadow:"0 4px 12px rgba(124,58,237,0.3)" }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
           </div>
@@ -104,18 +115,18 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
           ))}
         </nav>
 
-        <div style={{ padding:"16px 20px", borderTop:"1px solid #e5e7eb", display:"flex", alignItems:"center", gap:10 }}>
+        <div style={{ padding:"16px 20px", borderTop:"1px solid var(--border)", display:"flex", alignItems:"center", gap:10 }}>
           <div style={{ width:36, height:36, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)", display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", fontWeight:700, fontSize:15, flexShrink:0, boxShadow:"0 4px 12px rgba(124,58,237,0.3)" }}>
             {user?.full_name?.[0]?.toUpperCase() || user?.name?.[0]?.toUpperCase() || "F"}
           </div>
           <div style={{ flex:1, minWidth:0 }}>
-            <div style={{ fontSize:13, fontWeight:600, color:"#111827", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+            <div style={{ fontSize:13, fontWeight:600, color:"var(--text-primary)", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
               {user?.full_name || user?.name}
             </div>
-            <div style={{ fontSize:11, color:"#9ca3af" }}>Freelancer</div>
+            <div style={{ fontSize:11, color:"var(--text-faint)" }}>Freelancer</div>
           </div>
           <button onClick={handleLogout} title="Logout"
-            style={{ background:"none", border:"none", cursor:"pointer", color:"#9ca3af" }}
+            style={{ background:"none", border:"none", cursor:"pointer", color:"var(--text-faint)" }}
             onMouseEnter={e => e.currentTarget.style.color="#7c3aed"}
             onMouseLeave={e => e.currentTarget.style.color="#9ca3af"}>
             <LogoutIcon />
@@ -124,38 +135,59 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
       </aside>
 
       {/* Main */}
-      <main style={{ marginLeft:250, flex:1, backgroundColor:"#f8fafc", minHeight:"100vh" }}>
+      <main style={{ marginLeft:"var(--fl-sidebar-margin,250px)", flex:1, backgroundColor:"var(--page-bg)", minHeight:"100vh", minWidth:0, overflowX:"hidden" }}>
 
         {/* Topbar */}
-        <div style={{ backgroundColor:"#fff", borderBottom:"1px solid #e5e7eb", padding:"0 32px", height:64, display:"flex", justifyContent:"space-between", alignItems:"center", position:"sticky", top:0, zIndex:100, boxShadow:"0 1px 3px rgba(0,0,0,0.05)" }}>
+        <div style={{ backgroundColor:"var(--topbar-bg)", borderBottom:"1px solid var(--border)", padding:"0 16px", height:56, display:"flex", justifyContent:"space-between", alignItems:"center", position:"sticky", top:0, zIndex:100, boxShadow:"0 1px 3px rgba(0,0,0,0.05)" }}>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+            {/* Hamburger — mobile only */}
+            <button onClick={() => setSidebarOpen(v => !v)}
+              className="fl-hamburger"
+              style={{ display:"none", background:"none", border:"none", cursor:"pointer", padding:4 }}
+              aria-label="Open menu">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
             <div style={{ width:8, height:8, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)" }} />
-            <span style={{ fontWeight:700, fontSize:15, color:"#111827" }}>
+            <span style={{ fontWeight:700, fontSize:15, color:"var(--text-primary)" }}>
               {navItems.find(n => n.key === activePage)?.label}
             </span>
           </div>
 
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
             <NotificationBell theme="purple" />
-            <div style={{ display:"flex", alignItems:"center", gap:10, backgroundColor:"#f8fafc", padding:"6px 14px", borderRadius:20, border:"1px solid #e2e8f0" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, backgroundColor:"var(--page-bg)", padding:"6px 14px", borderRadius:20, border:"1px solid var(--border)" }}>
               <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:13 }}>
                 {user?.full_name?.[0]?.toUpperCase() || user?.name?.[0]?.toUpperCase() || "F"}
               </div>
-              <div>
-                <div style={{ fontWeight:600, fontSize:13, color:"#111827" }}>{user?.full_name || user?.name}</div>
-                <div style={{ fontSize:11, color:"#64748b" }}>Freelancer</div>
+              <div className="fl-name-hide" style={{ minWidth: 0 }}>
+                <div style={{ fontWeight:600, fontSize:13, color:"var(--text-primary)", maxWidth:90, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{user?.full_name || user?.name}</div>
+                <div style={{ fontSize:11, color:"var(--text-muted)" }}>Freelancer</div>
               </div>
             </div>
             <button onClick={handleLogout}
-              style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid #e2e8f0", borderRadius:8, cursor:"pointer", fontSize:13, color:"#64748b", background:"white", fontFamily:"inherit", transition:"all 0.15s" }}
+              style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid var(--border)", borderRadius:8, cursor:"pointer", fontSize:13, color:"var(--text-muted)", background:"white", fontFamily:"inherit", transition:"all 0.15s", flexShrink:0 }}
               onMouseEnter={e => { e.currentTarget.style.borderColor="#7c3aed"; e.currentTarget.style.color="#7c3aed"; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor="#e2e8f0"; e.currentTarget.style.color="#64748b"; }}>
-              <LogoutIcon /> Logout
+              <LogoutIcon /> <span className="fl-logout-text">Logout</span>
             </button>
           </div>
         </div>
 
         {renderPage()}
+        <style>{`
+          @media (max-width: 767px) {
+            :root { --fl-sidebar-margin: 0px; }
+            .freelancer-sidebar { transform: translateX(-100%); transition: transform 0.25s ease; }
+            .freelancer-sidebar.sidebar-open { transform: translateX(0); }
+            .fl-hamburger { display: flex !important; }
+            .fl-logout-text { display: none; }
+            .fl-name-hide { display: none !important; }
+          }
+          @media (min-width: 768px) {
+            :root { --fl-sidebar-margin: 250px; }
+            .freelancer-sidebar { transform: none !important; }
+          }
+        `}</style>
       </main>
     </div>
   );

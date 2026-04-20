@@ -25,6 +25,7 @@ export default function Messages({ onNavigate }) {
   const [loadingMsgs, setLoadingMsgs]     = useState(false);
   const [searchQuery, setSearchQuery]     = useState("");
   const [connected, setConnected]         = useState(false);
+  const [showConvList, setShowConvList]   = useState(true);
 
   // ✅ On mount: clear badge + stop incrementing + mark DB notifications as read
   useEffect(() => {
@@ -93,12 +94,14 @@ export default function Messages({ onNavigate }) {
         const existing = res.data.find(c => String(c.other_user_id) === String(initFreelancer));
         if (existing) {
           setActiveConv(existing);
+          setShowConvList(false);
         } else {
           setActiveConv({
             id: null,
             other_user_id: parseInt(initFreelancer),
             other_name: decodeURIComponent(initName || `User #${initFreelancer}`),
           });
+          setShowConvList(false);
         }
       } else if (res.data.length > 0) {
         setActiveConv(res.data[0]);
@@ -208,10 +211,24 @@ export default function Messages({ onNavigate }) {
   const getAvatarColor = (id) => avatarColors[(id || 0) % avatarColors.length];
 
   return (
-    <div style={{ display: "flex", height: "100vh", fontFamily: "'Segoe UI',sans-serif", backgroundColor: "#f8fafc", overflow: "hidden" }}>
+    <div style={{ display: "flex", height: "calc(100vh - 56px)", fontFamily: "'Segoe UI',sans-serif", backgroundColor: "#f8fafc", overflow: "hidden" }}>
+      <style>{`
+        @media (max-width: 767px) {
+          .msg-conv-panel { display: none !important; }
+          .msg-conv-panel.show { display: flex !important; width: 100% !important; }
+          .msg-chat-panel { display: none !important; }
+          .msg-chat-panel.show { display: flex !important; }
+          .msg-back-btn { display: flex !important; }
+        }
+        @media (min-width: 768px) {
+          .msg-conv-panel { display: flex !important; }
+          .msg-chat-panel { display: flex !important; }
+          .msg-back-btn { display: none !important; }
+        }
+      `}</style>
 
-      {/* Sidebar */}
-      <div style={{ width: 320, borderRight: "1px solid #e2e8f0", display: "flex", flexDirection: "column", backgroundColor: "#fff", flexShrink: 0 }}>
+      {/* Conversation List Panel */}
+      <div className={`msg-conv-panel${showConvList ? " show" : ""}`} style={{ width: 260, flexShrink: 0, borderRight: "1px solid #e2e8f0", flexDirection: "column", backgroundColor: "#fff", overflow: "hidden" }}>
         <div style={{ background: theme.headerBg, padding: "24px 20px 20px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
             <div>
@@ -266,7 +283,7 @@ export default function Messages({ onNavigate }) {
           {filtered.map(c => {
             const isActive = activeConv?.other_user_id === c.other_user_id;
             return (
-              <div key={c.other_user_id} onClick={() => setActiveConv(c)}
+              <div key={c.other_user_id} onClick={() => { setActiveConv(c); setShowConvList(false); }}
                 style={{ padding: "14px 16px", cursor: "pointer", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", gap: 12, backgroundColor: isActive ? theme.activeConv : "transparent", borderLeft: isActive ? `3px solid ${theme.activeBorder}` : "3px solid transparent", transition: "all 0.15s" }}
                 onMouseEnter={e => { if (!isActive) e.currentTarget.style.backgroundColor = "#f8fafc"; }}
                 onMouseLeave={e => { if (!isActive) e.currentTarget.style.backgroundColor = "transparent"; }}>
@@ -296,7 +313,7 @@ export default function Messages({ onNavigate }) {
       </div>
 
       {/* Chat Area */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div className={`msg-chat-panel${!showConvList ? " show" : ""}`} style={{ flex: 1, minWidth: 0, flexDirection: "column", overflow: "hidden" }}>
         {!activeConv ? (
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
             <div style={{ fontSize: 64 }}>💬</div>
@@ -306,6 +323,9 @@ export default function Messages({ onNavigate }) {
         ) : (
           <>
             <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #e2e8f0", padding: "16px 24px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+              <button className="msg-back-btn" onClick={() => setShowConvList(true)}
+                style={{ display: "none", background: "none", border: "none", cursor: "pointer", color: "#64748b", padding: "4px 8px 4px 0", fontSize: 20, alignItems: "center" }}
+                aria-label="Back to conversations">‹</button>
               <div style={{ width: 44, height: 44, borderRadius: "50%", background: getAvatarColor(activeConv.other_user_id), display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: 18, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
                 {getInitial(activeConv.other_name)}
               </div>
