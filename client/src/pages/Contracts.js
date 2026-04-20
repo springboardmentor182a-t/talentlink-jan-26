@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import api from "../utils/api";
@@ -10,7 +10,7 @@ export default function Contracts() {
   const [proposals, setProposals] = useState({});
   const [loading, setLoading]     = useState(true);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const projRes = await api.get(`/projects/client/${user.id}`);
@@ -27,14 +27,13 @@ export default function Contracts() {
     } catch (err) {
       console.error("Contracts error:", err.message);
     } finally { setLoading(false); }
-  };
+  }, [user]);
 
-  useEffect(() => { if (!user) return; fetchData(); }, [user]);
+  useEffect(() => { if (!user) return; fetchData(); }, [user, fetchData]);
 
   const markCompleted = async (projectId) => {
     try {
       await api.put(`/projects/${projectId}`, { status: "completed" });
-      await api.put(`/contracts/complete/${projectId}`);
       await fetchData();
     } catch (err) {
       console.error("Error completing:", err.message);
@@ -288,7 +287,7 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
         </div>
       )}
 
-      {/* ── AI RISK PREDICTION PANEL ── */}
+      {/* AI RISK PREDICTION PANEL */}
       {showRisk && (
         <div style={{ backgroundColor: riskLoading ? "#f8fafc" : rc.bg, border:`1px solid ${riskLoading ? "#e2e8f0" : rc.border}`, borderRadius:12, padding:16, marginBottom:16 }}>
           {riskLoading ? (
@@ -335,7 +334,7 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
         </div>
       )}
 
-      {/* ── AI SUMMARY PANEL ── */}
+      {/* AI SUMMARY PANEL */}
       {showSummary && (
         <div style={{ backgroundColor: summaryLoading ? "#f8fafc" : "#f0f9ff", border:"1px solid #bae6fd", borderRadius:12, padding:16, marginBottom:16 }}>
           {summaryLoading ? (
@@ -392,7 +391,6 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
             💬 Message {freelancerName ? freelancerName.split(" ")[0] : "Freelancer"}
           </button>
         )}
-        {/* ── AI BUTTONS ── */}
         <button onClick={fetchRisk}
           style={{ padding:"10px 20px", background: showRisk ? "#fef3c7" : "linear-gradient(135deg,#f59e0b,#f97316)", color: showRisk ? "#d97706" : "white", border: showRisk ? "1.5px solid #fcd34d" : "none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13, display:"flex", alignItems:"center", gap:6 }}>
           🔮 {showRisk ? "Hide Risk" : "Contract Risk"}
