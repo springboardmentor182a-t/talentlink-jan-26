@@ -144,7 +144,7 @@ export default function Profile({ onNavigate }) {
         <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:32, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
 
           {/* Avatar row */}
-          <div style={{ display:"flex", alignItems:"center", gap:20, marginBottom:28, paddingBottom:24, borderBottom:"1px solid var(--border-light)" }}>
+          <div style={{ display:"flex", alignItems:"flex-start", gap:16, marginBottom:28, paddingBottom:24, borderBottom:"1px solid var(--border-light)", flexWrap:"wrap" }}>
             <div style={{ width:80, height:80, borderRadius:"50%", background:theme.btn, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:800, fontSize:32, boxShadow:`0 4px 16px ${theme.shadow}`, flexShrink:0 }}>
               {initials}
             </div>
@@ -157,7 +157,7 @@ export default function Profile({ onNavigate }) {
             </div>
             {!editing && (
               <button onClick={() => setEditing(true)}
-                style={{ padding:"10px 24px", background:theme.btn, color:"white", border:"none", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14, boxShadow:`0 2px 8px ${theme.shadow}` }}>
+                style={{ padding:"10px 20px", background:theme.btn, color:"white", border:"none", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:13, boxShadow:`0 2px 8px ${theme.shadow}`, flexShrink:0, whiteSpace:"nowrap" }}>
                 ✏️ Edit Profile
               </button>
             )}

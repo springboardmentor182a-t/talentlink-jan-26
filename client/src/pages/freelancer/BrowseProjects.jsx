@@ -72,7 +72,7 @@ export default function BrowseProjects() {
       <div style={{ padding:"20px 16px" }}>
 
         {/* Filters */}
-        <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"20px 24px", marginBottom:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
+        <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"20px 24px", marginBottom:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:16 }}>
             <span style={{ fontSize:15, fontWeight:700, color:"var(--text-primary)" }}>🔽 Filters</span>
             <button onClick={clearFilters}
@@ -118,7 +118,7 @@ export default function BrowseProjects() {
         {loading && <p style={{ color:"var(--text-muted)" }}>Loading projects...</p>}
 
         {!loading && filtered.length === 0 && (
-          <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"60px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
+          <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"60px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
             <div style={{ fontSize:56, marginBottom:16 }}>🔍</div>
             <h3 style={{ fontSize:18, fontWeight:700, color:"var(--text-primary)", marginBottom:8 }}>No projects found</h3>
             <p style={{ color:"var(--text-muted)", fontSize:14, marginBottom:16 }}>Try adjusting your filters to find more projects.</p>
@@ -130,7 +130,7 @@ export default function BrowseProjects() {
         )}
 
         {filtered.map(p => (
-          <div key={p.id} style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}
+          <div key={p.id} style={{ backgroundColor:"var(--card)", borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}
             onMouseEnter={e => e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.1)"}
             onMouseLeave={e => e.currentTarget.style.boxShadow="0 1px 3px rgba(0,0,0,0.06)"}>
 
@@ -178,14 +178,14 @@ export default function BrowseProjects() {
                 🚀 Submit Proposal
               </button>
               <button onClick={() => setSelected(p)}
-                style={{ padding:"10px 24px", backgroundColor:"var(--card)" /* TODO-DARK */, color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:14 }}>
+                style={{ padding:"10px 24px", backgroundColor:"var(--card)", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:14 }}>
                 View Details
               </button>
 
               {/* ✅ NEW BUTTON */}
               <button onClick={() => checkMatchScore(p.id)}
                 disabled={matchLoading[p.id]}
-                style={{ padding:"10px 24px", backgroundColor:"var(--card)" /* TODO-DARK */, color:"#7c3aed", border:"1.5px solid #7c3aed", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:14, opacity: matchLoading[p.id] ? 0.7 : 1 }}>
+                style={{ padding:"10px 24px", backgroundColor:"var(--card)", color:"#7c3aed", border:"1.5px solid #7c3aed", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:14, opacity: matchLoading[p.id] ? 0.7 : 1 }}>
                 {matchLoading[p.id] ? "⏳ Checking..." : "🤖 Match Score"}
               </button>
             </div>
@@ -224,7 +224,7 @@ export default function BrowseProjects() {
         <div onClick={() => setSelected(null)}
           style={{ position:"fixed", inset:0, backgroundColor:"rgba(15,23,42,0.6)", zIndex:1000, display:"flex", alignItems:"center", justifyContent:"center", padding:24, backdropFilter:"blur(4px)" }}>
           <div onClick={e => e.stopPropagation()}
-            style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:20, padding:32, maxWidth:600, width:"100%", maxHeight:"80vh", overflowY:"auto", boxShadow:"0 20px 60px rgba(0,0,0,0.3)", border:"1px solid var(--border)" }}>
+            style={{ backgroundColor:"var(--card)", borderRadius:20, padding:32, maxWidth:600, width:"100%", maxHeight:"80vh", overflowY:"auto", boxShadow:"0 20px 60px rgba(0,0,0,0.3)", border:"1px solid var(--border)" }}>
 
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:20 }}>
               <div>
@@ -232,7 +232,7 @@ export default function BrowseProjects() {
                 <span style={{ padding:"6px 16px", borderRadius:20, fontSize:12, fontWeight:700, background:"linear-gradient(135deg,#7c3aed,#a855f7)", color:"white" }}>Open</span>
               </div>
               <button onClick={() => setSelected(null)}
-                style={{ background:"#f1f5f9", border:"none", width:32, height:32, borderRadius:"50%", cursor:"pointer", color:"var(--text-muted)", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+                style={{ background:"var(--muted)", border:"none", width:32, height:32, borderRadius:"50%", cursor:"pointer", color:"var(--text-muted)", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
             </div>
 
             <div style={{ marginBottom:20 }}>
@@ -274,7 +274,7 @@ export default function BrowseProjects() {
                 🚀 Submit Proposal
               </button>
               <button onClick={() => setSelected(null)}
-                style={{ padding:"13px 24px", backgroundColor:"var(--card)" /* TODO-DARK */, color:"var(--text-muted)", border:"1.5px solid var(--border)", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14 }}>
+                style={{ padding:"13px 24px", backgroundColor:"var(--card)", color:"var(--text-muted)", border:"1.5px solid var(--border)", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14 }}>
                 Close
               </button>
             </div>

@@ -154,6 +154,15 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
           </div>
 
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+              style={{ display:"flex", alignItems:"center", justifyContent:"center", width:34, height:34, borderRadius:8, border:"1px solid var(--border)", backgroundColor:"var(--input-bg)", cursor:"pointer", color:"var(--text-muted)", flexShrink:0 }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor="#7c3aed"; e.currentTarget.style.color="#7c3aed"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.color="var(--text-muted)"; }}>
+              {isDark ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
             <NotificationBell theme="purple" />
             <div style={{ display:"flex", alignItems:"center", gap:10, backgroundColor:"var(--page-bg)", padding:"6px 14px", borderRadius:20, border:"1px solid var(--border)" }}>
               <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:13 }}>
@@ -165,9 +174,9 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
               </div>
             </div>
             <button onClick={handleLogout}
-              style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid var(--border)", borderRadius:8, cursor:"pointer", fontSize:13, color:"var(--text-muted)", background:"white", fontFamily:"inherit", transition:"all 0.15s", flexShrink:0 }}
+              style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid var(--border)", borderRadius:8, cursor:"pointer", fontSize:13, color:"var(--text-muted)", background:"var(--topbar-bg)", fontFamily:"inherit", transition:"all 0.15s", flexShrink:0 }}
               onMouseEnter={e => { e.currentTarget.style.borderColor="#7c3aed"; e.currentTarget.style.color="#7c3aed"; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor="#e2e8f0"; e.currentTarget.style.color="#64748b"; }}>
+              onMouseLeave={e => { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.color="var(--text-muted)"; }}>
               <LogoutIcon /> <span className="fl-logout-text">Logout</span>
             </button>
           </div>

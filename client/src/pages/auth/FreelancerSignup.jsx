@@ -43,7 +43,7 @@ export default function FreelancerSignup() {
     } finally { setLoading(false); }
   };
 
-  const inp = { width:"100%", padding:"12px 16px", border:"1.5px solid #e5e7eb", borderRadius:10, fontSize:14, backgroundColor:"var(--page-bg)", outline:"none", boxSizing:"border-box", marginBottom:16, transition:"all 0.2s", color:"var(--text-primary)" };
+  const inp = { width:"100%", padding:"12px 16px", border:"1.5px solid var(--border)", borderRadius:10, fontSize:14, backgroundColor:"var(--page-bg)", outline:"none", boxSizing:"border-box", marginBottom:16, transition:"all 0.2s", color:"var(--text-primary)" };
   const lbl = { display:"block", fontSize:13, fontWeight:600, color:"var(--text-secondary)", marginBottom:6 };
 
   return (
@@ -60,7 +60,7 @@ export default function FreelancerSignup() {
       <div style={{ position:"fixed", top:50, right:-100, width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle, rgba(168,85,247,0.5) 0%, transparent 70%)", pointerEvents:"none", animation:"pulse 6s ease-in-out infinite 1s", filter:"blur(25px)" }} />
       <div style={{ position:"fixed", top:"40%", left:-80, width:350, height:350, borderRadius:"50%", background:"radial-gradient(circle, rgba(59,130,246,0.5) 0%, transparent 70%)", pointerEvents:"none", animation:"pulse 5s ease-in-out infinite 2s", filter:"blur(25px)" }} />
 
-      <div style={{ ...fadeUp, position:"relative", zIndex:10, backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:24, padding:"44px 40px", width:"100%", maxWidth:440, boxShadow:"0 20px 60px rgba(0,0,0,0.4)", border:"1px solid rgba(255,255,255,0.2)" }}>
+      <div style={{ ...fadeUp, position:"relative", zIndex:10, backgroundColor:"var(--card)", borderRadius:24, padding:"44px 40px", width:"100%", maxWidth:440, boxShadow:"0 20px 60px rgba(0,0,0,0.4)", border:"1px solid rgba(255,255,255,0.2)" }}>
 
         <button onClick={() => navigate("/")}
           style={{ background:"none", border:"none", fontSize:14, color:"#7c3aed", cursor:"pointer", padding:"4px 0", marginBottom:20, display:"flex", alignItems:"center", gap:6, fontWeight:500 }}>
@@ -77,7 +77,7 @@ export default function FreelancerSignup() {
 
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:20 }}>
           <button className="social-hover" onClick={() => alert("Google signup coming soon!")}
-            style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:12, border:"1.5px solid #e5e7eb", borderRadius:10, cursor:"pointer", backgroundColor:"white", fontSize:14, fontWeight:600, color:"var(--text-secondary)", transition:"all 0.2s" }}>
+            style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:12, border:"1.5px solid var(--border)", borderRadius:10, cursor:"pointer", backgroundColor:"var(--card)", fontSize:14, fontWeight:600, color:"var(--text-secondary)", transition:"all 0.2s" }}>
             <GoogleIcon /> Google
           </button>
           <button className="social-hover" onClick={() => alert("GitHub signup coming soon!")}
@@ -87,9 +87,9 @@ export default function FreelancerSignup() {
         </div>
 
         <div style={{ display:"flex", alignItems:"center", gap:12, margin:"20px 0", color:"var(--text-faint)", fontSize:12 }}>
-          <div style={{ flex:1, height:1, backgroundColor:"#e5e7eb" }} />
+          <div style={{ flex:1, height:1, backgroundColor:"var(--muted)" }} />
           or continue with email
-          <div style={{ flex:1, height:1, backgroundColor:"#e5e7eb" }} />
+          <div style={{ flex:1, height:1, backgroundColor:"var(--muted)" }} />
         </div>
 
         {error && (

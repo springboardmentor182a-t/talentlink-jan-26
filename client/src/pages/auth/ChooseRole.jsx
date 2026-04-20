@@ -43,7 +43,7 @@ export default function ChooseRole() {
   });
 
   const list        = { listStyle: "none", padding: 0, margin: "0 0 28px", display: "flex", flexDirection: "column", gap: 10 };
-  const item        = { display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: "#374151" };
+  const item        = { display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: "var(--text-secondary)" };
   const btnBlue     = { width: "100%", padding: 14, background: "linear-gradient(135deg,#1e3a5f,#2563eb,#3b82f6)", color: "white", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 15, cursor: "pointer", transition: "all 0.2s ease", boxShadow: "0 4px 15px rgba(37,99,235,0.5)" };
   const btnPurple   = { width: "100%", padding: 14, background: "linear-gradient(135deg,#4c1d95,#7c3aed,#a855f7)", color: "white", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 15, cursor: "pointer", transition: "all 0.2s ease", boxShadow: "0 4px 15px rgba(124,58,237,0.5)" };
   const badgeBlue   = { position: "absolute", top: 20, right: 20, backgroundColor: "#eff6ff", color: "#2563eb", fontSize: 12, fontWeight: 600, padding: "4px 12px", borderRadius: 20 };
@@ -126,15 +126,15 @@ export default function ChooseRole() {
         <div style={cardStyle(hoverClient)} onMouseEnter={() => setHoverClient(true)} onMouseLeave={() => setHoverClient(false)}>
           <span style={badgeBlue}>For Businesses</span>
           <div style={{ ...iconBlue, animation: "float 3s ease-in-out infinite" }}>💼</div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "#111827", marginBottom: 8 }}>I'm a Client</h2>
-          <p style={{ fontSize: 14, color: "#6b7280", marginBottom: 20, lineHeight: 1.6 }}>Post projects and hire talented freelancers to bring your vision to life.</p>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text-primary)", marginBottom: 8 }}>I'm a Client</h2>
+          <p style={{ fontSize: 14, color: "var(--text-faint)", marginBottom: 20, lineHeight: 1.6 }}>Post projects and hire talented freelancers to bring your vision to life.</p>
           <ul style={list}>
             {["Post unlimited projects", "Review freelancer proposals", "Manage contracts & progress", "Secure payment tracking"].map(f => (
               <li key={f} style={item}><span>✅</span>{f}</li>
             ))}
           </ul>
           <button className="btn-blue" style={btnBlue} onClick={() => navigate("/client/login")}>Continue as Client →</button>
-          <p style={{ textAlign: "center", fontSize: 12, color: "#9ca3af", marginTop: 12 }}>
+          <p style={{ textAlign: "center", fontSize: 12, color: "var(--text-faint)", marginTop: 12 }}>
             New here?{" "}
             <span onClick={() => navigate("/client/signup")} style={{ color: "#2563eb", fontWeight: 600, cursor: "pointer" }}>Create account</span>
           </p>
@@ -144,15 +144,15 @@ export default function ChooseRole() {
         <div style={cardStyle(hoverFreelancer)} onMouseEnter={() => setHoverFreelancer(true)} onMouseLeave={() => setHoverFreelancer(false)}>
           <span style={badgePurple}>For Professionals</span>
           <div style={{ ...iconPurple, animation: "float 3s ease-in-out infinite 1s" }}>👤</div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "#111827", marginBottom: 8 }}>I'm a Freelancer</h2>
-          <p style={{ fontSize: 14, color: "#6b7280", marginBottom: 20, lineHeight: 1.6 }}>Find exciting projects and work with clients from around the world.</p>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text-primary)", marginBottom: 8 }}>I'm a Freelancer</h2>
+          <p style={{ fontSize: 14, color: "var(--text-faint)", marginBottom: 20, lineHeight: 1.6 }}>Find exciting projects and work with clients from around the world.</p>
           <ul style={list}>
             {["Browse thousands of projects", "Submit competitive proposals", "Build your portfolio", "Get paid for your expertise"].map(f => (
               <li key={f} style={item}><span>✅</span>{f}</li>
             ))}
           </ul>
           <button className="btn-purple" style={btnPurple} onClick={() => navigate("/freelancer/login")}>Continue as Freelancer →</button>
-          <p style={{ textAlign: "center", fontSize: 12, color: "#9ca3af", marginTop: 12 }}>
+          <p style={{ textAlign: "center", fontSize: 12, color: "var(--text-faint)", marginTop: 12 }}>
             New here?{" "}
             <span onClick={() => navigate("/freelancer/signup")} style={{ color: "#7c3aed", fontWeight: 600, cursor: "pointer" }}>Create account</span>
           </p>

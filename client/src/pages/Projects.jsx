@@ -207,7 +207,7 @@ export default function Projects() {
                 <p style={{ fontSize:14, color:"var(--text-muted)", margin:0 }}>Update your project details</p>
               </div>
               <button onClick={() => setEditProject(null)}
-                style={{ background:"#f1f5f9", border:"none", width:32, height:32, borderRadius:"50%", cursor:"pointer", color:"var(--text-muted)", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+                style={{ background:"var(--muted)", border:"none", width:32, height:32, borderRadius:"50%", cursor:"pointer", color:"var(--text-muted)", fontSize:16, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
             </div>
             <label style={lbl}>Project Title</label>
             <input value={editForm.title} onChange={e => setEditForm({ ...editForm, title:e.target.value })} style={{ ...inp, marginBottom:16 }} />

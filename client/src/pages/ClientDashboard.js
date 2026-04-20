@@ -75,7 +75,7 @@ export default function ClientDashboard() {
             { label:"Total Proposals",   val:totalProposals,   icon:"📋", color:"#7c3aed", bg:"#f5f3ff" },
             { label:"Pending Proposals", val:pendingProposals, icon:"⏳", color:"#d97706", bg:"#fffbeb" },
           ].map(s => (
-            <div key={s.label} style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <div key={s.label} style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div>
                 <div style={{ fontSize:12, color:"var(--text-muted)", marginBottom:6, textTransform:"uppercase", letterSpacing:"0.5px" }}>{s.label}</div>
                 <div style={{ fontSize:32, fontWeight:800, color:s.color }}>{s.val}</div>
@@ -86,7 +86,7 @@ export default function ClientDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"20px 24px", marginBottom:28, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+        <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"20px 24px", marginBottom:28, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div>
             <div style={{ fontWeight:700, fontSize:15, color:"var(--text-primary)" }}>Ready to find talent?</div>
             <div style={{ fontSize:13, color:"var(--text-muted)", marginTop:2 }}>Post a new project and start receiving proposals</div>
@@ -149,7 +149,7 @@ export default function ClientDashboard() {
 
         {/* Empty State */}
         {projects.length === 0 && (
-          <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"60px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
+          <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"60px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
             <div style={{ fontSize:56, marginBottom:16 }}>📁</div>
             <h3 style={{ fontSize:18, fontWeight:700, color:"var(--text-primary)", marginBottom:8 }}>No projects yet</h3>
             <p style={{ color:"var(--text-muted)", fontSize:14, marginBottom:20 }}>Post your first project and start receiving proposals from top freelancers.</p>
@@ -207,7 +207,7 @@ function ProjectCard({ p, proposals, navigate, recommendations, setRecommendatio
   };
 
   return (
-    <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", flexDirection:"column", gap:12 }}
+    <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", flexDirection:"column", gap:12 }}
       onMouseEnter={e => e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.1)"}
       onMouseLeave={e => e.currentTarget.style.boxShadow="0 1px 3px rgba(0,0,0,0.06)"}>
 
@@ -270,7 +270,7 @@ function ProjectCard({ p, proposals, navigate, recommendations, setRecommendatio
       {/* ✅ AI RECOMMEND BUTTON */}
       <button onClick={getRecommendations}
         disabled={recommendLoading[p.id]}
-        style={{ width:"100%", padding:"10px", background:"#fff", color:"#7c3aed", border:"1.5px solid #7c3aed", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13, opacity: recommendLoading[p.id] ? 0.7 : 1 }}>
+        style={{ width:"100%", padding:"10px", background:"var(--card)", color:"#7c3aed", border:"1.5px solid #7c3aed", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13, opacity: recommendLoading[p.id] ? 0.7 : 1 }}>
         {recommendLoading[p.id] ? "⏳ Finding..." : "⭐ AI Recommend Freelancers"}
       </button>
 
@@ -279,7 +279,7 @@ function ProjectCard({ p, proposals, navigate, recommendations, setRecommendatio
         <div style={{ padding:16, backgroundColor:"#faf5ff", borderRadius:12, border:"1px solid #ddd6fe" }}>
           <div style={{ fontSize:13, fontWeight:700, color:"#7c3aed", marginBottom:12 }}>⭐ Top Recommended Freelancers</div>
           {recommendations[p.id].map((r, i) => (
-            <div key={r.id} style={{ padding:12, backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:10, border:"1px solid #ede9fe", marginBottom:8 }}>
+            <div key={r.id} style={{ padding:12, backgroundColor:"var(--card)", borderRadius:10, border:"1px solid #ede9fe", marginBottom:8 }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                   <div style={{ width:32, height:32, borderRadius:10, background:"linear-gradient(135deg,#7c3aed,#a855f7)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:800, fontSize:14 }}>

@@ -211,7 +211,7 @@ export default function Messages({ onNavigate }) {
   const getAvatarColor = (id) => avatarColors[(id || 0) % avatarColors.length];
 
   return (
-    <div style={{ display: "flex", height: "calc(100vh - 56px)", fontFamily: "'Segoe UI',sans-serif", backgroundColor: "#f8fafc", overflow: "hidden" }}>
+    <div style={{ display: "flex", height: "calc(100vh - 56px)", fontFamily: "'Segoe UI',sans-serif", backgroundColor: "var(--page-bg)", overflow: "hidden" }}>
       <style>{`
         @media (max-width: 767px) {
           .msg-conv-panel { display: none !important; }
@@ -228,7 +228,7 @@ export default function Messages({ onNavigate }) {
       `}</style>
 
       {/* Conversation List Panel */}
-      <div className={`msg-conv-panel${showConvList ? " show" : ""}`} style={{ width: 260, flexShrink: 0, borderRight: "1px solid #e2e8f0", flexDirection: "column", backgroundColor: "#fff", overflow: "hidden" }}>
+      <div className={`msg-conv-panel${showConvList ? " show" : ""}`} style={{ width: 260, flexShrink: 0, borderRight: "1px solid var(--border)", flexDirection: "column", backgroundColor: "var(--card)", overflow: "hidden" }}>
         <div style={{ background: theme.headerBg, padding: "24px 20px 20px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
             <div>
@@ -256,13 +256,13 @@ export default function Messages({ onNavigate }) {
 
         <div style={{ flex: 1, overflowY: "auto" }}>
           {loadingConvs && (
-            <div style={{ padding: 24, textAlign: "center", color: "#64748b", fontSize: 14 }}>Loading...</div>
+            <div style={{ padding: 24, textAlign: "center", color: "var(--text-muted)", fontSize: 14 }}>Loading...</div>
           )}
           {!loadingConvs && filtered.length === 0 && (
             <div style={{ padding: 32, textAlign: "center" }}>
               <div style={{ fontSize: 40, marginBottom: 12 }}>💬</div>
-              <p style={{ fontSize: 14, color: "#64748b", margin: 0 }}>No conversations yet</p>
-              <p style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
+              <p style={{ fontSize: 14, color: "var(--text-muted)", margin: 0 }}>No conversations yet</p>
+              <p style={{ fontSize: 12, color: "var(--text-faint)", marginTop: 4 }}>
                 {isFreelancer ? "Clients will message you once a proposal is accepted" : "Messages from freelancers will appear here"}
               </p>
             </div>
@@ -274,8 +274,8 @@ export default function Messages({ onNavigate }) {
                 {getInitial(decodeURIComponent(initName || "F"))}
               </div>
               <div>
-                <div style={{ fontWeight: 700, fontSize: 14, color: "#111827" }}>{decodeURIComponent(initName || `User #${initFreelancer}`)}</div>
-                <div style={{ fontSize: 12, color: "#64748b" }}>New conversation</div>
+                <div style={{ fontWeight: 700, fontSize: 14, color: "var(--text-primary)" }}>{decodeURIComponent(initName || `User #${initFreelancer}`)}</div>
+                <div style={{ fontSize: 12, color: "var(--text-muted)" }}>New conversation</div>
               </div>
             </div>
           )}
@@ -284,20 +284,20 @@ export default function Messages({ onNavigate }) {
             const isActive = activeConv?.other_user_id === c.other_user_id;
             return (
               <div key={c.other_user_id} onClick={() => { setActiveConv(c); setShowConvList(false); }}
-                style={{ padding: "14px 16px", cursor: "pointer", borderBottom: "1px solid #f1f5f9", display: "flex", alignItems: "center", gap: 12, backgroundColor: isActive ? theme.activeConv : "transparent", borderLeft: isActive ? `3px solid ${theme.activeBorder}` : "3px solid transparent", transition: "all 0.15s" }}
-                onMouseEnter={e => { if (!isActive) e.currentTarget.style.backgroundColor = "#f8fafc"; }}
+                style={{ padding: "14px 16px", cursor: "pointer", borderBottom: "1px solid var(--border-light)", display: "flex", alignItems: "center", gap: 12, backgroundColor: isActive ? theme.activeConv : "transparent", borderLeft: isActive ? `3px solid ${theme.activeBorder}` : "3px solid transparent", transition: "all 0.15s" }}
+                onMouseEnter={e => { if (!isActive) e.currentTarget.style.backgroundColor = "var(--page-bg)"; }}
                 onMouseLeave={e => { if (!isActive) e.currentTarget.style.backgroundColor = "transparent"; }}>
                 <div style={{ width: 44, height: 44, borderRadius: "50%", background: getAvatarColor(c.other_user_id), display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: 16, flexShrink: 0, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
                   {getInitial(c.other_name)}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontWeight: 700, fontSize: 14, color: "#111827", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <span style={{ fontWeight: 700, fontSize: 14, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {c.other_name || `User #${c.other_user_id}`}
                     </span>
-                    <span style={{ fontSize: 11, color: "#94a3b8", flexShrink: 0, marginLeft: 8 }}>{formatDay(c.last_message_at)}</span>
+                    <span style={{ fontSize: 11, color: "var(--text-faint)", flexShrink: 0, marginLeft: 8 }}>{formatDay(c.last_message_at)}</span>
                   </div>
-                  <div style={{ fontSize: 12, color: "#64748b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 2 }}>
+                  <div style={{ fontSize: 12, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 2 }}>
                     {c.last_message || "No messages yet"}
                   </div>
                 </div>
@@ -317,20 +317,20 @@ export default function Messages({ onNavigate }) {
         {!activeConv ? (
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
             <div style={{ fontSize: 64 }}>💬</div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: "#111827", margin: 0 }}>Select a conversation</h3>
-            <p style={{ fontSize: 14, color: "#64748b", margin: 0 }}>Choose from the sidebar to start messaging</p>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>Select a conversation</h3>
+            <p style={{ fontSize: 14, color: "var(--text-muted)", margin: 0 }}>Choose from the sidebar to start messaging</p>
           </div>
         ) : (
           <>
-            <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #e2e8f0", padding: "16px 24px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+            <div style={{ backgroundColor: "var(--card)", borderBottom: "1px solid var(--border)", padding: "16px 24px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
               <button className="msg-back-btn" onClick={() => setShowConvList(true)}
-                style={{ display: "none", background: "none", border: "none", cursor: "pointer", color: "#64748b", padding: "4px 8px 4px 0", fontSize: 20, alignItems: "center" }}
+                style={{ display: "none", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: "4px 8px 4px 0", fontSize: 20, alignItems: "center" }}
                 aria-label="Back to conversations">‹</button>
               <div style={{ width: 44, height: 44, borderRadius: "50%", background: getAvatarColor(activeConv.other_user_id), display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: 18, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
                 {getInitial(activeConv.other_name)}
               </div>
               <div>
-                <div style={{ fontWeight: 700, fontSize: 16, color: "#111827" }}>
+                <div style={{ fontWeight: 700, fontSize: 16, color: "var(--text-primary)" }}>
                   {activeConv.other_name || `User #${activeConv.other_user_id}`}
                 </div>
                 <div style={{ fontSize: 12, color: connected ? "#16a34a" : "#94a3b8", display: "flex", alignItems: "center", gap: 4 }}>
@@ -340,14 +340,14 @@ export default function Messages({ onNavigate }) {
               </div>
             </div>
 
-            <div style={{ flex: 1, overflowY: "auto", padding: "24px", display: "flex", flexDirection: "column", gap: 4, backgroundColor: "#f8fafc" }}>
+            <div style={{ flex: 1, overflowY: "auto", padding: "24px", display: "flex", flexDirection: "column", gap: 4, backgroundColor: "var(--page-bg)" }}>
               {loadingMsgs && (
-                <div style={{ textAlign: "center", color: "#64748b", fontSize: 14, padding: 24 }}>Loading messages...</div>
+                <div style={{ textAlign: "center", color: "var(--text-muted)", fontSize: 14, padding: 24 }}>Loading messages...</div>
               )}
               {!loadingMsgs && messages.length === 0 && (
                 <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8, marginTop: 80 }}>
                   <div style={{ fontSize: 48 }}>👋</div>
-                  <p style={{ fontSize: 14, color: "#64748b", margin: 0 }}>No messages yet. Say hello!</p>
+                  <p style={{ fontSize: 14, color: "var(--text-muted)", margin: 0 }}>No messages yet. Say hello!</p>
                 </div>
               )}
               {messages.map((m, i) => {
@@ -358,7 +358,7 @@ export default function Messages({ onNavigate }) {
                   <div key={m.id || i}>
                     {showDay && (
                       <div style={{ textAlign: "center", margin: "12px 0" }}>
-                        <span style={{ fontSize: 11, color: "#94a3b8", backgroundColor: "#e2e8f0", padding: "3px 12px", borderRadius: 20, fontWeight: 600 }}>
+                        <span style={{ fontSize: 11, color: "var(--text-faint)", backgroundColor: "var(--muted)", padding: "3px 12px", borderRadius: 20, fontWeight: 600 }}>
                           {formatDay(m.created_at)}
                         </span>
                       </div>
@@ -373,16 +373,16 @@ export default function Messages({ onNavigate }) {
                         <div style={{
                           padding: "10px 14px",
                           borderRadius: isMe ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-                          background:   isMe ? theme.bubbleBg : "#fff",
+                          background:   isMe ? theme.bubbleBg : "var(--card)",
                           color:        isMe ? "white" : "#111827",
                           fontSize: 14, lineHeight: 1.5,
                           boxShadow:    isMe ? theme.bubbleShadow : "0 1px 3px rgba(0,0,0,0.08)",
-                          border:       isMe ? "none" : "1px solid #e2e8f0",
+                          border:       isMe ? "none" : "1px solid var(--border)",
                           wordBreak: "break-word",
                         }}>
                           {m.content}
                         </div>
-                        <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 4, textAlign: isMe ? "right" : "left", paddingLeft: isMe ? 0 : 4, paddingRight: isMe ? 4 : 0 }}>
+                        <div style={{ fontSize: 11, color: "var(--text-faint)", marginTop: 4, textAlign: isMe ? "right" : "left", paddingLeft: isMe ? 0 : 4, paddingRight: isMe ? 4 : 0 }}>
                           {formatTime(m.created_at)}
                           {isMe && <span style={{ marginLeft: 4 }}>✓✓</span>}
                         </div>
@@ -394,7 +394,7 @@ export default function Messages({ onNavigate }) {
               <div ref={bottomRef} />
             </div>
 
-            <div style={{ backgroundColor: "#fff", borderTop: "1px solid #e2e8f0", padding: "16px 24px", display: "flex", gap: 12, alignItems: "flex-end" }}>
+            <div style={{ backgroundColor: "var(--card)", borderTop: "1px solid var(--border)", padding: "16px 24px", display: "flex", gap: 12, alignItems: "flex-end" }}>
               <textarea
                 ref={inputRef}
                 value={text}
@@ -402,7 +402,7 @@ export default function Messages({ onNavigate }) {
                 onKeyDown={handleKeyDown}
                 placeholder="Type a message... (Enter to send)"
                 rows={1}
-                style={{ flex: 1, padding: "12px 16px", border: `1.5px solid ${text ? theme.inputFocus : "#e2e8f0"}`, borderRadius: 12, fontSize: 14, fontFamily: "inherit", outline: "none", resize: "none", lineHeight: 1.5, maxHeight: 120, overflowY: "auto", transition: "border-color 0.2s" }}
+                style={{ flex: 1, padding: "12px 16px", border: `1.5px solid ${text ? theme.inputFocus : "var(--border)"}`, borderRadius: 12, fontSize: 14, fontFamily: "inherit", outline: "none", resize: "none", lineHeight: 1.5, maxHeight: 120, overflowY: "auto", transition: "border-color 0.2s" }}
                 onInput={e => { e.target.style.height = "auto"; e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px"; }}
               />
               <button onClick={sendMessage} disabled={sending || !text.trim()}

@@ -7,7 +7,7 @@ class Proposal(Base):
     __tablename__ = "proposals"
     __table_args__ = {"extend_existing": True}
 
-    id             = Column(Integer, primary_key=True, index=True)
+    id             = Column(Integer, primary_key=True)
     project_id     = Column(Integer, ForeignKey("projects.id"))
     freelancer_id  = Column(Integer, nullable=False)
     cover_letter   = Column(Text)

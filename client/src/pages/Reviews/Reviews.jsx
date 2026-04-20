@@ -186,7 +186,7 @@ export default function Reviews({ onNavigate }) {
             { label:isFreelancer ? "Feedback Given" : "Reviews Given", val:given.length, icon:"📤", color:"#16a34a", bg:"#f0fdf4" },
             { label:"Average Rating",   val:avgRating ? `${avgRating} ★` : "—", icon:"⭐", color:"#d97706", bg:"#fffbeb" },
           ].map(s => (
-            <div key={s.label} style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <div key={s.label} style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div>
                 <div style={{ fontSize:12, color:"var(--text-muted)", marginBottom:6, textTransform:"uppercase", letterSpacing:"0.5px" }}>{s.label}</div>
                 <div style={{ fontSize:28, fontWeight:800, color:s.color }}>{s.val}</div>
@@ -198,7 +198,7 @@ export default function Reviews({ onNavigate }) {
 
         {/* Write Review / Give Feedback CTA */}
         {dropdownOptions.length > 0 && (
-          <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"20px 24px", marginBottom:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
+          <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"20px 24px", marginBottom:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
             <div>
               <div style={{ fontWeight:700, fontSize:15, color:"var(--text-primary)" }}>
                 {isFreelancer ? "Give feedback to a client" : "Review a freelancer"}
@@ -218,7 +218,7 @@ export default function Reviews({ onNavigate }) {
 
         {/* Form */}
         {showForm && (
-          <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:28, marginBottom:24, boxShadow:"0 4px 16px rgba(0,0,0,0.08)", border:`1.5px solid ${theme.accent}44` }}>
+          <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:28, marginBottom:24, boxShadow:"0 4px 16px rgba(0,0,0,0.08)", border:`1.5px solid ${theme.accent}44` }}>
             <h3 style={{ fontSize:16, fontWeight:700, color:"var(--text-primary)", margin:"0 0 20px" }}>
               {isFreelancer ? "✍️ Give Feedback to Client" : "✍️ Write a Review"}
             </h3>
@@ -262,7 +262,7 @@ export default function Reviews({ onNavigate }) {
               <div>
                 <label style={lbl}>
                   {isFreelancer ? "Feedback" : "Review"} <span style={{ color:"#ef4444" }}>*</span>
-                  <span style={{ fontSize:11, color:"#94a3b8", fontWeight:400, marginLeft:6 }}>Required</span>
+                  <span style={{ fontSize:11, color:"var(--text-faint)", fontWeight:400, marginLeft:6 }}>Required</span>
                 </label>
                 <textarea value={form.comment}
                   onChange={e => setForm(f => ({ ...f, comment:e.target.value }))}
@@ -292,7 +292,7 @@ export default function Reviews({ onNavigate }) {
         )}
 
         {/* Tabs */}
-        <div style={{ display:"flex", gap:4, marginBottom:20, backgroundColor:"var(--card)" /* TODO-DARK */, padding:4, borderRadius:12, border:"1px solid var(--border)", width:"fit-content" }}>
+        <div style={{ display:"flex", gap:4, marginBottom:20, backgroundColor:"var(--card)", padding:4, borderRadius:12, border:"1px solid var(--border)", width:"fit-content" }}>
           {[
             { key:"received", label:`Received (${received.length})` },
             { key:"given",    label: isFreelancer ? `Feedback Given (${given.length})` : `Given (${given.length})` },
@@ -306,7 +306,7 @@ export default function Reviews({ onNavigate }) {
 
         {/* Review cards */}
         {listToShow.length === 0 ? (
-          <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"48px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
+          <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"48px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
             <div style={{ fontSize:48, marginBottom:12 }}>⭐</div>
             <h3 style={{ fontSize:16, fontWeight:700, color:"var(--text-primary)", marginBottom:8 }}>
               {activeTab === "received" ? "No reviews received yet" : isFreelancer ? "No feedback given yet" : "No reviews given yet"}
@@ -321,7 +321,7 @@ export default function Reviews({ onNavigate }) {
           </div>
         ) : (
           listToShow.map(r => (
-            <div key={r.id} style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}
+            <div key={r.id} style={{ backgroundColor:"var(--card)", borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}
               onMouseEnter={e => e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.1)"}
               onMouseLeave={e => e.currentTarget.style.boxShadow="0 1px 3px rgba(0,0,0,0.06)"}>
 
@@ -334,7 +334,7 @@ export default function Reviews({ onNavigate }) {
                     <div style={{ fontWeight:700, fontSize:15, color:"var(--text-primary)" }}>
                       {r.reviewer_name || "Anonymous"}
                     </div>
-                    <div style={{ fontSize:12, color:"#94a3b8", marginTop:2, display:"flex", alignItems:"center", gap:8 }}>
+                    <div style={{ fontSize:12, color:"var(--text-faint)", marginTop:2, display:"flex", alignItems:"center", gap:8 }}>
                       {r.created_at ? new Date(r.created_at).toLocaleDateString([], { year:"numeric", month:"long", day:"numeric" }) : ""}
                       {r.project_name && (
                         <span style={{ padding:"2px 10px", backgroundColor:theme.accentLight, color:theme.accent, borderRadius:20, fontSize:11, fontWeight:600 }}>
@@ -364,4 +364,4 @@ export default function Reviews({ onNavigate }) {
 }
 
 const lbl = { display:"flex", alignItems:"center", gap:6, fontSize:13, fontWeight:600, color:"var(--text-secondary)", marginBottom:6 };
-const inp = { width:"100%", padding:"10px 14px", border:"1.5px solid var(--border)", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", backgroundColor:"var(--card)" /* TODO-DARK */, boxSizing:"border-box", transition:"border-color 0.2s" };
+const inp = { width:"100%", padding:"10px 14px", border:"1.5px solid var(--border)", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", backgroundColor:"var(--input-background)", boxSizing:"border-box", transition:"border-color 0.2s" };

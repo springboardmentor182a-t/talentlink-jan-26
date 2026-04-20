@@ -134,7 +134,7 @@ export default function PostProject() {
           <div>
 
             {/* Progress Bar */}
-            <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:12, padding:"20px 24px", marginBottom:20, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
+            <div style={{ backgroundColor:"var(--card)", borderRadius:12, padding:"20px 24px", marginBottom:20, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
                 <span style={{ fontSize:13, fontWeight:600, color:"var(--text-secondary)" }}>Form Completeness</span>
                 <span style={{ fontSize:13, fontWeight:700, color: completionPercent === 100 ? "#16a34a" : "#2563eb" }}>{completionPercent}%</span>
@@ -159,7 +159,7 @@ export default function PostProject() {
             </div>
 
             {/* Form Card */}
-            <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:32, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
+            <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:32, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
 
               {error && (
                 <div style={{ background:"#fef2f2", border:"1px solid #fca5a5", color:"#b91c1c", borderRadius:10, padding:"12px 16px", marginBottom:20, fontSize:13 }}>
@@ -218,7 +218,7 @@ export default function PostProject() {
                     style={{
                       ...inp, resize:"vertical", lineHeight:1.7,
                       borderColor: descGenerated ? "#7c3aed" : form.description.length > 50 ? "#2563eb" : "#e2e8f0",
-                      background: descGenerated ? "#faf5ff" : "#fff"
+                      background: descGenerated ? "#faf5ff" : "var(--input-background)"
                     }} />
                   <div style={{ fontSize:12, color: form.description.length > 50 ? "#16a34a" : "#9ca3af", marginTop:4, textAlign:"right" }}>
                     {form.description.length} chars {form.description.length < 50 ? `(${50 - form.description.length} more needed)` : "✓"}
@@ -261,7 +261,7 @@ export default function PostProject() {
                         style={{ ...inp, paddingLeft:28, borderColor: form.budget ? "#2563eb" : "#e2e8f0" }} />
                     </div>
                     <button type="button" onClick={estimateBudget} disabled={budgetLoading}
-                      style={{ marginTop:8, padding:"8px 16px", backgroundColor:"var(--card)" /* TODO-DARK */, color:"#2563eb", border:"1.5px solid #2563eb", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:12, opacity: budgetLoading ? 0.7 : 1 }}>
+                      style={{ marginTop:8, padding:"8px 16px", backgroundColor:"var(--card)", color:"#2563eb", border:"1.5px solid #2563eb", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:12, opacity: budgetLoading ? 0.7 : 1 }}>
                       {budgetLoading ? "⏳ Estimating..." : "🤖 AI Estimate Budget"}
                     </button>
 
@@ -287,7 +287,7 @@ export default function PostProject() {
 
                 <div style={{ display:"flex", gap:12, justifyContent:"flex-end", paddingTop:24, borderTop:"1px solid var(--border-light)" }}>
                   <button type="button" onClick={() => navigate("/projects")}
-                    style={{ padding:"11px 24px", background:"#fff", border:"1.5px solid var(--border)", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14, color:"var(--text-muted)", fontFamily:"inherit" }}>
+                    style={{ padding:"11px 24px", background:"var(--card)", border:"1.5px solid var(--border)", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14, color:"var(--text-muted)", fontFamily:"inherit" }}>
                     Cancel
                   </button>
                   <button type="submit" disabled={posting || completionPercent < 100}
@@ -303,7 +303,7 @@ export default function PostProject() {
           <div style={{ display:"flex", flexDirection:"column", gap:16, position:"sticky", top:80 }}>
 
             {/* Live Preview */}
-            <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
+            <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
               <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:16 }}>
                 <div style={{ width:8, height:8, borderRadius:"50%", backgroundColor:"#16a34a" }} />
                 <h3 style={{ fontSize:14, fontWeight:700, color:"var(--text-primary)", margin:0 }}>Live Preview</h3>
@@ -330,7 +330,7 @@ export default function PostProject() {
             </div>
 
             {/* Tips */}
-            <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
+            <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
               <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:16 }}>
                 <span style={{ fontSize:18 }}>💡</span>
                 <h3 style={{ fontSize:14, fontWeight:700, color:"var(--text-primary)", margin:0 }}>Pro Tips</h3>
@@ -371,4 +371,4 @@ export default function PostProject() {
 }
 
 const lbl = { display:"block", fontSize:13, fontWeight:600, color:"var(--text-secondary)", marginBottom:6 };
-const inp = { width:"100%", padding:"10px 14px", border:"1.5px solid var(--border)", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", backgroundColor:"var(--card)" /* TODO-DARK */, boxSizing:"border-box", transition:"border-color 0.2s" };
+const inp = { width:"100%", padding:"10px 14px", border:"1.5px solid var(--border)", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", backgroundColor:"var(--input-background)", boxSizing:"border-box", transition:"border-color 0.2s" };

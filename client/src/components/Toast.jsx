@@ -61,7 +61,7 @@ export default function Toast() {
               <p style={{ fontSize: 13, fontWeight: 700, color: colors.text, margin: 0, lineHeight: 1.4 }}>
                 {toast.title}
               </p>
-              <p style={{ fontSize: 12, color: "#64748b", margin: "3px 0 0", lineHeight: 1.4 }}>
+              <p style={{ fontSize: 12, color: "var(--text-muted)", margin: "3px 0 0", lineHeight: 1.4 }}>
                 {toast.message}
               </p>
             </div>
@@ -69,7 +69,7 @@ export default function Toast() {
             {/* Close button */}
             <button
               onClick={() => removeToast(toast.toastId)}
-              style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: 18, padding: 0, flexShrink: 0, lineHeight: 1 }}
+              style={{ background: "none", border: "none", color: "var(--text-faint)", cursor: "pointer", fontSize: 18, padding: 0, flexShrink: 0, lineHeight: 1 }}
               onMouseEnter={e => e.currentTarget.style.color = "#374151"}
               onMouseLeave={e => e.currentTarget.style.color = "#94a3b8"}
             >

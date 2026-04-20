@@ -82,7 +82,7 @@ export default function FreelancerHome({ onNavigate }) {
             { label:"Accepted",          val:counts.accepted,                        icon:"✅", color:"#16a34a", bg:"#f0fdf4" },
             { label:"Total Earnings",    val:`$${totalEarnings.toLocaleString()}`,   icon:"💰", color:"#2563eb", bg:"#eff6ff" },
           ].map(s => (
-            <div key={s.label} style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <div key={s.label} style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div>
                 <div style={{ fontSize:12, color:"var(--text-muted)", marginBottom:6, textTransform:"uppercase", letterSpacing:"0.5px" }}>{s.label}</div>
                 <div style={{ fontSize:28, fontWeight:800, color:s.color }}>{s.val}</div>
@@ -93,14 +93,14 @@ export default function FreelancerHome({ onNavigate }) {
         </div>
 
         {/* Quick Actions */}
-        <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"20px 24px", marginBottom:28, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
+        <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"20px 24px", marginBottom:28, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
           <div>
             <div style={{ fontWeight:700, fontSize:15, color:"var(--text-primary)" }}>Ready to find work?</div>
             <div style={{ fontSize:13, color:"var(--text-muted)", marginTop:2 }}>Browse open projects and submit your proposals</div>
           </div>
           <div style={{ display:"flex", gap:12 }}>
             <button onClick={() => onNavigate("proposals")}
-              style={{ padding:"10px 20px", backgroundColor:"white", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}>
+              style={{ padding:"10px 20px", backgroundColor:"var(--card)", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}>
               My Proposals
             </button>
             <button onClick={() => onNavigate("browse")}
@@ -113,7 +113,7 @@ export default function FreelancerHome({ onNavigate }) {
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(200px, 1fr))", gap:24 }}>
 
           {/* Recent Proposals */}
-          <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
+          <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
               <div>
                 <h3 style={{ fontSize:16, fontWeight:700, color:"var(--text-primary)", margin:"0 0 4px" }}>Recent Proposals</h3>
@@ -161,7 +161,7 @@ export default function FreelancerHome({ onNavigate }) {
           </div>
 
           {/* New Projects */}
-          <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
+          <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:20 }}>
               <div>
                 <h3 style={{ fontSize:16, fontWeight:700, color:"var(--text-primary)", margin:"0 0 4px" }}>New Projects</h3>
@@ -213,7 +213,7 @@ export default function FreelancerHome({ onNavigate }) {
 
         {/* Proposal Progress Bar */}
         {counts.total > 0 && (
-          <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:24, marginTop:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
+          <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:24, marginTop:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
             <h3 style={{ fontSize:15, fontWeight:700, color:"var(--text-primary)", margin:"0 0 16px" }}>📊 Proposal Overview</h3>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(150px, 1fr))", gap:16, marginBottom:20 }}>
               {[
