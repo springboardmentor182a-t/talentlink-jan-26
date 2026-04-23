@@ -1,8 +1,10 @@
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContext";
 import { useEffect, useState } from "react";
 
 export default function ChooseRole() {
   const navigate = useNavigate();
+  const { isDark } = useTheme();
   const [visible, setVisible] = useState(false);
   const [hoverClient, setHoverClient] = useState(false);
   const [hoverFreelancer, setHoverFreelancer] = useState(false);
@@ -29,27 +31,27 @@ export default function ChooseRole() {
   const fadeInDelay3 = { opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(40px)", transition: "opacity 0.7s ease 0.6s, transform 0.7s ease 0.6s" };
 
   const cardStyle = (hovered) => ({
-    backgroundColor: "rgba(255,255,255,0.95)",
+    backgroundColor: isDark ? "rgba(30,27,50,0.92)" : "rgba(255,255,255,0.95)",
     backdropFilter: "blur(20px)",
     borderRadius: 20,
     padding: "36px 32px",
     width: 340,
-    boxShadow: hovered ? "0 24px 64px rgba(0,0,0,0.25)" : "0 8px 32px rgba(0,0,0,0.12)",
+    boxShadow: hovered ? "0 24px 64px rgba(0,0,0,0.35)" : "0 8px 32px rgba(0,0,0,0.18)",
     position: "relative",
     cursor: "pointer",
     transform: hovered ? "translateY(-10px)" : "translateY(0)",
     transition: "all 0.3s ease",
-    border: "1px solid rgba(255,255,255,0.6)",
+    border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(255,255,255,0.6)",
   });
 
   const list        = { listStyle: "none", padding: 0, margin: "0 0 28px", display: "flex", flexDirection: "column", gap: 10 };
-  const item        = { display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: "var(--text-secondary)" };
+  const item        = { display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: isDark ? "rgba(255,255,255,0.75)" : "#374151" };
   const btnBlue     = { width: "100%", padding: 14, background: "linear-gradient(135deg,#1e3a5f,#2563eb,#3b82f6)", color: "white", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 15, cursor: "pointer", transition: "all 0.2s ease", boxShadow: "0 4px 15px rgba(37,99,235,0.5)" };
   const btnPurple   = { width: "100%", padding: 14, background: "linear-gradient(135deg,#4c1d95,#7c3aed,#a855f7)", color: "white", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 15, cursor: "pointer", transition: "all 0.2s ease", boxShadow: "0 4px 15px rgba(124,58,237,0.5)" };
-  const badgeBlue   = { position: "absolute", top: 20, right: 20, backgroundColor: "#eff6ff", color: "#2563eb", fontSize: 12, fontWeight: 600, padding: "4px 12px", borderRadius: 20 };
-  const badgePurple = { position: "absolute", top: 20, right: 20, backgroundColor: "#f5f3ff", color: "#7c3aed", fontSize: 12, fontWeight: 600, padding: "4px 12px", borderRadius: 20 };
-  const iconBlue    = { width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#eff6ff,#dbeafe)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, marginBottom: 20 };
-  const iconPurple  = { width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#f5f3ff,#ede9fe)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, marginBottom: 20 };
+  const badgeBlue   = { position: "absolute", top: 20, right: 20, backgroundColor: isDark ? "rgba(37,99,235,0.2)" : "#eff6ff", color: "#2563eb", fontSize: 12, fontWeight: 600, padding: "4px 12px", borderRadius: 20 };
+  const badgePurple = { position: "absolute", top: 20, right: 20, backgroundColor: isDark ? "rgba(124,58,237,0.2)" : "#f5f3ff", color: "#7c3aed", fontSize: 12, fontWeight: 600, padding: "4px 12px", borderRadius: 20 };
+  const iconBlue    = { width: 52, height: 52, borderRadius: "50%", background: isDark ? "linear-gradient(135deg,rgba(37,99,235,0.3),rgba(59,130,246,0.2))" : "linear-gradient(135deg,#eff6ff,#dbeafe)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, marginBottom: 20 };
+  const iconPurple  = { width: 52, height: 52, borderRadius: "50%", background: isDark ? "linear-gradient(135deg,rgba(124,58,237,0.3),rgba(168,85,247,0.2))" : "linear-gradient(135deg,#f5f3ff,#ede9fe)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, marginBottom: 20 };
 
   const navLinkStyle = {
     display: "flex", alignItems: "center", gap: 6, padding: "7px 16px",

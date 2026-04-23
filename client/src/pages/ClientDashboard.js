@@ -93,7 +93,7 @@ export default function ClientDashboard() {
           </div>
           <div style={{ display:"flex", gap:12 }}>
             <button onClick={() => navigate("/projects")}
-              style={{ padding:"10px 20px", backgroundColor:"white", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}>
+              style={{ padding:"10px 20px", backgroundColor:"var(--card)", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}>
               View All Projects
             </button>
             <button onClick={() => navigate("/post-project")}

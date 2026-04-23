@@ -126,7 +126,7 @@ export default function ClientLogin() {
             <GoogleIcon /> Google
           </button>
           <button className="social-hover" onClick={handleGitHub}
-            style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:12, border:"1.5px solid #24292e", borderRadius:10, cursor:"pointer", backgroundColor:"#24292e", fontSize:14, fontWeight:600, color:"white", transition:"all 0.2s" }}>
+            style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8, padding:12, border:"1.5px solid var(--border)", borderRadius:10, cursor:"pointer", backgroundColor:"var(--card)", fontSize:14, fontWeight:600, color:"var(--text-secondary)", transition:"all 0.2s" }}>
             <GitHubIcon /> GitHub
           </button>
         </div>

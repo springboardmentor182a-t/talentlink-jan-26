@@ -1,7 +1,9 @@
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { Sun, Moon } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
 import { NotificationContext } from "../../context/NotificationContext";
+import { useTheme } from "../../context/ThemeContext";
 import NotificationBell from "../../components/NotificationBell";
 import BrowseProjects from "./BrowseProjects";
 import ProposalTracking from "../proposal/ProposalTracking";
@@ -23,6 +25,7 @@ const LogoutIcon   = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill
 export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
   const { user, logout }                                    = useContext(AuthContext);
   const { msgUnreadCount, enterMessages, leaveMessages }    = useContext(NotificationContext); // ✅
+  const { isDark, toggleTheme }                             = useTheme();
   const navigate                                            = useNavigate();
   const [activePage, setActivePage]                         = useState(defaultPage);
 

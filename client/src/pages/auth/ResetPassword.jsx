@@ -69,13 +69,13 @@ export default function ResetPassword() {
 
         <label style={{ display:"block", fontSize:13, fontWeight:600, color:"var(--text-secondary)", marginBottom:6 }}>New Password</label>
         <input className="inp-focus" type="password" placeholder="Min. 6 characters" value={password} onChange={e => setPassword(e.target.value)}
-          style={{ width:"100%", padding:"12px 16px", border:"1.5px solid #e5e7eb", borderRadius:10, fontSize:14, backgroundColor:"var(--page-bg)", outline:"none", boxSizing:"border-box", marginBottom:8, transition:"all 0.2s", color:"var(--text-primary)" }} />
+          style={{ width:"100%", padding:"12px 16px", border:"1.5px solid var(--border)", borderRadius:10, fontSize:14, backgroundColor:"var(--input-background)", outline:"none", boxSizing:"border-box", marginBottom:8, transition:"all 0.2s", color:"var(--text-primary)" }} />
 
         {password.length > 0 && (
           <div style={{ marginBottom:16 }}>
             <div style={{ display:"flex", gap:4, marginBottom:4 }}>
               {[1,2,3].map(i => (
-                <div key={i} style={{ flex:1, height:4, borderRadius:2, backgroundColor: i <= strengthScore ? strengthColor : "#e5e7eb", transition:"all 0.3s" }} />
+                <div key={i} style={{ flex:1, height:4, borderRadius:2, backgroundColor: i <= strengthScore ? strengthColor : "var(--border)", transition:"all 0.3s" }} />
               ))}
             </div>
             <div style={{ fontSize:11, color:strengthColor, fontWeight:600 }}>{strengthLabel}</div>
@@ -84,7 +84,7 @@ export default function ResetPassword() {
 
         <label style={{ display:"block", fontSize:13, fontWeight:600, color:"var(--text-secondary)", marginBottom:6 }}>Confirm Password</label>
         <input className="inp-focus" type="password" placeholder="Confirm new password" value={confirm} onChange={e => setConfirm(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSubmit()}
-          style={{ width:"100%", padding:"12px 16px", border:`1.5px solid ${confirm && confirm !== password ? "#ef4444" : "#e5e7eb"}`, borderRadius:10, fontSize:14, backgroundColor:"var(--page-bg)", outline:"none", boxSizing:"border-box", marginBottom: confirm && confirm !== password ? 4 : 24, transition:"all 0.2s", color:"var(--text-primary)" }} />
+          style={{ width:"100%", padding:"12px 16px", border:`1.5px solid ${confirm && confirm !== password ? "#ef4444" : "var(--border)"}`, borderRadius:10, fontSize:14, backgroundColor:"var(--page-bg)", outline:"none", boxSizing:"border-box", marginBottom: confirm && confirm !== password ? 4 : 24, transition:"all 0.2s", color:"var(--text-primary)" }} />
 
         {confirm && confirm !== password && (
           <p style={{ fontSize:12, color:"#ef4444", marginBottom:16, marginTop:0 }}>Passwords do not match</p>

@@ -229,7 +229,7 @@ export default function Projects() {
                 {saving ? "Saving..." : "💾 Save Changes"}
               </button>
               <button onClick={() => setEditProject(null)}
-                style={{ padding:"12px 24px", backgroundColor:"white", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14 }}>
+                style={{ padding:"12px 24px", backgroundColor:"var(--card)", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14 }}>
                 Cancel
               </button>
             </div>

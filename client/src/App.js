@@ -86,7 +86,7 @@ function ClientTopbar({ onMenuClick }) {
       zIndex:         100,
       boxShadow:      "0 1px 3px rgba(0,0,0,0.05)",
     }}>
-      <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+      <div style={{ display:"flex", alignItems:"center", gap:10, minWidth:0, flexShrink:0 }}>
         <button onClick={onMenuClick} className="cl-hamburger"
           style={{ display:"none", background:"none", border:"none", cursor:"pointer", padding:4 }}
           aria-label="Open menu">
@@ -161,7 +161,8 @@ function DashboardLayout({ children }) {
         <ClientTopbar onMenuClick={() => setSidebarOpen(v => !v)} />
         {children}
         <style>{`
-          @media (max-width: 767px) {
+          @media (max-width: 480px) {
+            .cl-topbar-right { gap: 6px !important; }
             :root { --cl-sidebar-margin: 0px; }
             .client-sidebar-wrap { position:fixed; left:0; top:0; z-index:200; transform:translateX(-100%); transition:transform 0.25s ease; height:100vh; }
             .client-sidebar-wrap.sidebar-open { transform:translateX(0); }

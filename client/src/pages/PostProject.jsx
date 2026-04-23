@@ -291,7 +291,7 @@ export default function PostProject() {
                     Cancel
                   </button>
                   <button type="submit" disabled={posting || completionPercent < 100}
-                    style={{ padding:"11px 32px", background: completionPercent < 100 ? "#cbd5e1" : "linear-gradient(135deg,#2563eb,#3b82f6)", color:"white", border:"none", borderRadius:10, cursor: posting || completionPercent < 100 ? "not-allowed" : "pointer", fontWeight:700, fontSize:14, fontFamily:"inherit", boxShadow: completionPercent === 100 ? "0 4px 15px rgba(37,99,235,0.4)" : "none" }}>
+                    style={{ padding:"11px 32px", background: completionPercent < 100 ? "var(--muted)" : "linear-gradient(...)",color: completionPercent < 100 ? "var(--text-faint)" : "white", border:"none", borderRadius:10, cursor: posting || completionPercent < 100 ? "not-allowed" : "pointer", fontWeight:700, fontSize:14, fontFamily:"inherit", boxShadow: completionPercent === 100 ? "0 4px 15px rgba(37,99,235,0.4)" : "none" }}>
                     {posting ? "🚀 Posting..." : completionPercent < 100 ? `Complete form (${completionPercent}%)` : "🚀 Post Project"}
                   </button>
                 </div>
