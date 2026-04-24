@@ -2,9 +2,12 @@ from groq import Groq
 import json
 import re
 import os
+from dotenv import load_dotenv
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+load_dotenv(override=True)
 
+api_key = os.getenv("GROQ_API_KEY")
+client = Groq(api_key=api_key)
 
 def get_job_match_score(candidate_profile: dict, job: dict) -> dict:
     prompt = f"""
