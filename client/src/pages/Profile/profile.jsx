@@ -128,7 +128,7 @@ export default function Profile({ onNavigate }) {
 
         {/* Banners */}
         {success && (
-          <div style={{ backgroundColor:"#f0fdf4", border:"1px solid #86efac", borderRadius:10, padding:"12px 16px", marginBottom:20, display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{ backgroundColor:"var(--tint-green)", border:"1px solid var(--tint-green-border)", borderRadius:10, padding:"12px 16px", marginBottom:20, display:"flex", alignItems:"center", gap:10 }}>
             <span>✅</span>
             <span style={{ fontSize:14, fontWeight:600, color:"#16a34a" }}>Profile updated successfully!</span>
           </div>
@@ -260,7 +260,7 @@ export default function Profile({ onNavigate }) {
           {editing && (
             <div style={{ display:"flex", gap:12, marginTop:28, paddingTop:24, borderTop:"1px solid var(--border-light)" }}>
               <button onClick={handleSave} disabled={saving}
-                style={{ display:"flex", alignItems:"center", gap:8, padding:"12px 32px", background:saving ? "#cbd5e1" : theme.btn, color:"white", border:"none", borderRadius:10, cursor:saving ? "not-allowed" : "pointer", fontWeight:700, fontSize:14, boxShadow:saving ? "none" : `0 4px 12px ${theme.shadow}` }}>
+                style={{ display:"flex", alignItems:"center", gap:8, padding:"12px 32px", background:saving ? "var(--muted)" : theme.btn, color:"white", border:"none", borderRadius:10, cursor:saving ? "not-allowed" : "pointer", fontWeight:700, fontSize:14, boxShadow:saving ? "none" : `0 4px 12px ${theme.shadow}` }}>
                 💾 {saving ? "Saving..." : "Save Changes"}
               </button>
               <button onClick={handleCancel}

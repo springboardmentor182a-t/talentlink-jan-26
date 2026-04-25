@@ -155,7 +155,7 @@ export default function FreelancerLogin() {
           style={{ width:"100%", padding:"12px 16px", border:"1.5px solid var(--border)", borderRadius:10, fontSize:14, backgroundColor:"var(--page-bg)", outline:"none", boxSizing:"border-box", marginBottom:24, transition:"all 0.2s", color:"var(--text-primary)" }} />
 
         <button className="btn-hover-p" onClick={handleSubmit} disabled={loading}
-          style={{ width:"100%", padding:14, background: loading ? "#cbd5e1" : "linear-gradient(135deg,#7c3aed,#a855f7)", color:"white", border:"none", borderRadius:10, cursor: loading ? "not-allowed" : "pointer", fontWeight:700, fontSize:15, boxShadow:"0 4px 15px rgba(124,58,237,0.4)", transition:"all 0.2s" }}>
+          style={{ width:"100%", padding:14, background: loading ? "var(--muted)" : "linear-gradient(135deg,#7c3aed,#a855f7)", color:"white", border:"none", borderRadius:10, cursor: loading ? "not-allowed" : "pointer", fontWeight:700, fontSize:15, boxShadow:"0 4px 15px rgba(124,58,237,0.4)", transition:"all 0.2s" }}>
           {loading ? "Signing in..." : "Sign In →"}
         </button>
 

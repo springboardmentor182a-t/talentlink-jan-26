@@ -71,8 +71,8 @@ export default function ClientDashboard() {
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(140px, 1fr))", gap:16, marginBottom:32 }}>
           {[
             { label:"Total Projects",    val:projects.length,  icon:"📁", color:"#2563eb", bg:"#eff6ff" },
-            { label:"Open Projects",     val:open.length,      icon:"🟢", color:"#16a34a", bg:"#f0fdf4" },
-            { label:"Total Proposals",   val:totalProposals,   icon:"📋", color:"#7c3aed", bg:"#f5f3ff" },
+            { label:"Open Projects",     val:open.length,      icon:"🟢", color:"#16a34a", bg:"var(--tint-green)" },
+            { label:"Total Proposals",   val:totalProposals,   icon:"📋", color:"#7c3aed", bg:"var(--tint-purple)" },
             { label:"Pending Proposals", val:pendingProposals, icon:"⏳", color:"#d97706", bg:"#fffbeb" },
           ].map(s => (
             <div key={s.label} style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
@@ -255,7 +255,7 @@ function ProjectCard({ p, proposals, navigate, recommendations, setRecommendatio
             </span>
           )}
           {accepted > 0 && (
-            <span style={{ padding:"3px 10px", backgroundColor:"#f0fdf4", color:"#16a34a", borderRadius:20, fontSize:11, fontWeight:600, border:"1px solid #86efac" }}>
+            <span style={{ padding:"3px 10px", backgroundColor:"var(--tint-green)", color:"#16a34a", borderRadius:20, fontSize:11, fontWeight:600, border:"1px solid #86efac" }}>
               ✅ {accepted} accepted
             </span>
           )}
@@ -276,7 +276,7 @@ function ProjectCard({ p, proposals, navigate, recommendations, setRecommendatio
 
       {/* ✅ AI RECOMMENDATIONS RESULT */}
       {recommendations[p.id] && (
-        <div style={{ padding:16, backgroundColor:"#faf5ff", borderRadius:12, border:"1px solid #ddd6fe" }}>
+        <div style={{ padding:16, backgroundColor:"var(--tint-purple)", borderRadius:12, border:"1px solid var(--tint-purple-border)" }}>
           <div style={{ fontSize:13, fontWeight:700, color:"#7c3aed", marginBottom:12 }}>⭐ Top Recommended Freelancers</div>
           {recommendations[p.id].map((r, i) => (
             <div key={r.id} style={{ padding:12, backgroundColor:"var(--card)", borderRadius:10, border:"1px solid #ede9fe", marginBottom:8 }}>

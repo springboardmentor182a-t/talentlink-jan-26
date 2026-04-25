@@ -55,8 +55,8 @@ export default function FreelancerContracts({ onNavigate }) {
       <div style={{ padding:"20px 16px" }}>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(150px, 1fr))", gap:16, marginBottom:32 }}>
           {[
-            { label:"Active Contracts",    val:active.length,                        icon:"⚡", color:"#7c3aed", bg:"#f5f3ff" },
-            { label:"Completed Contracts", val:completed.length,                     icon:"✅", color:"#16a34a", bg:"#f0fdf4" },
+            { label:"Active Contracts",    val:active.length,                        icon:"⚡", color:"#7c3aed", bg:"var(--tint-purple)" },
+            { label:"Completed Contracts", val:completed.length,                     icon:"✅", color:"#16a34a", bg:"var(--tint-green)" },
             { label:"Total Earnings",      val:`$${totalEarnings.toLocaleString()}`, icon:"💰", color:"#2563eb", bg:"#eff6ff" },
           ].map(s => (
             <div key={s.label} style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
@@ -178,7 +178,7 @@ function ContractCard({ contract, onNavigate, user, completed }) {
   };
 
   const riskColor = {
-    "Low":    { bg:"#f0fdf4", border:"#86efac", text:"#16a34a", badge:"#dcfce7", badgeText:"#16a34a" },
+    "Low":    { bg:"var(--tint-green)", border:"var(--tint-green-border)", text:"#16a34a", badge:"#dcfce7", badgeText:"#16a34a" },
     "Medium": { bg:"#fffbeb", border:"#fcd34d", text:"#d97706", badge:"#fef3c7", badgeText:"#d97706" },
     "High":   { bg:"#fef2f2", border:"#fca5a5", text:"#dc2626", badge:"#fee2e2", badgeText:"#dc2626" },
   };
@@ -243,7 +243,7 @@ function ContractCard({ contract, onNavigate, user, completed }) {
       )}
 
       {completed && (
-        <div style={{ backgroundColor:"#f0fdf4", border:"1px solid #86efac", borderRadius:10, padding:"12px 16px", marginBottom:16, display:"flex", alignItems:"center", gap:10 }}>
+        <div style={{ backgroundColor:"var(--tint-green)", border:"1px solid var(--tint-green-border)", borderRadius:10, padding:"12px 16px", marginBottom:16, display:"flex", alignItems:"center", gap:10 }}>
           <span style={{ fontSize:20 }}>🎉</span>
           <div>
             <div style={{ fontWeight:700, color:"#16a34a", fontSize:14 }}>Contract Completed!</div>
@@ -254,7 +254,7 @@ function ContractCard({ contract, onNavigate, user, completed }) {
 
       {/* ── AI RISK PANEL ── */}
       {showRisk && (
-        <div style={{ backgroundColor: riskLoading ? "#f8fafc" : rc.bg, border:`1px solid ${riskLoading ? "#e2e8f0" : rc.border}`, borderRadius:12, padding:16, marginBottom:16 }}>
+        <div style={{ backgroundColor: riskLoading ? "var(--input-background)" : rc.bg, border:`1px solid ${riskLoading ? "var(--border)" : rc.border}`, borderRadius:12, padding:16, marginBottom:16 }}>
           {riskLoading ? (
             <div style={{ display:"flex", alignItems:"center", gap:8, color:"var(--text-muted)", fontSize:13 }}><span>⏳</span> Analyzing contract risk...</div>
           ) : risk && (
@@ -293,7 +293,7 @@ function ContractCard({ contract, onNavigate, user, completed }) {
 
       {/* ── AI SUMMARY PANEL ── */}
       {showSummary && (
-        <div style={{ backgroundColor: summaryLoading ? "#f8fafc" : "#f5f3ff", border:"1px solid #ddd6fe", borderRadius:12, padding:16, marginBottom:16 }}>
+        <div style={{ backgroundColor: summaryLoading ? "var(--input-background)" : "var(--card)", border:"1px solid var(--border)", borderRadius:12, padding:16, marginBottom:16 }}>
           {summaryLoading ? (
             <div style={{ display:"flex", alignItems:"center", gap:8, color:"var(--text-muted)", fontSize:13 }}><span>⏳</span> Generating AI tips...</div>
           ) : summary && (
@@ -335,7 +335,9 @@ function ContractCard({ contract, onNavigate, user, completed }) {
           💬 Message Client
         </button>
         <button onClick={() => onNavigate && onNavigate("proposals")}
-          style={{ padding:"10px 20px", backgroundColor:"white", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}>
+          style={{ padding:"10px 20px", backgroundColor:"transparent", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor="var(--text-secondary)"; e.currentTarget.style.backgroundColor="var(--input-background)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.backgroundColor="transparent"; }}>
           📋 View My Proposals
         </button>
         {/* ── AI BUTTONS ── */}

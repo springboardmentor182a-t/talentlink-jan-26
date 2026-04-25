@@ -65,8 +65,8 @@ export default function Contracts() {
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(160px, 1fr))", gap:16, marginBottom:32 }}>
           {[
             { label:"Active Contracts",    val:active.length,                     icon:"⚡", color:"#2563eb", bg:"#eff6ff" },
-            { label:"Completed Contracts", val:completed.length,                  icon:"✅", color:"#16a34a", bg:"#f0fdf4" },
-            { label:"Total Investment",    val:`$${totalBudget.toLocaleString()}`, icon:"💰", color:"#7c3aed", bg:"#f5f3ff" },
+            { label:"Completed Contracts", val:completed.length,                  icon:"✅", color:"#16a34a", bg:"var(--tint-green)" },
+            { label:"Total Investment",    val:`$${totalBudget.toLocaleString()}`, icon:"💰", color:"#7c3aed", bg:"var(--tint-purple)" },
           ].map(s => (
             <div key={s.label} style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div>
@@ -197,7 +197,7 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
   };
 
   const riskColor = {
-    "Low":    { bg:"#f0fdf4", border:"#86efac", text:"#16a34a", badge:"#dcfce7", badgeText:"#16a34a" },
+    "Low":    { bg:"var(--tint-green)", border:"var(--tint-green-border)", text:"#16a34a", badge:"#dcfce7", badgeText:"#16a34a" },
     "Medium": { bg:"#fffbeb", border:"#fcd34d", text:"#d97706", badge:"#fef3c7", badgeText:"#d97706" },
     "High":   { bg:"#fef2f2", border:"#fca5a5", text:"#dc2626", badge:"#fee2e2", badgeText:"#dc2626" },
   };
@@ -279,7 +279,7 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
 
       {/* Completion Banner */}
       {p.status === "completed" && (
-        <div style={{ backgroundColor:"#f0fdf4", border:"1px solid #86efac", borderRadius:10, padding:"12px 16px", marginBottom:16, display:"flex", alignItems:"center", gap:10 }}>
+        <div style={{ backgroundColor:"var(--tint-green)", border:"1px solid var(--tint-green-border)", borderRadius:10, padding:"12px 16px", marginBottom:16, display:"flex", alignItems:"center", gap:10 }}>
           <span style={{ fontSize:20 }}>🎉</span>
           <div>
             <div style={{ fontWeight:700, color:"#16a34a", fontSize:14 }}>Contract Completed!</div>
@@ -290,7 +290,7 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
 
       {/* ── AI RISK PREDICTION PANEL ── */}
       {showRisk && (
-        <div style={{ backgroundColor: riskLoading ? "#f8fafc" : rc.bg, border:`1px solid ${riskLoading ? "#e2e8f0" : rc.border}`, borderRadius:12, padding:16, marginBottom:16 }}>
+        <div style={{ backgroundColor: riskLoading ? "var(--input-background)" : rc.bg, border:`1px solid ${riskLoading ? "var(--border)" : rc.border}`, borderRadius:12, padding:16, marginBottom:16 }}>
           {riskLoading ? (
             <div style={{ display:"flex", alignItems:"center", gap:8, color:"var(--text-muted)", fontSize:13 }}>
               <span>⏳</span> Analyzing contract risk...
@@ -337,7 +337,7 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
 
       {/* ── AI SUMMARY PANEL ── */}
       {showSummary && (
-        <div style={{ backgroundColor: summaryLoading ? "#f8fafc" : "#f0f9ff", border:"1px solid #bae6fd", borderRadius:12, padding:16, marginBottom:16 }}>
+        <div style={{ backgroundColor: summaryLoading ? "var(--input-background)" : "var(--card)", border:"1px solid var(--border)", borderRadius:12, padding:16, marginBottom:16 }}>
           {summaryLoading ? (
             <div style={{ display:"flex", alignItems:"center", gap:8, color:"var(--text-muted)", fontSize:13 }}>
               <span>⏳</span> Generating AI summary...
@@ -351,20 +351,20 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
               <p style={{ fontSize:13, color:"var(--text-secondary)", lineHeight:1.6, margin:"0 0 12px" }}>{summary.summary}</p>
               {summary.next_steps?.length > 0 && (
                 <div style={{ marginBottom:10 }}>
-                  <div style={{ fontSize:12, fontWeight:600, color:"#0369a1", marginBottom:4 }}>📋 Next Steps</div>
+                  <div style={{ fontSize:12, fontWeight:600, color:"var(--text-info)", marginBottom:4 }}>📋 Next Steps</div>
                   {summary.next_steps.map((s, i) => (
                     <div key={i} style={{ fontSize:12, color:"var(--text-secondary)", padding:"3px 0", display:"flex", gap:6 }}>
-                      <span style={{ color:"#0369a1", fontWeight:700 }}>{i+1}.</span> {s}
+                      <span style={{ color:"var(--text-info)", fontWeight:700 }}>{i+1}.</span> {s}
                     </div>
                   ))}
                 </div>
               )}
               {summary.tips?.length > 0 && (
                 <div>
-                  <div style={{ fontSize:12, fontWeight:600, color:"#0369a1", marginBottom:4 }}>💡 Tips</div>
+                  <div style={{ fontSize:12, fontWeight:600, color:"var(--text-info)", marginBottom:4 }}>💡 Tips</div>
                   {summary.tips.map((t, i) => (
                     <div key={i} style={{ fontSize:12, color:"var(--text-muted)", padding:"3px 0", display:"flex", gap:6 }}>
-                      <span style={{ color:"#0369a1" }}>•</span> {t}
+                      <span style={{ color:"var(--text-info)" }}>•</span> {t}
                     </div>
                   ))}
                 </div>
@@ -378,7 +378,7 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
       <div style={{ display:"flex", gap:10, paddingTop:16, borderTop:"1px solid var(--border-light)", flexWrap:"wrap" }}>
         {onComplete && (
           <button onClick={handleComplete} disabled={completing}
-            style={{ padding:"10px 20px", background: completing ? "#cbd5e1" : "linear-gradient(135deg,#16a34a,#22c55e)", color:"white", border:"none", borderRadius:8, cursor: completing ? "not-allowed" : "pointer", fontWeight:600, fontSize:13 }}>
+            style={{ padding:"10px 20px", background: completing ? "var(--muted)" : "linear-gradient(135deg,#16a34a,#22c55e)", color: completing ? "var(--text-faint)" : "white", border:"none", borderRadius:8, cursor: completing ? "not-allowed" : "pointer", fontWeight:600, fontSize:13 }}>
             {completing ? "Completing..." : "✅ Mark Completed"}
           </button>
         )}
@@ -402,7 +402,9 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
           🤖 {showSummary ? "Hide Summary" : "AI Summary"}
         </button>
         <button onClick={() => navigate("/projects")}
-          style={{ padding:"10px 20px", backgroundColor:"white", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}>
+          style={{ padding:"10px 20px", backgroundColor:"transparent", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor="var(--text-secondary)"; e.currentTarget.style.backgroundColor="var(--input-background)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.backgroundColor="transparent"; }}>
           📁 View Project
         </button>
       </div>

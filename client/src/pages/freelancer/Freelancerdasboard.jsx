@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Sun, Moon } from "lucide-react";
 import { AuthContext } from "../../context/AuthContext";
@@ -28,6 +28,16 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
   const { isDark, toggleTheme }                             = useTheme();
   const navigate                                            = useNavigate();
   const [activePage, setActivePage]                         = useState(defaultPage);
+
+  // Hide the floating AI chat button when messages page is active (it overlaps Send button)
+  useEffect(() => {
+    if (activePage === "messages") {
+      document.body.classList.add("messages-active");
+    } else {
+      document.body.classList.remove("messages-active");
+    }
+    return () => document.body.classList.remove("messages-active");
+  }, [activePage]);
 
   const handleLogout = () => { logout(); navigate("/"); };
 
@@ -61,7 +71,7 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
     if (activePage === "browse")    return <BrowseProjects />;
     if (activePage === "proposals") return <ProposalTracking />;
     if (activePage === "contracts") return <FreelancerContracts onNavigate={handleNavClick} />;
-    if (activePage === "messages")  return <Messages            onNavigate={handleNavClick} />;
+    if (activePage === "messages")  return <Messages onNavigate={handleNavClick} />;
     if (activePage === "reviews")   return <Reviews             onNavigate={handleNavClick} />;
     return null;
   };
@@ -98,13 +108,13 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
                 padding:"11px 14px", borderRadius:8, border:"none", cursor:"pointer",
                 fontFamily:"inherit", fontSize:14,
                 fontWeight: activePage === item.key ? 600 : 400,
-                backgroundColor: activePage === item.key ? "#f5f3ff" : "transparent",
+                backgroundColor: activePage === item.key ? "var(--nav-active-bg)" : "transparent",
                 color: activePage === item.key ? "#7c3aed" : "#6b7280",
                 marginBottom:4, textAlign:"left",
                 borderLeft: activePage === item.key ? "3px solid #7c3aed" : "3px solid transparent",
                 transition:"all 0.15s"
               }}
-              onMouseEnter={e => { if (activePage !== item.key) e.currentTarget.style.backgroundColor="#faf5ff"; }}
+              onMouseEnter={e => { if (activePage !== item.key) e.currentTarget.style.backgroundColor="var(--nav-active-bg)"; }}
               onMouseLeave={e => { if (activePage !== item.key) e.currentTarget.style.backgroundColor="transparent"; }}>
               {item.icon}
               <span style={{ flex:1 }}>{item.label}</span>
@@ -131,7 +141,7 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
           <button onClick={handleLogout} title="Logout"
             style={{ background:"none", border:"none", cursor:"pointer", color:"var(--text-faint)" }}
             onMouseEnter={e => e.currentTarget.style.color="#7c3aed"}
-            onMouseLeave={e => e.currentTarget.style.color="#9ca3af"}>
+            onMouseLeave={e => e.currentTarget.style.color="var(--text-muted)"}>
             <LogoutIcon />
           </button>
         </div>
@@ -142,21 +152,21 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
 
         {/* Topbar */}
         <div style={{ backgroundColor:"var(--topbar-bg)", borderBottom:"1px solid var(--border)", padding:"0 16px", height:56, display:"flex", justifyContent:"space-between", alignItems:"center", position:"sticky", top:0, zIndex:100, boxShadow:"0 1px 3px rgba(0,0,0,0.05)" }}>
-          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:8, minWidth:0, flex:1 }}>
             {/* Hamburger — mobile only */}
             <button onClick={() => setSidebarOpen(v => !v)}
               className="fl-hamburger"
-              style={{ display:"none", background:"none", border:"none", cursor:"pointer", padding:4 }}
+              style={{ display:"none", background:"none", border:"none", cursor:"pointer", padding:4, flexShrink:0 }}
               aria-label="Open menu">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
-            <div style={{ width:8, height:8, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)" }} />
-            <span style={{ fontWeight:700, fontSize:15, color:"var(--text-primary)" }}>
+            <div style={{ width:8, height:8, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)", flexShrink:0 }} />
+            <span style={{ fontWeight:700, fontSize:15, color:"var(--text-primary)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
               {navItems.find(n => n.key === activePage)?.label}
             </span>
           </div>
 
-          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+          <div className="fl-topbar-right" style={{ display:"flex", alignItems:"center", gap:12, flexShrink:0 }}>
             {/* Theme toggle */}
             <button
               onClick={toggleTheme}
@@ -167,8 +177,8 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
               {isDark ? <Sun size={16} /> : <Moon size={16} />}
             </button>
             <NotificationBell theme="purple" />
-            <div style={{ display:"flex", alignItems:"center", gap:10, backgroundColor:"var(--page-bg)", padding:"6px 14px", borderRadius:20, border:"1px solid var(--border)" }}>
-              <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:13 }}>
+            <div className="fl-user-pill" style={{ display:"flex", alignItems:"center", gap:8, backgroundColor:"var(--page-bg)", padding:"6px 10px", borderRadius:20, border:"1px solid var(--border)", flexShrink:0 }}>
+              <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:13, flexShrink:0 }}>
                 {user?.full_name?.[0]?.toUpperCase() || user?.name?.[0]?.toUpperCase() || "F"}
               </div>
               <div className="fl-name-hide" style={{ minWidth: 0 }}>
@@ -194,6 +204,10 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
             .fl-hamburger { display: flex !important; }
             .fl-logout-text { display: none; }
             .fl-name-hide { display: none !important; }
+          }
+          @media (max-width: 480px) {
+            .fl-topbar-right { gap: 6px !important; }
+            .fl-user-pill { padding: 5px 8px !important; }
           }
           @media (min-width: 768px) {
             :root { --fl-sidebar-margin: 250px; }

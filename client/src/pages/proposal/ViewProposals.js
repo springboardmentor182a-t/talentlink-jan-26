@@ -121,9 +121,9 @@ export default function ViewProposals() {
         {/* Stats */}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(130px, 1fr))", gap:16, marginBottom:24 }}>
           {[
-            { label:"Total",    val:counts.total,    color:"#4f46e5", bg:"#f5f3ff", icon:"📋" },
+            { label:"Total",    val:counts.total,    color:"#4f46e5", bg:"var(--tint-purple)", icon:"📋" },
             { label:"Pending",  val:counts.pending,  color:"#d97706", bg:"#fffbeb", icon:"⏳" },
-            { label:"Accepted", val:counts.accepted, color:"#16a34a", bg:"#f0fdf4", icon:"✅" },
+            { label:"Accepted", val:counts.accepted, color:"#16a34a", bg:"var(--tint-green)", icon:"✅" },
             { label:"Rejected", val:counts.rejected, color:"#dc2626", bg:"#fef2f2", icon:"❌" },
           ].map(s => (
             <div key={s.label} style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:12, padding:"20px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
@@ -187,7 +187,7 @@ export default function ViewProposals() {
 
         {/* ✅ RANKED RESULTS */}
         {showRanked && rankings.length > 0 && (
-          <div style={{ backgroundColor:"#faf5ff", borderRadius:16, padding:24, marginBottom:24, border:"1px solid #ddd6fe" }}>
+          <div style={{ backgroundColor:"var(--nav-active-bg)", borderRadius:16, padding:24, marginBottom:24, border:"1px solid #ddd6fe" }}>
             <div style={{ fontSize:15, fontWeight:700, color:"#7c3aed", marginBottom:16 }}>🏆 AI Proposal Rankings</div>
             {rankings.map((r, i) => (
               <div key={r.id} style={{ display:"flex", alignItems:"center", gap:16, padding:"14px 16px", backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:12, border:`2px solid ${i === 0 ? "#f59e0b" : i === 1 ? "#94a3b8" : i === 2 ? "#b45309" : "#e2e8f0"}`, marginBottom:10 }}>
@@ -248,7 +248,7 @@ export default function ViewProposals() {
                 </div>
                 <div style={{ display:"flex", gap:8, alignItems:"center" }}>
                   {rankInfo && (
-                    <span style={{ padding:"4px 12px", borderRadius:20, fontSize:12, fontWeight:700, backgroundColor:"#faf5ff", color:"#7c3aed", border:"1px solid #ddd6fe" }}>
+                    <span style={{ padding:"4px 12px", borderRadius:20, fontSize:12, fontWeight:700, backgroundColor:"var(--nav-active-bg)", color:"#7c3aed", border:"1px solid #ddd6fe" }}>
                       #{rankInfo.rank} — {rankInfo.score}%
                     </span>
                   )}
@@ -274,14 +274,14 @@ export default function ViewProposals() {
 
               <div style={{ display:"flex", gap:24, paddingTop:16, borderTop:"1px solid var(--border-light)" }}>
                 <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                  <div style={{ width:36, height:36, borderRadius:10, backgroundColor:"#eff6ff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>💰</div>
+                  <div style={{ width:36, height:36, borderRadius:10, backgroundColor:"var(--nav-active-bg)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>💰</div>
                   <div>
                     <div style={{ fontSize:11, color:"var(--text-muted)", textTransform:"uppercase", letterSpacing:"0.5px" }}>Proposed Budget</div>
                     <strong style={{ color:"var(--text-primary)", fontSize:15 }}>${p.proposed_budget}</strong>
                   </div>
                 </div>
                 <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                  <div style={{ width:36, height:36, borderRadius:10, backgroundColor:"#f0fdf4", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>🕐</div>
+                  <div style={{ width:36, height:36, borderRadius:10, backgroundColor:"var(--nav-active-bg)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>🕐</div>
                   <div>
                     <div style={{ fontSize:11, color:"var(--text-muted)", textTransform:"uppercase", letterSpacing:"0.5px" }}>Delivery Time</div>
                     <strong style={{ color:"var(--text-primary)", fontSize:15 }}>{p.delivery_time}</strong>
@@ -289,7 +289,7 @@ export default function ViewProposals() {
                 </div>
                 {p.created_at && (
                   <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                    <div style={{ width:36, height:36, borderRadius:10, backgroundColor:"#fdf4ff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>📅</div>
+                    <div style={{ width:36, height:36, borderRadius:10, backgroundColor:"var(--nav-active-bg)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>📅</div>
                     <div>
                       <div style={{ fontSize:11, color:"var(--text-muted)", textTransform:"uppercase", letterSpacing:"0.5px" }}>Submitted</div>
                       <strong style={{ color:"var(--text-primary)", fontSize:15 }}>{new Date(p.created_at).toLocaleDateString()}</strong>
@@ -320,7 +320,7 @@ export default function ViewProposals() {
 
               {/* ✅ AI MATCH SCORE RESULT */}
               {matchScores[p.freelancer_id] && (
-                <div style={{ marginTop:12, padding:16, backgroundColor:"#eff6ff", borderRadius:12, border:"1px solid #bfdbfe" }}>
+                <div style={{ marginTop:12, padding:16, backgroundColor:"var(--nav-active-bg)", borderRadius:12, border:"1px solid #bfdbfe" }}>
                   <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:10 }}>
                     <div style={{ fontSize:32, fontWeight:800, color:"#2563eb" }}>{matchScores[p.freelancer_id].score}%</div>
                     <div>

@@ -183,7 +183,9 @@ export default function Projects() {
                 👁 View Proposals {proposalCounts[p.id] > 0 && `(${proposalCounts[p.id]})`}
               </button>
               <button onClick={() => openEdit(p)}
-                style={{ padding:"10px 20px", backgroundColor:"white", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}>
+                style={{ padding:"10px 20px", backgroundColor:"transparent", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor="var(--text-secondary)"; e.currentTarget.style.backgroundColor="var(--input-background)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.backgroundColor="transparent"; }}>
                 ✏️ Edit
               </button>
               {p.status === "open" && (

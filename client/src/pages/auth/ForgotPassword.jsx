@@ -63,14 +63,14 @@ export default function ForgotPassword() {
         </div>
 
         {error && <div style={{ backgroundColor:"#fef2f2", border:"1.5px solid #fecaca", borderRadius:10, padding:"12px 16px", fontSize:13, color:"#dc2626", marginBottom:16 }}>⚠️ {error}</div>}
-        {success && <div style={{ backgroundColor:"#f0fdf4", border:"1.5px solid #bbf7d0", borderRadius:10, padding:"12px 16px", fontSize:13, color:"#16a34a", marginBottom:16 }}>{success}</div>}
+        {success && <div style={{ backgroundColor:"var(--tint-green)", border:"1.5px solid var(--tint-green-border)", borderRadius:10, padding:"12px 16px", fontSize:13, color:"#16a34a", marginBottom:16 }}>{success}</div>}
 
         <label style={{ display:"block", fontSize:13, fontWeight:600, color:"var(--text-secondary)", marginBottom:6 }}>Email Address</label>
         <input className="inp-focus" type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSubmit()}
           style={{ width:"100%", padding:"12px 16px", border:"1.5px solid var(--border)", borderRadius:10, fontSize:14, backgroundColor:"var(--input-background)", outline:"none", boxSizing:"border-box", marginBottom:24, transition:"all 0.2s", color:"var(--text-primary)" }} />
 
         <button className="btn-hover" onClick={handleSubmit} disabled={loading}
-          style={{ width:"100%", padding:14, background: loading ? "#cbd5e1" : "linear-gradient(135deg,#2563eb,#7c3aed)", color:"white", border:"none", borderRadius:10, cursor: loading ? "not-allowed" : "pointer", fontWeight:700, fontSize:15, boxShadow:"0 4px 15px rgba(37,99,235,0.4)", transition:"all 0.2s" }}>
+          style={{ width:"100%", padding:14, background: loading ? "var(--muted)" : "linear-gradient(135deg,#2563eb,#7c3aed)", color:"white", border:"none", borderRadius:10, cursor: loading ? "not-allowed" : "pointer", fontWeight:700, fontSize:15, boxShadow:"0 4px 15px rgba(37,99,235,0.4)", transition:"all 0.2s" }}>
           {loading ? "Sending..." : "Send Reset Link →"}
         </button>
 

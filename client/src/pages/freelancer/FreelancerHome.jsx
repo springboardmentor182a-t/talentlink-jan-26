@@ -44,7 +44,7 @@ export default function FreelancerHome({ onNavigate }) {
 
   const statusStyle = {
     pending:  { bg:"#fff7ed", color:"#ea580c", border:"#fed7aa" },
-    accepted: { bg:"#f0fdf4", color:"#16a34a", border:"#86efac" },
+    accepted: { bg:"var(--tint-green)", color:"#16a34a", border:"var(--tint-green-border)" },
     rejected: { bg:"#fef2f2", color:"#dc2626", border:"#fca5a5" },
   };
 
@@ -77,9 +77,9 @@ export default function FreelancerHome({ onNavigate }) {
         {/* Stats Cards */}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(140px, 1fr))", gap:16, marginBottom:32 }}>
           {[
-            { label:"Total Proposals",   val:counts.total,                          icon:"📋", color:"#7c3aed", bg:"#f5f3ff" },
+            { label:"Total Proposals",   val:counts.total,                          icon:"📋", color:"#7c3aed", bg:"var(--tint-purple)" },
             { label:"Pending",           val:counts.pending,                         icon:"⏳", color:"#d97706", bg:"#fffbeb" },
-            { label:"Accepted",          val:counts.accepted,                        icon:"✅", color:"#16a34a", bg:"#f0fdf4" },
+            { label:"Accepted",          val:counts.accepted,                        icon:"✅", color:"#16a34a", bg:"var(--tint-green)" },
             { label:"Total Earnings",    val:`$${totalEarnings.toLocaleString()}`,   icon:"💰", color:"#2563eb", bg:"#eff6ff" },
           ].map(s => (
             <div key={s.label} style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
@@ -181,7 +181,7 @@ export default function FreelancerHome({ onNavigate }) {
             ) : (
               openProjects.map(p => (
                 <div key={p.id} style={{ padding:"14px 0", borderBottom:"1px solid var(--border-light)" }}
-                  onMouseEnter={e => e.currentTarget.style.backgroundColor="#faf5ff"}
+                  onMouseEnter={e => e.currentTarget.style.backgroundColor="var(--nav-active-bg)"}
                   onMouseLeave={e => e.currentTarget.style.backgroundColor="transparent"}>
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
                     <div style={{ flex:1, marginRight:12 }}>

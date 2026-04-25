@@ -374,7 +374,7 @@ export default function Messages({ onNavigate }) {
                           padding: "10px 14px",
                           borderRadius: isMe ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
                           background:   isMe ? theme.bubbleBg : "var(--card)",
-                          color:        isMe ? "white" : "#111827",
+                          color:        isMe ? "white" : "var(--text-primary)",
                           fontSize: 14, lineHeight: 1.5,
                           boxShadow:    isMe ? theme.bubbleShadow : "0 1px 3px rgba(0,0,0,0.08)",
                           border:       isMe ? "none" : "1px solid var(--border)",
@@ -406,7 +406,7 @@ export default function Messages({ onNavigate }) {
                 onInput={e => { e.target.style.height = "auto"; e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px"; }}
               />
               <button onClick={sendMessage} disabled={sending || !text.trim()}
-                style={{ padding: "12px 20px", background: (sending || !text.trim()) ? "#cbd5e1" : theme.sendBtn, color: "white", border: "none", borderRadius: 12, cursor: (sending || !text.trim()) ? "not-allowed" : "pointer", fontWeight: 700, fontSize: 14, boxShadow: (sending || !text.trim()) ? "none" : theme.sendShadow, transition: "all 0.2s", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 6 }}>
+                style={{ padding: "12px 20px", background: (sending || !text.trim()) ? "var(--muted)" : theme.sendBtn, color: (sending || !text.trim()) ? "var(--text-faint)" : "white", border: "none", borderRadius: 12, cursor: (sending || !text.trim()) ? "not-allowed" : "pointer", fontWeight: 700, fontSize: 14, boxShadow: (sending || !text.trim()) ? "none" : theme.sendShadow, transition: "all 0.2s", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 6 }}>
                 {sending ? "..." : "Send ➤"}
               </button>
             </div>

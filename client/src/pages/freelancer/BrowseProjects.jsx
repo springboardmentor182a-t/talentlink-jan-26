@@ -192,7 +192,7 @@ export default function BrowseProjects() {
 
             {/* ✅ MATCH SCORE RESULT */}
             {matchScores[p.id] && (
-              <div style={{ marginTop:16, padding:16, backgroundColor:"#f5f3ff", borderRadius:12, border:"1px solid #ddd6fe" }}>
+              <div style={{ marginTop:16, padding:16, backgroundColor:"var(--tint-purple)", borderRadius:12, border:"1px solid var(--tint-purple-border)" }}>
                 <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:10 }}>
                   <div style={{ fontSize:32, fontWeight:800, color:"#7c3aed" }}>{matchScores[p.id].score}%</div>
                   <div>

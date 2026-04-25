@@ -167,7 +167,7 @@ export default function PostProject() {
                 </div>
               )}
               {success && (
-                <div style={{ background:"#f0fdf4", border:"1px solid #86efac", color:"#166534", borderRadius:10, padding:"12px 16px", marginBottom:20, fontSize:13 }}>
+                <div style={{ background:"var(--tint-green)", border:"1px solid var(--tint-green-border)", color:"#166534", borderRadius:10, padding:"12px 16px", marginBottom:20, fontSize:13 }}>
                   ✅ {success} Redirecting...
                 </div>
               )}
@@ -180,7 +180,7 @@ export default function PostProject() {
                   <input required type="text"
                     placeholder="e.g., Build a responsive e-commerce website with React"
                     value={form.title} onChange={e => setForm({ ...form, title:e.target.value })}
-                    style={{ ...inp, borderColor: form.title ? "#2563eb" : "#e2e8f0" }} />
+                    style={{ ...inp, borderColor: form.title ? "#2563eb" : "var(--border)" }} />
                 </div>
 
                 {/* Description with AI Generate button */}
@@ -217,8 +217,8 @@ export default function PostProject() {
                     value={form.description} onChange={e => { setForm({ ...form, description:e.target.value }); setDescGenerated(false); }}
                     style={{
                       ...inp, resize:"vertical", lineHeight:1.7,
-                      borderColor: descGenerated ? "#7c3aed" : form.description.length > 50 ? "#2563eb" : "#e2e8f0",
-                      background: descGenerated ? "#faf5ff" : "var(--input-background)"
+                      borderColor: descGenerated ? "#7c3aed" : form.description.length > 50 ? "#2563eb" : "var(--border)",
+                      background: descGenerated ? "var(--tint-purple)" : "var(--input-background)"
                     }} />
                   <div style={{ fontSize:12, color: form.description.length > 50 ? "#16a34a" : "#9ca3af", marginTop:4, textAlign:"right" }}>
                     {form.description.length} chars {form.description.length < 50 ? `(${50 - form.description.length} more needed)` : "✓"}
@@ -232,7 +232,7 @@ export default function PostProject() {
                     <span style={{ fontSize:11, color:"var(--text-faint)", fontWeight:400, marginLeft:8 }}>Press Enter to add</span>
                   </label>
                   <div onClick={() => document.getElementById("skill-inp").focus()}
-                    style={{ ...inp, display:"flex", flexWrap:"wrap", gap:8, height:"auto", minHeight:48, padding:"10px 14px", cursor:"text", borderColor: skillTags.length > 0 ? "#2563eb" : "#e2e8f0" }}>
+                    style={{ ...inp, display:"flex", flexWrap:"wrap", gap:8, height:"auto", minHeight:48, padding:"10px 14px", cursor:"text", borderColor: skillTags.length > 0 ? "#2563eb" : "var(--border)" }}>
                     {skillTags.map(s => (
                       <span key={s} style={{ padding:"4px 12px", background:"linear-gradient(135deg,#eff6ff,#dbeafe)", color:"#1d4ed8", borderRadius:20, fontSize:12, fontWeight:600, display:"flex", alignItems:"center", gap:6, border:"1px solid #bfdbfe" }}>
                         {s}
@@ -258,7 +258,7 @@ export default function PostProject() {
                       <span style={{ position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", color:"var(--text-muted)", fontWeight:600 }}>$</span>
                       <input required type="number" min="1" placeholder="5000"
                         value={form.budget} onChange={e => setForm({ ...form, budget:e.target.value })}
-                        style={{ ...inp, paddingLeft:28, borderColor: form.budget ? "#2563eb" : "#e2e8f0" }} />
+                        style={{ ...inp, paddingLeft:28, borderColor: form.budget ? "#2563eb" : "var(--border)" }} />
                     </div>
                     <button type="button" onClick={estimateBudget} disabled={budgetLoading}
                       style={{ marginTop:8, padding:"8px 16px", backgroundColor:"var(--card)", color:"#2563eb", border:"1.5px solid #2563eb", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:12, opacity: budgetLoading ? 0.7 : 1 }}>
@@ -266,7 +266,7 @@ export default function PostProject() {
                     </button>
 
                     {budgetEstimate && (
-                      <div style={{ marginTop:10, padding:12, backgroundColor:"#eff6ff", borderRadius:10, border:"1px solid #bfdbfe" }}>
+                      <div style={{ marginTop:10, padding:12, backgroundColor:"var(--tint-blue)", borderRadius:10, border:"1px solid #bfdbfe" }}>
                         <div style={{ fontSize:12, fontWeight:700, color:"#1d4ed8", marginBottom:6 }}>🤖 AI Budget Suggestion</div>
                         <div style={{ display:"flex", gap:12, marginBottom:6 }}>
                           <div style={{ fontSize:12, color:"var(--text-secondary)" }}><span style={{ color:"var(--text-muted)" }}>Min: </span><strong style={{ color:"#16a34a" }}>${budgetEstimate.min}</strong></div>
@@ -281,7 +281,7 @@ export default function PostProject() {
                     <label style={lbl}>Deadline <span style={{ color:"#ef4444" }}>*</span></label>
                     <input required type="date"
                       value={form.deadline} onChange={e => setForm({ ...form, deadline:e.target.value })}
-                      style={{ ...inp, borderColor: form.deadline ? "#2563eb" : "#e2e8f0" }} />
+                      style={{ ...inp, borderColor: form.deadline ? "#2563eb" : "var(--border)" }} />
                   </div>
                 </div>
 
@@ -291,7 +291,7 @@ export default function PostProject() {
                     Cancel
                   </button>
                   <button type="submit" disabled={posting || completionPercent < 100}
-                    style={{ padding:"11px 32px", background: completionPercent < 100 ? "var(--muted)" : "linear-gradient(...)",color: completionPercent < 100 ? "var(--text-faint)" : "white", border:"none", borderRadius:10, cursor: posting || completionPercent < 100 ? "not-allowed" : "pointer", fontWeight:700, fontSize:14, fontFamily:"inherit", boxShadow: completionPercent === 100 ? "0 4px 15px rgba(37,99,235,0.4)" : "none" }}>
+                    style={{ padding:"11px 32px", background: completionPercent < 100 ? "var(--muted)" : "linear-gradient(135deg,#2563eb,#3b82f6)", color: completionPercent < 100 ? "var(--text-faint)" : "white", border:"none", borderRadius:10, cursor: posting || completionPercent < 100 ? "not-allowed" : "pointer", fontWeight:700, fontSize:14, fontFamily:"inherit", boxShadow: completionPercent === 100 ? "0 4px 15px rgba(37,99,235,0.4)" : "none" }}>
                     {posting ? "🚀 Posting..." : completionPercent < 100 ? `Complete form (${completionPercent}%)` : "🚀 Post Project"}
                   </button>
                 </div>
@@ -318,7 +318,7 @@ export default function PostProject() {
                 {skillTags.length > 0 && (
                   <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:12 }}>
                     {skillTags.slice(0,4).map(s => (
-                      <span key={s} style={{ padding:"2px 10px", backgroundColor:"#eff6ff", color:"#2563eb", borderRadius:20, fontSize:11, fontWeight:600 }}>{s}</span>
+                      <span key={s} style={{ padding:"2px 10px", backgroundColor:"var(--tint-blue)", color:"#2563eb", borderRadius:20, fontSize:11, fontWeight:600 }}>{s}</span>
                     ))}
                   </div>
                 )}

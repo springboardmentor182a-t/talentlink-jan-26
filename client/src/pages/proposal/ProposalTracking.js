@@ -6,7 +6,7 @@ import { AuthContext } from "../../context/AuthContext";
 function Badge({ status }) {
   const map = {
     pending:  { bg:"#fff7ed", color:"#ea580c", border:"#fed7aa" },
-    accepted: { bg:"#f0fdf4", color:"#16a34a", border:"#86efac" },
+    accepted: { bg:"var(--tint-green)", color:"#16a34a", border:"var(--tint-green-border)" },
     rejected: { bg:"#fef2f2", color:"#dc2626", border:"#fca5a5" },
   };
   const c = map[status] || map.pending;
@@ -59,7 +59,7 @@ export default function ProposalTracking() {
         <div style={{ display:"grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap:16, marginBottom:28 }}>
           {[
             { label:"Pending",  val:counts.pending,  color:"#d97706", bg:"#fffbeb", icon:"⏳" },
-            { label:"Accepted", val:counts.accepted, color:"#16a34a", bg:"#f0fdf4", icon:"✅" },
+            { label:"Accepted", val:counts.accepted, color:"#16a34a", bg:"var(--tint-green)", icon:"✅" },
             { label:"Rejected", val:counts.rejected, color:"#dc2626", bg:"#fef2f2", icon:"❌" },
           ].map(s => (
             <div key={s.label} style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"22px 24px", display:"flex", justifyContent:"space-between", alignItems:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
@@ -117,14 +117,14 @@ export default function ProposalTracking() {
 
               <div style={{ display:"flex", gap:24, paddingTop:14, borderTop:"1px solid var(--border-light)" }}>
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                  <div style={{ width:32, height:32, borderRadius:8, backgroundColor:"#f5f3ff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14 }}>💰</div>
+                  <div style={{ width:32, height:32, borderRadius:8, backgroundColor:"var(--nav-active-bg)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14 }}>💰</div>
                   <div>
                     <div style={{ fontSize:11, color:"var(--text-muted)", textTransform:"uppercase", letterSpacing:"0.5px" }}>Budget</div>
                     <strong style={{ color:"var(--text-primary)", fontSize:14 }}>${p.proposed_budget}</strong>
                   </div>
                 </div>
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                  <div style={{ width:32, height:32, borderRadius:8, backgroundColor:"#f0fdf4", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14 }}>🕐</div>
+                  <div style={{ width:32, height:32, borderRadius:8, backgroundColor:"var(--nav-active-bg)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14 }}>🕐</div>
                   <div>
                     <div style={{ fontSize:11, color:"var(--text-muted)", textTransform:"uppercase", letterSpacing:"0.5px" }}>Delivery</div>
                     <strong style={{ color:"var(--text-primary)", fontSize:14 }}>{p.delivery_time}</strong>

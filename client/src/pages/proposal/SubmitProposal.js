@@ -119,7 +119,7 @@ export default function SubmitProposal() {
         <div style={{ display:"flex", alignItems:"center", gap:12 }}>
           <button onClick={() => navigate("/proposal-tracking")}
             style={{ background:"none", border:"none", fontSize:14, color:"var(--text-muted)", cursor:"pointer", display:"flex", alignItems:"center", gap:6, padding:"6px 12px", borderRadius:8 }}
-            onMouseEnter={e => e.currentTarget.style.backgroundColor="#f1f5f9"}
+            onMouseEnter={e => e.currentTarget.style.backgroundColor="var(--input-background)"}
             onMouseLeave={e => e.currentTarget.style.backgroundColor="transparent"}>
             ← Back
           </button>
@@ -140,7 +140,7 @@ export default function SubmitProposal() {
             </div>
           </div>
           <button onClick={() => { logout(); navigate("/"); }}
-            style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid var(--border)", borderRadius:8, cursor:"pointer", fontSize:13, color:"var(--text-muted)", background:"white" }}>
+            style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid var(--border)", borderRadius:8, cursor:"pointer", fontSize:13, color:"var(--text-muted)", background:"var(--card)" }}>
             Logout
           </button>
         </div>
@@ -169,7 +169,7 @@ export default function SubmitProposal() {
                   <span style={{ fontSize:11, color:"var(--text-faint)", fontWeight:400, marginLeft:8 }}>Describe your experience and approach</span>
                 </label>
                 <button onClick={generateCoverLetter} disabled={aiLoading}
-                  style={{ padding:"6px 14px", backgroundColor:"#faf5ff", color:"#7c3aed", border:"1.5px solid #ddd6fe", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:12, opacity: aiLoading ? 0.7 : 1, whiteSpace:"nowrap" }}>
+                  style={{ padding:"6px 14px", backgroundColor:"var(--nav-active-bg)", color:"#7c3aed", border:"1.5px solid var(--border)", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:12, opacity: aiLoading ? 0.7 : 1, whiteSpace:"nowrap" }}>
                   {aiLoading ? "⏳ Generating..." : "🤖 AI Generate"}
                 </button>
               </div>
@@ -188,7 +188,7 @@ export default function SubmitProposal() {
               </div>
 
               {keyPoints.length > 0 && (
-                <div style={{ marginTop:12, padding:14, backgroundColor:"#faf5ff", borderRadius:10, border:"1px solid #ddd6fe" }}>
+                <div style={{ marginTop:12, padding:14, backgroundColor:"var(--tint-purple)", borderRadius:10, border:"1px solid var(--tint-purple-border)" }}>
                   <div style={{ fontSize:12, fontWeight:700, color:"#7c3aed", marginBottom:8 }}>✨ AI Key Points Used</div>
                   {keyPoints.map((point, i) => (
                     <div key={i} style={{ fontSize:12, color:"var(--text-secondary)", marginBottom:4, display:"flex", gap:6 }}>
@@ -207,7 +207,7 @@ export default function SubmitProposal() {
                   </label>
                   {/* ✅ AI BUDGET BUTTON */}
                   <button onClick={estimateBudget} disabled={budgetLoading}
-                    style={{ padding:"4px 10px", backgroundColor:"#f0fdf4", color:"#16a34a", border:"1.5px solid #86efac", borderRadius:6, cursor:"pointer", fontWeight:600, fontSize:11, opacity: budgetLoading ? 0.7 : 1, whiteSpace:"nowrap" }}>
+                    style={{ padding:"4px 10px", backgroundColor:"var(--nav-active-bg)", color:"#16a34a", border:"1.5px solid var(--border)", borderRadius:6, cursor:"pointer", fontWeight:600, fontSize:11, opacity: budgetLoading ? 0.7 : 1, whiteSpace:"nowrap" }}>
                     {budgetLoading ? "⏳..." : "🤖 AI Estimate"}
                   </button>
                 </div>
@@ -219,7 +219,7 @@ export default function SubmitProposal() {
 
                 {/* ✅ BUDGET ESTIMATE RESULT */}
                 {budgetEstimate && (
-                  <div style={{ marginTop:8, padding:10, backgroundColor:"#f0fdf4", borderRadius:8, border:"1px solid #86efac" }}>
+                  <div style={{ marginTop:8, padding:10, backgroundColor:"var(--tint-green)", borderRadius:8, border:"1px solid var(--tint-green-border)" }}>
                     <div style={{ fontSize:11, fontWeight:700, color:"#16a34a", marginBottom:4 }}>🤖 AI Budget Suggestion</div>
                     <div style={{ display:"flex", gap:10, marginBottom:4 }}>
                       <span style={{ fontSize:11, color:"var(--text-secondary)" }}>Min: <strong style={{ color:"#16a34a" }}>${budgetEstimate.min}</strong></span>
@@ -240,7 +240,7 @@ export default function SubmitProposal() {
 
             <div style={{ paddingTop:24, marginTop:16, borderTop:"1px solid var(--border-light)" }}>
               <button onClick={handleSubmit} disabled={loading}
-                style={{ width:"100%", padding:14, background: loading ? "#cbd5e1" : "linear-gradient(135deg,#7c3aed,#a855f7)", color:"white", border:"none", borderRadius:10, cursor: loading ? "not-allowed" : "pointer", fontWeight:700, fontSize:15, boxShadow: loading ? "none" : "0 4px 15px rgba(124,58,237,0.4)", transition:"all 0.2s" }}>
+                style={{ width:"100%", padding:14, background: loading ? "var(--muted)" : "linear-gradient(135deg,#7c3aed,#a855f7)", color:"white", border:"none", borderRadius:10, cursor: loading ? "not-allowed" : "pointer", fontWeight:700, fontSize:15, boxShadow: loading ? "none" : "0 4px 15px rgba(124,58,237,0.4)", transition:"all 0.2s" }}>
                 {loading ? "Submitting..." : "🚀 Submit Proposal →"}
               </button>
             </div>

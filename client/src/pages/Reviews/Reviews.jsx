@@ -171,7 +171,7 @@ export default function Reviews({ onNavigate }) {
 
         {/* Success */}
         {success && (
-          <div style={{ backgroundColor:"#f0fdf4", border:"1px solid #86efac", borderRadius:10, padding:"12px 16px", marginBottom:20, display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{ backgroundColor:"var(--tint-green)", border:"1px solid var(--tint-green-border)", borderRadius:10, padding:"12px 16px", marginBottom:20, display:"flex", alignItems:"center", gap:10 }}>
             <span>✅</span>
             <span style={{ fontSize:14, fontWeight:600, color:"#16a34a" }}>
               {isFreelancer ? "Feedback submitted successfully!" : "Review submitted successfully!"}
@@ -183,7 +183,7 @@ export default function Reviews({ onNavigate }) {
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(160px, 1fr))", gap:16, marginBottom:28 }}>
           {[
             { label:"Reviews Received", val:received.length,                    icon:"📥", color:theme.accent, bg:theme.accentLight },
-            { label:isFreelancer ? "Feedback Given" : "Reviews Given", val:given.length, icon:"📤", color:"#16a34a", bg:"#f0fdf4" },
+            { label:isFreelancer ? "Feedback Given" : "Reviews Given", val:given.length, icon:"📤", color:"#16a34a", bg:"var(--tint-green)" },
             { label:"Average Rating",   val:avgRating ? `${avgRating} ★` : "—", icon:"⭐", color:"#d97706", bg:"#fffbeb" },
           ].map(s => (
             <div key={s.label} style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
@@ -279,7 +279,7 @@ export default function Reviews({ onNavigate }) {
               <div style={{ display:"flex", gap:12 }}>
                 <button onClick={handleSubmit}
                   disabled={submitting || !form.selectedContract || !form.comment.trim()}
-                  style={{ padding:"12px 28px", background:(submitting || !form.selectedContract || !form.comment.trim()) ? "#cbd5e1" : theme.btn, color:"white", border:"none", borderRadius:10, cursor:(submitting || !form.selectedContract || !form.comment.trim()) ? "not-allowed" : "pointer", fontWeight:700, fontSize:14, boxShadow:(submitting || !form.selectedContract || !form.comment.trim()) ? "none" : `0 4px 12px ${theme.shadow}` }}>
+                  style={{ padding:"12px 28px", background:(submitting || !form.selectedContract || !form.comment.trim()) ? "var(--muted)" : theme.btn, color:(submitting || !form.selectedContract || !form.comment.trim()) ? "var(--text-faint)" : "white", border:"none", borderRadius:10, cursor:(submitting || !form.selectedContract || !form.comment.trim()) ? "not-allowed" : "pointer", fontWeight:700, fontSize:14, boxShadow:(submitting || !form.selectedContract || !form.comment.trim()) ? "none" : `0 4px 12px ${theme.shadow}` }}>
                   {submitting ? "Submitting..." : isFreelancer ? "Submit Feedback →" : "Submit Review →"}
                 </button>
                 <button onClick={() => { setShowForm(false); setFormError(""); }}

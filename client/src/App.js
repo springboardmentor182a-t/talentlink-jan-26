@@ -44,11 +44,11 @@ const routeLabels = {
   "/dashboard":      "Dashboard",
   "/profile":        "Profile",
   "/post-project":   "Post Project",
-  "/projects":       "Project Management",
-  "/contracts":      "Contract Management",
+  "/projects":       "Projects",
+  "/contracts":      "Contracts",
   "/messages":       "Messages",
   "/reviews":        "Reviews",
-  "/view-proposals": "View Proposals",
+  "/view-proposals": "Proposals",
 };
 
 function ProtectedRoute({ children, allowedRole }) {
@@ -86,19 +86,19 @@ function ClientTopbar({ onMenuClick }) {
       zIndex:         100,
       boxShadow:      "0 1px 3px rgba(0,0,0,0.05)",
     }}>
-      <div style={{ display:"flex", alignItems:"center", gap:10, minWidth:0, flexShrink:0 }}>
+      <div style={{ display:"flex", alignItems:"center", gap:8, minWidth:0, flex:1 }}>
         <button onClick={onMenuClick} className="cl-hamburger"
-          style={{ display:"none", background:"none", border:"none", cursor:"pointer", padding:4 }}
+          style={{ display:"none", background:"none", border:"none", cursor:"pointer", padding:4, flexShrink:0 }}
           aria-label="Open menu">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round">
             <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
-        <div style={{ width:8, height:8, borderRadius:"50%", background:"linear-gradient(135deg,#1e3a5f,#2563eb)" }} />
-        <span style={{ fontWeight:700, fontSize:15, color:"var(--text-primary)" }}>{label}</span>
+        <div style={{ width:8, height:8, borderRadius:"50%", background:"linear-gradient(135deg,#1e3a5f,#2563eb)", flexShrink:0 }} />
+        <span style={{ fontWeight:700, fontSize:15, color:"var(--text-primary)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{label}</span>
       </div>
 
-      <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+      <div className="cl-topbar-right" style={{ display:"flex", alignItems:"center", gap:10, flexShrink:0 }}>
         {/* ── Dark / Light toggle ── */}
         <button
           onClick={toggleTheme}
@@ -120,7 +120,7 @@ function ClientTopbar({ onMenuClick }) {
         <NotificationBell theme="blue" />
 
         {/* User pill */}
-        <div className="th-input-bg" style={{ display:"flex", alignItems:"center", gap:10, padding:"6px 14px", borderRadius:20, border:"1px solid var(--border)" }}>
+        <div className="th-input-bg cl-user-pill" style={{ display:"flex", alignItems:"center", gap:8, padding:"6px 10px", borderRadius:20, border:"1px solid var(--border)", flexShrink:0 }}>
           <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#1e3a5f,#2563eb)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:13, boxShadow:"0 2px 8px rgba(37,99,235,0.2)", flexShrink:0 }}>
             {(user?.name || "C").charAt(0).toUpperCase()}
           </div>
@@ -161,14 +161,17 @@ function DashboardLayout({ children }) {
         <ClientTopbar onMenuClick={() => setSidebarOpen(v => !v)} />
         {children}
         <style>{`
-          @media (max-width: 480px) {
-            .cl-topbar-right { gap: 6px !important; }
+          @media (max-width: 767px) {
             :root { --cl-sidebar-margin: 0px; }
             .client-sidebar-wrap { position:fixed; left:0; top:0; z-index:200; transform:translateX(-100%); transition:transform 0.25s ease; height:100vh; }
             .client-sidebar-wrap.sidebar-open { transform:translateX(0); }
             .cl-hamburger { display:flex !important; }
             .cl-name-hide { display:none !important; }
             .cl-logout-text { display:none !important; }
+          }
+          @media (max-width: 480px) {
+            .cl-topbar-right { gap: 6px !important; }
+            .cl-user-pill { padding: 5px 8px !important; }
           }
           @media (min-width: 768px) {
             :root { --cl-sidebar-margin: 250px; }
@@ -182,7 +185,10 @@ function DashboardLayout({ children }) {
 
 function AiChatWrapper() {
   const { user } = useContext(AuthContext);
+  const location = useLocation();
   if (!user) return null;
+  // Hide the floating AI chat button on the messages page — it overlaps the Send button
+  if (location.pathname.startsWith("/messages")) return null;
   return <AiChat />;
 }
 

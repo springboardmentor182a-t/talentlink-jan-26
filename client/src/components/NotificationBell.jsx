@@ -72,7 +72,7 @@ export default function NotificationBell({ theme = "blue" }) {
 
       {/* Dropdown */}
       {open && (
-        <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, left: "auto", width: "min(360px, calc(100vw - 32px))", maxWidth: "calc(100vw - 16px)", backgroundColor: "var(--card)", borderRadius: 16, boxShadow: "0 8px 40px rgba(0,0,0,0.15)", border: "1px solid var(--border)", zIndex: 1000, overflow: "hidden" }}>
+        <div className="notif-panel" style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, width: "min(360px, calc(100vw - 16px))", backgroundColor: "var(--card)", borderRadius: 16, boxShadow: "0 8px 40px rgba(0,0,0,0.15)", border: "1px solid var(--border)", zIndex: 1000, overflow: "hidden" }}>
 
           {/* Header */}
           <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-light)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>

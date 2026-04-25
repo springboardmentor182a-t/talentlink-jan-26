@@ -94,6 +94,7 @@ export default function AiChat() {
       {/* Floating Button */}
       <button
         onClick={() => setOpen((o) => !o)}
+        className="ai-chat-fab"
         style={styles.fab}
         title="AI Assistant"
         aria-label="Open AI Chat"
@@ -194,7 +195,7 @@ export default function AiChat() {
 const styles = {
   fab: {
     position: "fixed",
-    bottom: "28px",
+    bottom: "90px",
     right: "28px",
     width: "56px",
     height: "56px",
@@ -213,7 +214,7 @@ const styles = {
   },
   window: {
     position: "fixed",
-    bottom: "96px",
+    bottom: "158px",
     right: "28px",
     width: "min(360px, calc(100vw - 56px))",
     height: "500px",

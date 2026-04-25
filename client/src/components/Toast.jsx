@@ -70,8 +70,8 @@ export default function Toast() {
             <button
               onClick={() => removeToast(toast.toastId)}
               style={{ background: "none", border: "none", color: "var(--text-faint)", cursor: "pointer", fontSize: 18, padding: 0, flexShrink: 0, lineHeight: 1 }}
-              onMouseEnter={e => e.currentTarget.style.color = "#374151"}
-              onMouseLeave={e => e.currentTarget.style.color = "#94a3b8"}
+              onMouseEnter={e => e.currentTarget.style.color = "var(--text-primary)"}
+              onMouseLeave={e => e.currentTarget.style.color = "var(--text-faint)"}
             >
               ×
             </button>
