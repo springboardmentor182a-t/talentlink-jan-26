@@ -97,7 +97,7 @@ export default function ClientSignup() {
         </div>
 
         {error && (
-          <div style={{ backgroundColor:"#fef2f2", border:"1.5px solid #fecaca", borderRadius:10, padding:"12px 16px", fontSize:13, color:"#dc2626", marginBottom:16 }}>
+          <div style={{ backgroundColor:"var(--tint-red)", border:"1.5px solid var(--tint-red-border)", borderRadius:10, padding:"12px 16px", fontSize:13, color:"var(--text-error)", marginBottom:16 }}>
             ⚠️ {error}
           </div>
         )}

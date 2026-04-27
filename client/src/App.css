@@ -46,13 +46,22 @@
   --nav-active-color: #2563eb;
   --nav-idle-color:   #64748b;
 
+  /* Focus ring */
+  --ring:             rgba(31,99,255,0.18);
+
   /* Semantic tint panels */
   --tint-green:         #f0fdf4;
   --tint-green-border:  #86efac;
   --tint-purple:        #faf5ff;
   --tint-purple-border: #ddd6fe;
   --tint-blue:          #eff6ff;
+  --tint-red:           #fef2f2;
+  --tint-red-border:    #fca5a5;
+  --tint-orange:        #fff7ed;
+  --tint-orange-border: #fed7aa;
   --text-info:          #0369a1;
+  --text-error:         #b91c1c;
+  --text-warning:       #c2410c;
 }
 
 /* ═══════════════════════════════════════
@@ -87,13 +96,22 @@
   --nav-active-color: #60a5fa;
   --nav-idle-color:   #94a3b8;
 
+  /* Focus ring — stronger opacity needed on dark surfaces */
+  --ring:             rgba(96,165,250,0.35);
+
   /* Semantic tint panels — darkened so they don't blind in dark mode */
   --tint-green:         rgba(22,163,74,0.12);
   --tint-green-border:  rgba(22,163,74,0.3);
   --tint-purple:        rgba(124,58,237,0.12);
   --tint-purple-border: rgba(124,58,237,0.3);
   --tint-blue:          rgba(37,99,235,0.12);
+  --tint-red:           rgba(220,38,38,0.12);
+  --tint-red-border:    rgba(220,38,38,0.3);
+  --tint-orange:        rgba(234,88,12,0.12);
+  --tint-orange-border: rgba(234,88,12,0.3);
   --text-info:          #60a5fa;
+  --text-error:         #f87171;
+  --text-warning:       #fb923c;
 }
 
 /* Hide floating AI chat button on messages page to avoid overlapping Send button */
@@ -327,7 +345,7 @@ input, textarea, select {
 input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(31, 99, 255, 0.1);
+  box-shadow: 0 0 0 3px var(--ring);
 }
 
 input::placeholder {
@@ -618,6 +636,21 @@ input::placeholder {
 /* Dark mode: scrollbar */
 [data-theme="dark"] {
   color-scheme: dark;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: var(--page-bg);
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
 }
 
 /* Dark mode override for inline #f8fafc bg (DashboardLayout main content) */

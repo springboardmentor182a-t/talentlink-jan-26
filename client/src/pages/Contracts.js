@@ -402,9 +402,7 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
           🤖 {showSummary ? "Hide Summary" : "AI Summary"}
         </button>
         <button onClick={() => navigate("/projects")}
-          style={{ padding:"10px 20px", backgroundColor:"transparent", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor="var(--text-secondary)"; e.currentTarget.style.backgroundColor="var(--input-background)"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.backgroundColor="transparent"; }}>
+          style={{ padding:"10px 20px", background:"linear-gradient(135deg,#d97706,#f59e0b)", color:"white", border:"none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}>
           📁 View Project
         </button>
       </div>

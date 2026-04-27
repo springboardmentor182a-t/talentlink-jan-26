@@ -57,7 +57,7 @@ export default function FreelancerContracts({ onNavigate }) {
           {[
             { label:"Active Contracts",    val:active.length,                        icon:"⚡", color:"#7c3aed", bg:"var(--tint-purple)" },
             { label:"Completed Contracts", val:completed.length,                     icon:"✅", color:"#16a34a", bg:"var(--tint-green)" },
-            { label:"Total Earnings",      val:`$${totalEarnings.toLocaleString()}`, icon:"💰", color:"#2563eb", bg:"#eff6ff" },
+            { label:"Total Earnings",      val:`$${totalEarnings.toLocaleString()}`, icon:"💰", color:"#2563eb", bg:"var(--tint-blue)" },
           ].map(s => (
             <div key={s.label} style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div>
@@ -86,7 +86,7 @@ export default function FreelancerContracts({ onNavigate }) {
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
               <div style={{ width:10, height:10, borderRadius:"50%", backgroundColor:"#a855f7" }} />
               <h2 style={{ fontSize:18, fontWeight:700, color:"var(--text-primary)", margin:0 }}>Active Contracts</h2>
-              <span style={{ backgroundColor:"#f3e8ff", color:"#7c3aed", borderRadius:20, padding:"2px 10px", fontSize:12, fontWeight:600 }}>{active.length}</span>
+              <span style={{ backgroundColor:"var(--tint-purple)", color:"var(--nav-active-color)", borderRadius:20, padding:"2px 10px", fontSize:12, fontWeight:600 }}>{active.length}</span>
             </div>
             {active.map(c => <ContractCard key={c.id} contract={c} onNavigate={onNavigate} user={user} />)}
           </div>
@@ -97,7 +97,7 @@ export default function FreelancerContracts({ onNavigate }) {
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
               <div style={{ width:10, height:10, borderRadius:"50%", backgroundColor:"#16a34a" }} />
               <h2 style={{ fontSize:18, fontWeight:700, color:"var(--text-primary)", margin:0 }}>Completed Contracts</h2>
-              <span style={{ backgroundColor:"#dcfce7", color:"#16a34a", borderRadius:20, padding:"2px 10px", fontSize:12, fontWeight:600 }}>{completed.length}</span>
+              <span style={{ backgroundColor:"var(--tint-green)", color:"#16a34a", borderRadius:20, padding:"2px 10px", fontSize:12, fontWeight:600 }}>{completed.length}</span>
             </div>
             {completed.map(c => <ContractCard key={c.id} contract={c} onNavigate={onNavigate} user={user} completed />)}
           </div>
@@ -178,9 +178,9 @@ function ContractCard({ contract, onNavigate, user, completed }) {
   };
 
   const riskColor = {
-    "Low":    { bg:"var(--tint-green)", border:"var(--tint-green-border)", text:"#16a34a", badge:"#dcfce7", badgeText:"#16a34a" },
-    "Medium": { bg:"#fffbeb", border:"#fcd34d", text:"#d97706", badge:"#fef3c7", badgeText:"#d97706" },
-    "High":   { bg:"#fef2f2", border:"#fca5a5", text:"#dc2626", badge:"#fee2e2", badgeText:"#dc2626" },
+    "Low":    { bg:"var(--tint-green)",  border:"var(--tint-green-border)",  text:"#16a34a",            badge:"var(--tint-green)",  badgeText:"#16a34a"            },
+    "Medium": { bg:"var(--tint-orange)", border:"var(--tint-orange-border)", text:"#d97706",            badge:"var(--tint-orange)", badgeText:"#d97706"            },
+    "High":   { bg:"var(--tint-red)",    border:"var(--tint-red-border)",    text:"var(--text-error)",  badge:"var(--tint-red)",    badgeText:"var(--text-error)"  },
   };
   const rc = riskColor[risk?.risk_level] || riskColor["Medium"];
 
@@ -335,9 +335,7 @@ function ContractCard({ contract, onNavigate, user, completed }) {
           💬 Message Client
         </button>
         <button onClick={() => onNavigate && onNavigate("proposals")}
-          style={{ padding:"10px 20px", backgroundColor:"transparent", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor="var(--text-secondary)"; e.currentTarget.style.backgroundColor="var(--input-background)"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.backgroundColor="transparent"; }}>
+          style={{ padding:"10px 20px", background:"linear-gradient(135deg,#059669,#10b981)", color:"white", border:"none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13 }}>
           📋 View My Proposals
         </button>
         {/* ── AI BUTTONS ── */}

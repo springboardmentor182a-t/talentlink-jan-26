@@ -124,7 +124,7 @@ export default function Reviews({ onNavigate }) {
     <div style={{ display:"flex", gap:2 }}>
       {[1,2,3,4,5].map(n => (
         <span key={n} onClick={() => interactive && onChange(n)}
-          style={{ fontSize:size, cursor:interactive ? "pointer" : "default", color: n <= rating ? "#f59e0b" : "#d1d5db", lineHeight:1 }}>
+          style={{ fontSize:size, cursor:interactive ? "pointer" : "default", color: n <= rating ? "#f59e0b" : "var(--border)", lineHeight:1 }}>
           ★
         </span>
       ))}
@@ -184,7 +184,7 @@ export default function Reviews({ onNavigate }) {
           {[
             { label:"Reviews Received", val:received.length,                    icon:"📥", color:theme.accent, bg:theme.accentLight },
             { label:isFreelancer ? "Feedback Given" : "Reviews Given", val:given.length, icon:"📤", color:"#16a34a", bg:"var(--tint-green)" },
-            { label:"Average Rating",   val:avgRating ? `${avgRating} ★` : "—", icon:"⭐", color:"#d97706", bg:"#fffbeb" },
+            { label:"Average Rating",   val:avgRating ? `${avgRating} ★` : "—", icon:"⭐", color:"#d97706", bg:"var(--tint-orange)" },
           ].map(s => (
             <div key={s.label} style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div>
@@ -224,7 +224,7 @@ export default function Reviews({ onNavigate }) {
             </h3>
 
             {formError && (
-              <div style={{ backgroundColor:"#fef2f2", border:"1px solid #fca5a5", borderRadius:8, padding:"10px 14px", marginBottom:16, fontSize:13, color:"#dc2626" }}>
+              <div style={{ backgroundColor:"var(--tint-red)", border:"1px solid var(--tint-red-border)", borderRadius:8, padding:"10px 14px", marginBottom:16, fontSize:13, color:"var(--text-error)" }}>
                 ⚠️ {formError}
               </div>
             )}

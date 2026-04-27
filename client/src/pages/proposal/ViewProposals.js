@@ -122,9 +122,9 @@ export default function ViewProposals() {
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(130px, 1fr))", gap:16, marginBottom:24 }}>
           {[
             { label:"Total",    val:counts.total,    color:"#4f46e5", bg:"var(--tint-purple)", icon:"📋" },
-            { label:"Pending",  val:counts.pending,  color:"#d97706", bg:"#fffbeb", icon:"⏳" },
-            { label:"Accepted", val:counts.accepted, color:"#16a34a", bg:"var(--tint-green)", icon:"✅" },
-            { label:"Rejected", val:counts.rejected, color:"#dc2626", bg:"#fef2f2", icon:"❌" },
+            { label:"Pending",  val:counts.pending,  color:"#d97706", bg:"var(--tint-orange)", icon:"⏳" },
+            { label:"Accepted", val:counts.accepted, color:"#16a34a", bg:"var(--tint-green)",  icon:"✅" },
+            { label:"Rejected", val:counts.rejected, color:"#dc2626", bg:"var(--tint-red)",    icon:"❌" },
           ].map(s => (
             <div key={s.label} style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:12, padding:"20px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div>
@@ -213,7 +213,7 @@ export default function ViewProposals() {
         )}
 
         {error && (
-          <div style={{ backgroundColor:"#fef2f2", border:"1.5px solid #fca5a5", borderRadius:10, padding:"12px 16px", fontSize:13, color:"#b91c1c", marginBottom:16 }}>
+          <div style={{ backgroundColor:"var(--tint-red)", border:"1.5px solid var(--tint-red-border)", borderRadius:10, padding:"12px 16px", fontSize:13, color:"var(--text-error)", marginBottom:16 }}>
             ⚠️ {error}
           </div>
         )}
@@ -248,15 +248,15 @@ export default function ViewProposals() {
                 </div>
                 <div style={{ display:"flex", gap:8, alignItems:"center" }}>
                   {rankInfo && (
-                    <span style={{ padding:"4px 12px", borderRadius:20, fontSize:12, fontWeight:700, backgroundColor:"var(--nav-active-bg)", color:"#7c3aed", border:"1px solid #ddd6fe" }}>
+                    <span style={{ padding:"4px 12px", borderRadius:20, fontSize:12, fontWeight:700, backgroundColor:"var(--nav-active-bg)", color:"var(--nav-active-color)", border:"1px solid var(--tint-purple-border)" }}>
                       #{rankInfo.rank} — {rankInfo.score}%
                     </span>
                   )}
                   <span style={{
                     padding:"6px 16px", borderRadius:20, fontSize:12, fontWeight:700,
-                    background: p.status==="pending" ? "linear-gradient(135deg,#f8fafc,#f1f5f9)" : p.status==="accepted" ? "linear-gradient(135deg,#f0fdf4,#dcfce7)" : "linear-gradient(135deg,#fef2f2,#fee2e2)",
-                    color: p.status==="pending" ? "#374151" : p.status==="accepted" ? "#166534" : "#dc2626",
-                    border:`1px solid ${p.status==="pending" ? "#e2e8f0" : p.status==="accepted" ? "#86efac" : "#fca5a5"}`
+                    background: p.status==="pending" ? "var(--muted)" : p.status==="accepted" ? "var(--tint-green)" : "var(--tint-red)",
+                    color: p.status==="pending" ? "var(--text-secondary)" : p.status==="accepted" ? "#166534" : "var(--text-error)",
+                    border:`1px solid ${p.status==="pending" ? "var(--border)" : p.status==="accepted" ? "var(--tint-green-border)" : "var(--tint-red-border)"}`
                   }}>
                     {p.status}
                   </span>
@@ -299,7 +299,7 @@ export default function ViewProposals() {
               </div>
 
               {p.status === "pending" && (
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginTop:20 }}>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(min(100%, 160px), 1fr))", gap:12, marginTop:20 }}>
                   <button onClick={() => accept(p.id)}
                     style={{ padding:"12px", background:"linear-gradient(135deg,#16a34a,#22c55e)", color:"white", border:"none", borderRadius:10, cursor:"pointer", fontWeight:700, fontSize:14, boxShadow:"0 4px 12px rgba(22,163,74,0.3)" }}>
                     ✓ Accept Proposal

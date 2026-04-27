@@ -81,7 +81,7 @@ export default function ChooseRole() {
       <div style={{ position: "fixed", bottom: "20%", left: "20%", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(139,92,246,0.4) 0%, transparent 70%)", pointerEvents: "none", animation: "pulse 8s ease-in-out infinite 1.5s", filter: "blur(20px)", zIndex: 0 }} />
 
       {/* Navbar */}
-      <div style={{ position: "relative", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "18px clamp(16px, 4vw, 40px)", backgroundColor: "rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(20px)" }}>
+      <div style={{ position: "relative", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px 16px", padding: "14px clamp(12px, 4vw, 40px)", backgroundColor: "rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(20px)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
           <div style={{ width: 38, height: 38, background: "linear-gradient(135deg,#2563eb,#7c3aed)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 18, boxShadow: "0 4px 15px rgba(37,99,235,0.4)", flexShrink: 0 }}>💼</div>
           <span style={{ fontWeight: 800, fontSize: 20, background: "linear-gradient(135deg,#60a5fa,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", whiteSpace: "nowrap" }}>TalentLink</span>
@@ -89,10 +89,10 @@ export default function ChooseRole() {
 
         {/* Direct sign in links */}
         <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-          <button className="nav-link-blue" style={navLinkStyle} onClick={() => navigate("/client/login")}>
+          <button className="nav-link-blue" style={{ ...navLinkStyle, fontSize: "clamp(11px, 2.5vw, 13px)", padding: "6px clamp(10px, 2vw, 16px)" }} onClick={() => navigate("/client/login")}>
             💼 Client
           </button>
-          <button className="nav-link-purple" style={navLinkStyle} onClick={() => navigate("/freelancer/login")}>
+          <button className="nav-link-purple" style={{ ...navLinkStyle, fontSize: "clamp(11px, 2.5vw, 13px)", padding: "6px clamp(10px, 2vw, 16px)" }} onClick={() => navigate("/freelancer/login")}>
             👤 Freelancer
           </button>
         </div>

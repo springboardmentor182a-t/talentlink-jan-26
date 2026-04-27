@@ -43,9 +43,9 @@ export default function FreelancerHome({ onNavigate }) {
     .slice(0, 4);
 
   const statusStyle = {
-    pending:  { bg:"#fff7ed", color:"#ea580c", border:"#fed7aa" },
-    accepted: { bg:"var(--tint-green)", color:"#16a34a", border:"var(--tint-green-border)" },
-    rejected: { bg:"#fef2f2", color:"#dc2626", border:"#fca5a5" },
+    pending:  { bg:"var(--tint-orange)", color:"#ea580c", border:"var(--tint-orange-border)" },
+    accepted: { bg:"var(--tint-green)",  color:"#16a34a", border:"var(--tint-green-border)"  },
+    rejected: { bg:"var(--tint-red)",    color:"var(--text-error)", border:"var(--tint-red-border)" },
   };
 
   if (loading) return (
@@ -78,9 +78,9 @@ export default function FreelancerHome({ onNavigate }) {
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(140px, 1fr))", gap:16, marginBottom:32 }}>
           {[
             { label:"Total Proposals",   val:counts.total,                          icon:"📋", color:"#7c3aed", bg:"var(--tint-purple)" },
-            { label:"Pending",           val:counts.pending,                         icon:"⏳", color:"#d97706", bg:"#fffbeb" },
-            { label:"Accepted",          val:counts.accepted,                        icon:"✅", color:"#16a34a", bg:"var(--tint-green)" },
-            { label:"Total Earnings",    val:`$${totalEarnings.toLocaleString()}`,   icon:"💰", color:"#2563eb", bg:"#eff6ff" },
+            { label:"Pending",           val:counts.pending,                         icon:"⏳", color:"#d97706", bg:"var(--tint-orange)" },
+            { label:"Accepted",          val:counts.accepted,                        icon:"✅", color:"#16a34a", bg:"var(--tint-green)"  },
+            { label:"Total Earnings",    val:`$${totalEarnings.toLocaleString()}`,   icon:"💰", color:"#2563eb", bg:"var(--tint-blue)"   },
           ].map(s => (
             <div key={s.label} style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div>
@@ -241,9 +241,9 @@ export default function FreelancerHome({ onNavigate }) {
             </div>
             <div style={{ display:"flex", gap:16, marginTop:10 }}>
               {[
-                { label:"Accepted", color:"#16a34a", bg:"#dcfce7" },
-                { label:"Pending",  color:"#d97706", bg:"#fef3c7" },
-                { label:"Rejected", color:"#dc2626", bg:"#fee2e2" },
+                { label:"Accepted", color:"#16a34a", bg:"var(--tint-green)"  },
+                { label:"Pending",  color:"#d97706", bg:"var(--tint-orange)" },
+                { label:"Rejected", color:"#dc2626", bg:"var(--tint-red)"    },
               ].map(l => (
                 <div key={l.label} style={{ display:"flex", alignItems:"center", gap:6 }}>
                   <div style={{ width:10, height:10, borderRadius:"50%", backgroundColor:l.color }} />

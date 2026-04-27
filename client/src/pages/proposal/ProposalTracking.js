@@ -5,9 +5,9 @@ import { AuthContext } from "../../context/AuthContext";
 
 function Badge({ status }) {
   const map = {
-    pending:  { bg:"#fff7ed", color:"#ea580c", border:"#fed7aa" },
-    accepted: { bg:"var(--tint-green)", color:"#16a34a", border:"var(--tint-green-border)" },
-    rejected: { bg:"#fef2f2", color:"#dc2626", border:"#fca5a5" },
+    pending:  { bg:"var(--tint-orange)", color:"#ea580c", border:"var(--tint-orange-border)" },
+    accepted: { bg:"var(--tint-green)",  color:"#16a34a", border:"var(--tint-green-border)"  },
+    rejected: { bg:"var(--tint-red)",    color:"var(--text-error)", border:"var(--tint-red-border)" },
   };
   const c = map[status] || map.pending;
   return (
@@ -58,9 +58,9 @@ export default function ProposalTracking() {
         {/* Stats Cards */}
         <div style={{ display:"grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap:16, marginBottom:28 }}>
           {[
-            { label:"Pending",  val:counts.pending,  color:"#d97706", bg:"#fffbeb", icon:"⏳" },
-            { label:"Accepted", val:counts.accepted, color:"#16a34a", bg:"var(--tint-green)", icon:"✅" },
-            { label:"Rejected", val:counts.rejected, color:"#dc2626", bg:"#fef2f2", icon:"❌" },
+            { label:"Pending",  val:counts.pending,  color:"#d97706", bg:"var(--tint-orange)", icon:"⏳" },
+            { label:"Accepted", val:counts.accepted, color:"#16a34a", bg:"var(--tint-green)",  icon:"✅" },
+            { label:"Rejected", val:counts.rejected, color:"#dc2626", bg:"var(--tint-red)",    icon:"❌" },
           ].map(s => (
             <div key={s.label} style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"22px 24px", display:"flex", justifyContent:"space-between", alignItems:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
               <div>

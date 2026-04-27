@@ -30,7 +30,7 @@ export default function SubmitProposal() {
   if (!user) {
     return (
       <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", fontFamily:"'Segoe UI',sans-serif" }}>
-        <div style={{ backgroundColor:"#fff7ed", border:"1px solid #fed7aa", borderRadius:12, padding:24, color:"#c2410c", fontSize:14 }}>
+        <div style={{ backgroundColor:"var(--tint-orange)", border:"1px solid var(--tint-orange-border)", borderRadius:12, padding:24, color:"var(--text-warning)", fontSize:14 }}>
           ⚠️ You must be logged in.{" "}
           <span style={{ textDecoration:"underline", cursor:"pointer" }} onClick={() => navigate("/freelancer/login")}>Login here</span>
         </div>
@@ -177,14 +177,14 @@ export default function SubmitProposal() {
               <textarea
                 value={coverLetter} onChange={e => setCoverLetter(e.target.value)}
                 placeholder="Describe your relevant experience, skills, and why you're the best fit for this project..."
-                style={{ ...inp, resize:"vertical", minHeight:160, lineHeight:1.7, borderColor: coverLetter ? "#7c3aed" : "#e2e8f0" }}
+                style={{ ...inp, resize:"vertical", minHeight:160, lineHeight:1.7, borderColor: coverLetter ? "#7c3aed" : "var(--border)" }}
               />
               <div style={{ display:"flex", justifyContent:"space-between", marginTop:4 }}>
                 {errors.coverLetter
-                  ? <p style={{ fontSize:12, color:"#ef4444", margin:0 }}>{errors.coverLetter}</p>
+                  ? <p style={{ fontSize:12, color:"var(--text-error)", margin:0 }}>{errors.coverLetter}</p>
                   : <span />
                 }
-                <span style={{ fontSize:12, color: charCount > 50 ? "#16a34a" : "#9ca3af" }}>{charCount} characters</span>
+                <span style={{ fontSize:12, color: charCount > 50 ? "#16a34a" : "var(--text-faint)" }}>{charCount} characters</span>
               </div>
 
               {keyPoints.length > 0 && (
@@ -203,7 +203,7 @@ export default function SubmitProposal() {
               <div>
                 <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
                   <label style={lbl}>
-                    Proposed Budget ($) <span style={{ color:"#ef4444" }}>*</span>
+                    Proposed Budget ($) <span style={{ color:"var(--text-error)" }}>*</span>
                   </label>
                   {/* ✅ AI BUDGET BUTTON */}
                   <button onClick={estimateBudget} disabled={budgetLoading}
@@ -213,9 +213,9 @@ export default function SubmitProposal() {
                 </div>
                 <div style={{ position:"relative" }}>
                   <span style={{ position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", color:"var(--text-muted)", fontWeight:600 }}>$</span>
-                  <input style={{ ...inp, paddingLeft:26, borderColor: budget ? "#7c3aed" : "#e2e8f0" }} type="number" min="1" placeholder="5000" value={budget} onChange={e => setBudget(e.target.value)} />
+                  <input style={{ ...inp, paddingLeft:26, borderColor: budget ? "#7c3aed" : "var(--border)" }} type="number" min="1" placeholder="5000" value={budget} onChange={e => setBudget(e.target.value)} />
                 </div>
-                {errors.budget && <p style={{ fontSize:12, color:"#ef4444", marginTop:4 }}>{errors.budget}</p>}
+                {errors.budget && <p style={{ fontSize:12, color:"var(--text-error)", marginTop:4 }}>{errors.budget}</p>}
 
                 {/* ✅ BUDGET ESTIMATE RESULT */}
                 {budgetEstimate && (
@@ -231,10 +231,10 @@ export default function SubmitProposal() {
               </div>
               <div>
                 <label style={lbl}>
-                  Delivery Time <span style={{ color:"#ef4444" }}>*</span>
+                  Delivery Time <span style={{ color:"var(--text-error)" }}>*</span>
                 </label>
-                <input style={{ ...inp, borderColor: deliveryTime ? "#7c3aed" : "#e2e8f0" }} type="text" placeholder="e.g. 2 weeks, 10 days" value={deliveryTime} onChange={e => setDeliveryTime(e.target.value)} />
-                {errors.deliveryTime && <p style={{ fontSize:12, color:"#ef4444", marginTop:4 }}>{errors.deliveryTime}</p>}
+                <input style={{ ...inp, borderColor: deliveryTime ? "#7c3aed" : "var(--border)" }} type="text" placeholder="e.g. 2 weeks, 10 days" value={deliveryTime} onChange={e => setDeliveryTime(e.target.value)} />
+                {errors.deliveryTime && <p style={{ fontSize:12, color:"var(--text-error)", marginTop:4 }}>{errors.deliveryTime}</p>}
               </div>
             </div>
 

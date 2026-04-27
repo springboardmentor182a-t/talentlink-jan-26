@@ -109,9 +109,9 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
                 fontFamily:"inherit", fontSize:14,
                 fontWeight: activePage === item.key ? 600 : 400,
                 backgroundColor: activePage === item.key ? "var(--nav-active-bg)" : "transparent",
-                color: activePage === item.key ? "#7c3aed" : "#6b7280",
+                color: activePage === item.key ? "var(--nav-active-color)" : "var(--nav-idle-color)",
                 marginBottom:4, textAlign:"left",
-                borderLeft: activePage === item.key ? "3px solid #7c3aed" : "3px solid transparent",
+                borderLeft: activePage === item.key ? "3px solid var(--nav-active-color)" : "3px solid transparent",
                 transition:"all 0.15s"
               }}
               onMouseEnter={e => { if (activePage !== item.key) e.currentTarget.style.backgroundColor="var(--nav-active-bg)"; }}
