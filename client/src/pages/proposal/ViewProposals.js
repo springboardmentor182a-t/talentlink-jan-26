@@ -42,7 +42,7 @@ export default function ViewProposals() {
   const fetchFreelancerProfile = async (freelancerId) => {
     if (freelancers[freelancerId]) return;
     try {
-      const res = await api.get(`/profile/${freelancerId}/full`);
+      const res = await api.get(`/profile/${freelancerId}`);
       setFreelancers(prev => ({ ...prev, [freelancerId]: res.data }));
     } catch {
       setFreelancers(prev => ({ ...prev, [freelancerId]: null }));

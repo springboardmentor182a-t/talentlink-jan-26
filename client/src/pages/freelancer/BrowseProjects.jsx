@@ -58,7 +58,7 @@ export default function BrowseProjects() {
     setClientProfile(null);
     setShowClientProfile(true);
     try {
-      const res = await api.get(`/profile/${clientId}/full`);
+      const res = await api.get(`/profile/${clientId}`);
       setClientProfile(res.data);
     } catch (err) {
       console.error("Client profile error:", err.message);
