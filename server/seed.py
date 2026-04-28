@@ -33,12 +33,16 @@ def seed():
             print(f"  ⏭  Client already exists: {client.name} (id={client.id})")
         else:
             client = User(
-                name       = "Test Client",
-                email      = client_email,
-                password   = hash_password("password123"),
-                role       = "client",
-                bio        = "We build innovative digital products.",
-                location   = "New York, USA",
+                name         = "Test Client",
+                email        = client_email,
+                password     = hash_password("password123"),
+                role         = "client",
+                bio          = "We build innovative digital products.",
+                location     = "New York, USA",
+                phone        = "+1 212 555 0100",
+                industry     = "Software & Technology",
+                website      = "https://testclient.com",
+                company_size = "50-200 employees",
             )
             db.add(client)
             db.commit()
@@ -52,14 +56,24 @@ def seed():
             print(f"  ⏭  Freelancer already exists: {freelancer.name} (id={freelancer.id})")
         else:
             freelancer = User(
-                name       = "Test Freelancer",
-                email      = freelancer_email,
-                password   = hash_password("password123"),
-                role       = "freelancer",
-                skills     = "React, Python, Django",
-                experience = "2 years of full-stack development",
-                bio        = "Full-stack developer specializing in React and Django.",
-                location   = "London, UK",
+                name            = "Test Freelancer",
+                email           = freelancer_email,
+                password        = hash_password("password123"),
+                role            = "freelancer",
+                bio             = "Full-stack developer specializing in React and Django.",
+                location        = "London, UK",
+                phone           = "+44 20 7946 0958",
+                title           = "Full Stack Developer",
+                skills          = "React, Python, Django",
+                experience      = "2 years of full-stack development",
+                portfolio       = "https://testfreelancer.dev",
+                linkedin        = "https://linkedin.com/in/testfreelancer",
+                github          = "https://github.com/testfreelancer",
+                education       = "B.Tech Computer Science, IIT Delhi",
+                certifications  = "AWS Certified Developer, Google UX Design",
+                languages       = "English, Hindi",
+                expected_salary = "$50/hr",
+                availability    = "Immediate",
             )
             db.add(freelancer)
             db.commit()
@@ -184,7 +198,6 @@ def seed():
             print(f"  ✅ Messages created (2 messages)")
 
         # ── 7. Review ──────────────────────────────────────────────
-        # Review uses project_name (string) not project_id FK
         review = db.query(Review).filter(
             Review.reviewer_id == client.id,
             Review.reviewee_id == freelancer.id,
