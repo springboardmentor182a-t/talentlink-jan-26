@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from src.database.core import get_db
-from .model import Proposal
+from src.proposals.model import Proposal
 from .schema import ProposalCreate, ProposalResponse
 from src.projects.model import Project
 from src.entities.contract import Contract
@@ -98,16 +98,23 @@ async def accept_proposal(proposal_id: int, db: Session = Depends(get_db)):
     freelancer      = db.query(User).filter(User.id == proposal.freelancer_id).first()
     freelancer_name = freelancer.name if freelancer else f"Freelancer #{proposal.freelancer_id}"
 
-    contract = Contract(
-        project_id      = proposal.project_id,
-        client_id       = project.client_id if project else None,
-        freelancer_id   = proposal.freelancer_id,
-        title           = project.title if project else f"Project #{proposal.project_id}",
-        freelancer_name = freelancer_name,
-        status          = "active",
-        contract_value  = str(proposal.proposed_budget),
-    )
-    db.add(contract)
+    # ✅ CHECK if contract already exists before creating
+    existing_contract = db.query(Contract).filter(
+        Contract.project_id == proposal.project_id
+    ).first()
+
+    if not existing_contract:
+        contract = Contract(
+            project_id      = proposal.project_id,
+            client_id       = project.client_id if project else None,
+            freelancer_id   = proposal.freelancer_id,
+            title           = project.title if project else f"Project #{proposal.project_id}",
+            freelancer_name = freelancer_name,
+            status          = "active",
+            contract_value  = str(proposal.proposed_budget),
+        )
+        db.add(contract)
+
     db.commit()
 
     # ── Notify freelancer — proposal accepted ─────────────────
