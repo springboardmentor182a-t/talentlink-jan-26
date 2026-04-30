@@ -8,7 +8,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from src.database.core import SessionLocal
+from src.database.core import SessionLocal, Base, engine
 from src.entities.user import User
 from src.projects.model import Project
 from src.proposals.model import Proposal
@@ -22,6 +22,8 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def hash_password(p): return pwd_context.hash(p)
 
 def seed():
+    print("Creating all tables from models...")
+    Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
         print("🌱 Starting safe seed...\n")

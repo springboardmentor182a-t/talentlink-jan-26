@@ -90,20 +90,20 @@ export default function ViewProposals() {
   const getRankInfo = (proposalId) => rankings.find(r => r.id === proposalId);
 
   return (
-    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#f8fafc", minHeight:"100vh" }}>
+    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#0f172a", minHeight:"100vh" }}>
 
       {/* Back link */}
       <div style={{ padding:"16px 32px 0" }}>
         <button onClick={() => navigate("/projects")}
-          style={{ background:"none", border:"none", fontSize:14, color:"#64748b", cursor:"pointer", display:"flex", alignItems:"center", gap:6, padding:"6px 0" }}
-          onMouseEnter={e => e.currentTarget.style.color="#2563eb"}
+          style={{ background:"none", border:"none", fontSize:14, color:"#94a3b8", cursor:"pointer", display:"flex", alignItems:"center", gap:6, padding:"6px 0" }}
+          onMouseEnter={e => e.currentTarget.style.color="#10b981"}
           onMouseLeave={e => e.currentTarget.style.color="#64748b"}>
           ← Back to Projects
         </button>
       </div>
 
       {/* Hero */}
-      <div style={{ background:"linear-gradient(135deg,#1e3a5f 0%,#2563eb 50%,#3b82f6 100%)", padding:"28px 32px", margin:"16px 32px 0", borderRadius:16, position:"relative", overflow:"hidden" }}>
+      <div style={{ background:"linear-gradient(135deg,#064e3b 0%,#10b981 50%,#06b6d4 100%)", padding:"28px 32px", margin:"16px 32px 0", borderRadius:16, position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:-40, right:-40, width:180, height:180, borderRadius:"50%", background:"rgba(255,255,255,0.05)" }} />
         <div style={{ display:"inline-flex", alignItems:"center", gap:8, backgroundColor:"rgba(255,255,255,0.15)", borderRadius:20, padding:"4px 14px", fontSize:12, color:"white", fontWeight:600, marginBottom:10 }}>
           📋 Proposals
@@ -126,9 +126,9 @@ export default function ViewProposals() {
             { label:"Accepted", val:counts.accepted, color:"#16a34a", bg:"#f0fdf4", icon:"✅" },
             { label:"Rejected", val:counts.rejected, color:"#dc2626", bg:"#fef2f2", icon:"❌" },
           ].map(s => (
-            <div key={s.label} style={{ backgroundColor:"#fff", borderRadius:12, padding:"20px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <div key={s.label} style={{ backgroundColor:"#1e293b", borderRadius:12, padding:"20px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #334155", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div>
-                <div style={{ fontSize:12, color:"#64748b", marginBottom:4, textTransform:"uppercase", letterSpacing:"0.5px" }}>{s.label}</div>
+                <div style={{ fontSize:12, color:"#94a3b8", marginBottom:4, textTransform:"uppercase", letterSpacing:"0.5px" }}>{s.label}</div>
                 <div style={{ fontSize:28, fontWeight:800, color:s.color }}>{s.val}</div>
               </div>
               <div style={{ width:44, height:44, borderRadius:12, backgroundColor:s.bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:22 }}>{s.icon}</div>
@@ -138,32 +138,32 @@ export default function ViewProposals() {
 
         {/* Project Details */}
         {project && (
-          <div style={{ backgroundColor:"#fff", borderRadius:12, padding:"24px 28px", marginBottom:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
-            <h3 style={{ fontSize:12, fontWeight:700, color:"#64748b", marginBottom:16, textTransform:"uppercase", letterSpacing:"0.5px" }}>Project Details</h3>
+          <div style={{ backgroundColor:"#1e293b", borderRadius:12, padding:"24px 28px", marginBottom:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #334155" }}>
+            <h3 style={{ fontSize:12, fontWeight:700, color:"#94a3b8", marginBottom:16, textTransform:"uppercase", letterSpacing:"0.5px" }}>Project Details</h3>
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 2fr 1fr", gap:16, alignItems:"start" }}>
               <div>
-                <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:4 }}>Budget</div>
-                <div style={{ fontSize:18, fontWeight:700, color:"#111827" }}>${project.budget}</div>
+                <div style={{ fontSize:11, color:"#94a3b8", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:4 }}>Budget</div>
+                <div style={{ fontSize:18, fontWeight:700, color:"#f8fafc" }}>${project.budget}</div>
               </div>
               <div>
-                <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:4 }}>Deadline</div>
-                <div style={{ fontSize:18, fontWeight:700, color:"#111827" }}>{project.deadline}</div>
+                <div style={{ fontSize:11, color:"#94a3b8", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:4 }}>Deadline</div>
+                <div style={{ fontSize:18, fontWeight:700, color:"#f8fafc" }}>{project.deadline}</div>
               </div>
               <div>
-                <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:6 }}>Skills</div>
+                <div style={{ fontSize:11, color:"#94a3b8", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:6 }}>Skills</div>
                 {project.skills ? (
                   <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                     {project.skills.split(",").map(s => (
-                      <span key={s} style={{ padding:"4px 12px", background:"linear-gradient(135deg,#eff6ff,#f5f3ff)", color:"#2563eb", borderRadius:20, fontSize:12, fontWeight:600, border:"1px solid #bfdbfe" }}>
+                      <span key={s} style={{ padding:"4px 12px", background:"linear-gradient(135deg,#ecfdf5,#f5f3ff)", color:"#10b981", borderRadius:20, fontSize:12, fontWeight:600, border:"1px solid #a7f3d0" }}>
                         {s.trim()}
                       </span>
                     ))}
                   </div>
-                ) : <span style={{ fontSize:14, color:"#64748b" }}>No skills specified</span>}
+                ) : <span style={{ fontSize:14, color:"#94a3b8" }}>No skills specified</span>}
               </div>
               <div>
-                <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:6 }}>Status</div>
-                <span style={{ padding:"6px 16px", borderRadius:20, fontSize:12, fontWeight:700, background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"white" }}>
+                <div style={{ fontSize:11, color:"#94a3b8", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:6 }}>Status</div>
+                <span style={{ padding:"6px 16px", borderRadius:20, fontSize:12, fontWeight:700, background:"linear-gradient(135deg,#10b981,#06b6d4)", color:"white" }}>
                   {project.status}
                 </span>
               </div>
@@ -173,10 +173,10 @@ export default function ViewProposals() {
 
         {/* ✅ AI RANK ALL BUTTON */}
         {proposals.length > 1 && (
-          <div style={{ backgroundColor:"#fff", borderRadius:12, padding:"20px 24px", marginBottom:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <div style={{ backgroundColor:"#1e293b", borderRadius:12, padding:"20px 24px", marginBottom:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #334155", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
             <div>
-              <div style={{ fontWeight:700, fontSize:15, color:"#111827" }}>📋 AI Proposal Ranking</div>
-              <div style={{ fontSize:13, color:"#64748b", marginTop:2 }}>Let AI rank all proposals by best fit for your project</div>
+              <div style={{ fontWeight:700, fontSize:15, color:"#f8fafc" }}>📋 AI Proposal Ranking</div>
+              <div style={{ fontSize:13, color:"#94a3b8", marginTop:2 }}>Let AI rank all proposals by best fit for your project</div>
             </div>
             <button onClick={rankAllProposals} disabled={rankLoading}
               style={{ padding:"10px 24px", background:"linear-gradient(135deg,#7c3aed,#a855f7)", color:"white", border:"none", borderRadius:10, cursor:"pointer", fontWeight:700, fontSize:14, boxShadow:"0 2px 8px rgba(124,58,237,0.3)", opacity: rankLoading ? 0.7 : 1 }}>
@@ -190,13 +190,13 @@ export default function ViewProposals() {
           <div style={{ backgroundColor:"#faf5ff", borderRadius:16, padding:24, marginBottom:24, border:"1px solid #ddd6fe" }}>
             <div style={{ fontSize:15, fontWeight:700, color:"#7c3aed", marginBottom:16 }}>🏆 AI Proposal Rankings</div>
             {rankings.map((r, i) => (
-              <div key={r.id} style={{ display:"flex", alignItems:"center", gap:16, padding:"14px 16px", backgroundColor:"#fff", borderRadius:12, border:`2px solid ${i === 0 ? "#f59e0b" : i === 1 ? "#94a3b8" : i === 2 ? "#b45309" : "#e2e8f0"}`, marginBottom:10 }}>
+              <div key={r.id} style={{ display:"flex", alignItems:"center", gap:16, padding:"14px 16px", backgroundColor:"#1e293b", borderRadius:12, border:`2px solid ${i === 0 ? "#f59e0b" : i === 1 ? "#94a3b8" : i === 2 ? "#b45309" : "#e2e8f0"}`, marginBottom:10 }}>
                 <div style={{ width:40, height:40, borderRadius:12, background: i === 0 ? "linear-gradient(135deg,#f59e0b,#fbbf24)" : i === 1 ? "linear-gradient(135deg,#94a3b8,#cbd5e1)" : i === 2 ? "linear-gradient(135deg,#b45309,#d97706)" : "linear-gradient(135deg,#e2e8f0,#f1f5f9)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, fontSize:18, color:"white" }}>
                   {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${r.rank}`}
                 </div>
                 <div style={{ flex:1 }}>
-                  <div style={{ fontWeight:700, fontSize:14, color:"#111827" }}>{r.freelancer_name}</div>
-                  <div style={{ fontSize:12, color:"#64748b", marginTop:2 }}>{r.reason}</div>
+                  <div style={{ fontWeight:700, fontSize:14, color:"#f8fafc" }}>{r.freelancer_name}</div>
+                  <div style={{ fontSize:12, color:"#94a3b8", marginTop:2 }}>{r.reason}</div>
                   <div style={{ display:"flex", gap:12, marginTop:6 }}>
                     <span style={{ fontSize:11, color: r.budget_fit === "good" ? "#16a34a" : r.budget_fit === "fair" ? "#d97706" : "#dc2626", fontWeight:600 }}>
                       💰 Budget: {r.budget_fit}
@@ -218,13 +218,13 @@ export default function ViewProposals() {
           </div>
         )}
 
-        {loading && <p style={{ color:"#64748b" }}>Loading proposals...</p>}
+        {loading && <p style={{ color:"#94a3b8" }}>Loading proposals...</p>}
 
         {!loading && proposals.length === 0 && (
-          <div style={{ backgroundColor:"#fff", borderRadius:16, padding:"60px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+          <div style={{ backgroundColor:"#1e293b", borderRadius:16, padding:"60px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #334155" }}>
             <div style={{ fontSize:56, marginBottom:16 }}>📭</div>
-            <h3 style={{ fontSize:18, fontWeight:700, color:"#111827", marginBottom:8 }}>No proposals yet</h3>
-            <p style={{ color:"#64748b", fontSize:14 }}>Freelancers haven't applied to this project yet.</p>
+            <h3 style={{ fontSize:18, fontWeight:700, color:"#f8fafc", marginBottom:8 }}>No proposals yet</h3>
+            <p style={{ color:"#94a3b8", fontSize:14 }}>Freelancers haven't applied to this project yet.</p>
           </div>
         )}
 
@@ -232,18 +232,18 @@ export default function ViewProposals() {
           const freelancerName = p.freelancer_name || `Freelancer #${p.freelancer_id}`;
           const rankInfo = getRankInfo(p.id);
           return (
-            <div key={p.id} style={{ backgroundColor:"#fff", borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border: rankInfo?.rank === 1 ? "2px solid #f59e0b" : "1px solid #e2e8f0" }}
+            <div key={p.id} style={{ backgroundColor:"#1e293b", borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border: rankInfo?.rank === 1 ? "2px solid #f59e0b" : "1px solid #e2e8f0" }}
               onMouseEnter={e => e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.1)"}
               onMouseLeave={e => e.currentTarget.style.boxShadow="0 1px 3px rgba(0,0,0,0.06)"}>
 
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:16 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-                  <div style={{ width:52, height:52, borderRadius:16, background:"linear-gradient(135deg,#2563eb,#3b82f6)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, fontSize:20, color:"white", boxShadow:"0 4px 12px rgba(37,99,235,0.3)" }}>
+                  <div style={{ width:52, height:52, borderRadius:16, background:"linear-gradient(135deg,#10b981,#06b6d4)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, fontSize:20, color:"white", boxShadow:"0 4px 12px rgba(16,185,129,0.3)" }}>
                     {freelancerName.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <div style={{ fontWeight:700, fontSize:16, color:"#111827" }}>{freelancerName}</div>
-                    <div style={{ fontSize:12, color:"#64748b", marginTop:3 }}>Freelancer</div>
+                    <div style={{ fontWeight:700, fontSize:16, color:"#f8fafc" }}>{freelancerName}</div>
+                    <div style={{ fontSize:12, color:"#94a3b8", marginTop:3 }}>Freelancer</div>
                   </div>
                 </div>
                 <div style={{ display:"flex", gap:8, alignItems:"center" }}>
@@ -265,8 +265,8 @@ export default function ViewProposals() {
 
               {p.cover_letter && (
                 <div style={{ marginBottom:16 }}>
-                  <div style={{ fontSize:12, fontWeight:700, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:8 }}>Cover Letter</div>
-                  <div style={{ fontSize:14, color:"#374151", lineHeight:1.8, backgroundColor:"#f8fafc", padding:"16px", borderRadius:10, border:"1px solid #e2e8f0" }}>
+                  <div style={{ fontSize:12, fontWeight:700, color:"#94a3b8", textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:8 }}>Cover Letter</div>
+                  <div style={{ fontSize:14, color:"#e2e8f0", lineHeight:1.8, backgroundColor:"#0f172a", padding:"16px", borderRadius:10, border:"1px solid #334155" }}>
                     {p.cover_letter}
                   </div>
                 </div>
@@ -274,25 +274,25 @@ export default function ViewProposals() {
 
               <div style={{ display:"flex", gap:24, paddingTop:16, borderTop:"1px solid #f1f5f9" }}>
                 <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-                  <div style={{ width:36, height:36, borderRadius:10, backgroundColor:"#eff6ff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>💰</div>
+                  <div style={{ width:36, height:36, borderRadius:10, backgroundColor:"#ecfdf5", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>💰</div>
                   <div>
-                    <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px" }}>Proposed Budget</div>
-                    <strong style={{ color:"#111827", fontSize:15 }}>${p.proposed_budget}</strong>
+                    <div style={{ fontSize:11, color:"#94a3b8", textTransform:"uppercase", letterSpacing:"0.5px" }}>Proposed Budget</div>
+                    <strong style={{ color:"#f8fafc", fontSize:15 }}>${p.proposed_budget}</strong>
                   </div>
                 </div>
                 <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                   <div style={{ width:36, height:36, borderRadius:10, backgroundColor:"#f0fdf4", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>🕐</div>
                   <div>
-                    <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px" }}>Delivery Time</div>
-                    <strong style={{ color:"#111827", fontSize:15 }}>{p.delivery_time}</strong>
+                    <div style={{ fontSize:11, color:"#94a3b8", textTransform:"uppercase", letterSpacing:"0.5px" }}>Delivery Time</div>
+                    <strong style={{ color:"#f8fafc", fontSize:15 }}>{p.delivery_time}</strong>
                   </div>
                 </div>
                 {p.created_at && (
                   <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                     <div style={{ width:36, height:36, borderRadius:10, backgroundColor:"#fdf4ff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:16 }}>📅</div>
                     <div>
-                      <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px" }}>Submitted</div>
-                      <strong style={{ color:"#111827", fontSize:15 }}>{new Date(p.created_at).toLocaleDateString()}</strong>
+                      <div style={{ fontSize:11, color:"#94a3b8", textTransform:"uppercase", letterSpacing:"0.5px" }}>Submitted</div>
+                      <strong style={{ color:"#f8fafc", fontSize:15 }}>{new Date(p.created_at).toLocaleDateString()}</strong>
                     </div>
                   </div>
                 )}
@@ -314,30 +314,30 @@ export default function ViewProposals() {
               {/* ✅ AI MATCH SCORE BUTTON */}
               <button onClick={() => checkMatchScore(p.freelancer_id)}
                 disabled={matchLoading[p.freelancer_id]}
-                style={{ width:"100%", padding:"12px", marginTop:12, backgroundColor:"#fff", color:"#2563eb", border:"1.5px solid #2563eb", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14, opacity: matchLoading[p.freelancer_id] ? 0.7 : 1 }}>
+                style={{ width:"100%", padding:"12px", marginTop:12, backgroundColor:"#1e293b", color:"#10b981", border:"1.5px solid #10b981", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14, opacity: matchLoading[p.freelancer_id] ? 0.7 : 1 }}>
                 {matchLoading[p.freelancer_id] ? "⏳ Analyzing..." : "🤖 Check AI Match Score"}
               </button>
 
               {/* ✅ AI MATCH SCORE RESULT */}
               {matchScores[p.freelancer_id] && (
-                <div style={{ marginTop:12, padding:16, backgroundColor:"#eff6ff", borderRadius:12, border:"1px solid #bfdbfe" }}>
+                <div style={{ marginTop:12, padding:16, backgroundColor:"#ecfdf5", borderRadius:12, border:"1px solid #a7f3d0" }}>
                   <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:10 }}>
-                    <div style={{ fontSize:32, fontWeight:800, color:"#2563eb" }}>{matchScores[p.freelancer_id].score}%</div>
+                    <div style={{ fontSize:32, fontWeight:800, color:"#10b981" }}>{matchScores[p.freelancer_id].score}%</div>
                     <div>
-                      <div style={{ fontSize:13, fontWeight:700, color:"#111827" }}>AI Match Score</div>
-                      <div style={{ fontSize:12, color:"#64748b" }}>{matchScores[p.freelancer_id].summary}</div>
+                      <div style={{ fontSize:13, fontWeight:700, color:"#f8fafc" }}>AI Match Score</div>
+                      <div style={{ fontSize:12, color:"#94a3b8" }}>{matchScores[p.freelancer_id].summary}</div>
                     </div>
                   </div>
                   {matchScores[p.freelancer_id].matching_skills?.length > 0 && (
                     <div style={{ marginBottom:6 }}>
                       <span style={{ fontSize:12, fontWeight:600, color:"#16a34a" }}>✅ Matching: </span>
-                      <span style={{ fontSize:12, color:"#374151" }}>{matchScores[p.freelancer_id].matching_skills.join(", ")}</span>
+                      <span style={{ fontSize:12, color:"#e2e8f0" }}>{matchScores[p.freelancer_id].matching_skills.join(", ")}</span>
                     </div>
                   )}
                   {matchScores[p.freelancer_id].missing_skills?.length > 0 && (
                     <div>
                       <span style={{ fontSize:12, fontWeight:600, color:"#dc2626" }}>❌ Missing: </span>
-                      <span style={{ fontSize:12, color:"#374151" }}>{matchScores[p.freelancer_id].missing_skills.join(", ")}</span>
+                      <span style={{ fontSize:12, color:"#e2e8f0" }}>{matchScores[p.freelancer_id].missing_skills.join(", ")}</span>
                     </div>
                   )}
                 </div>

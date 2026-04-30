@@ -52,16 +52,16 @@ export default function Messages({ onNavigate }) {
         backPage:    "dashboard",
       }
     : {
-        headerBg:    "linear-gradient(135deg,#1e3a5f 0%,#2563eb 50%,#3b82f6 100%)",
-        bubbleBg:    "linear-gradient(135deg,#2563eb,#3b82f6)",
-        bubbleShadow:"0 2px 8px rgba(37,99,235,0.35)",
-        activeConv:  "#eff6ff",
-        activeBorder:"#2563eb",
-        inputFocus:  "#2563eb",
-        sendBtn:     "linear-gradient(135deg,#2563eb,#3b82f6)",
-        sendShadow:  "0 4px 12px rgba(37,99,235,0.4)",
-        unreadBg:    "linear-gradient(135deg,#2563eb,#3b82f6)",
-        onlineDot:   "#3b82f6",
+        headerBg:    "linear-gradient(135deg,#064e3b 0%,#10b981 50%,#06b6d4 100%)",
+        bubbleBg:    "linear-gradient(135deg,#10b981,#06b6d4)",
+        bubbleShadow:"0 2px 8px rgba(16,185,129,0.35)",
+        activeConv:  "#ecfdf5",
+        activeBorder:"#10b981",
+        inputFocus:  "#10b981",
+        sendBtn:     "linear-gradient(135deg,#10b981,#06b6d4)",
+        sendShadow:  "0 4px 12px rgba(16,185,129,0.4)",
+        unreadBg:    "linear-gradient(135deg,#10b981,#06b6d4)",
+        onlineDot:   "#06b6d4",
         backLabel:   "← Contracts",
         backPage:    "contracts",
       };
@@ -199,19 +199,19 @@ export default function Messages({ onNavigate }) {
   );
   const getInitial     = (name) => (name || "?").charAt(0).toUpperCase();
   const avatarColors   = [
-    "linear-gradient(135deg,#2563eb,#7c3aed)",
+    "linear-gradient(135deg,#10b981,#7c3aed)",
     "linear-gradient(135deg,#7c3aed,#a855f7)",
-    "linear-gradient(135deg,#0891b2,#2563eb)",
-    "linear-gradient(135deg,#16a34a,#2563eb)",
+    "linear-gradient(135deg,#0891b2,#10b981)",
+    "linear-gradient(135deg,#16a34a,#10b981)",
     "linear-gradient(135deg,#d97706,#ea580c)",
   ];
   const getAvatarColor = (id) => avatarColors[(id || 0) % avatarColors.length];
 
   return (
-    <div style={{ display: "flex", height: "100vh", fontFamily: "'Segoe UI',sans-serif", backgroundColor: "#f8fafc", overflow: "hidden" }}>
+    <div style={{ display: "flex", height: "100vh", fontFamily: "'Segoe UI',sans-serif", backgroundColor:"#0f172a", overflow: "hidden" }}>
 
       {/* Sidebar */}
-      <div style={{ width: 320, borderRight: "1px solid #e2e8f0", display: "flex", flexDirection: "column", backgroundColor: "#fff", flexShrink: 0 }}>
+      <div style={{ width: 320, borderRight:"1px solid #334155", display: "flex", flexDirection: "column", backgroundColor:"#1e293b", flexShrink: 0 }}>
         <div style={{ background: theme.headerBg, padding: "24px 20px 20px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
             <div>
@@ -239,12 +239,12 @@ export default function Messages({ onNavigate }) {
 
         <div style={{ flex: 1, overflowY: "auto" }}>
           {loadingConvs && (
-            <div style={{ padding: 24, textAlign: "center", color: "#64748b", fontSize: 14 }}>Loading...</div>
+            <div style={{ padding: 24, textAlign: "center", color:"#94a3b8", fontSize: 14 }}>Loading...</div>
           )}
           {!loadingConvs && filtered.length === 0 && (
             <div style={{ padding: 32, textAlign: "center" }}>
               <div style={{ fontSize: 40, marginBottom: 12 }}>💬</div>
-              <p style={{ fontSize: 14, color: "#64748b", margin: 0 }}>No conversations yet</p>
+              <p style={{ fontSize: 14, color:"#94a3b8", margin: 0 }}>No conversations yet</p>
               <p style={{ fontSize: 12, color: "#94a3b8", marginTop: 4 }}>
                 {isFreelancer ? "Clients will message you once a proposal is accepted" : "Messages from freelancers will appear here"}
               </p>
@@ -257,8 +257,8 @@ export default function Messages({ onNavigate }) {
                 {getInitial(decodeURIComponent(initName || "F"))}
               </div>
               <div>
-                <div style={{ fontWeight: 700, fontSize: 14, color: "#111827" }}>{decodeURIComponent(initName || `User #${initFreelancer}`)}</div>
-                <div style={{ fontSize: 12, color: "#64748b" }}>New conversation</div>
+                <div style={{ fontWeight: 700, fontSize: 14, color:"#f8fafc" }}>{decodeURIComponent(initName || `User #${initFreelancer}`)}</div>
+                <div style={{ fontSize: 12, color:"#94a3b8" }}>New conversation</div>
               </div>
             </div>
           )}
@@ -275,12 +275,12 @@ export default function Messages({ onNavigate }) {
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <span style={{ fontWeight: 700, fontSize: 14, color: "#111827", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    <span style={{ fontWeight: 700, fontSize: 14, color:"#f8fafc", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {c.other_name || `User #${c.other_user_id}`}
                     </span>
                     <span style={{ fontSize: 11, color: "#94a3b8", flexShrink: 0, marginLeft: 8 }}>{formatDay(c.last_message_at)}</span>
                   </div>
-                  <div style={{ fontSize: 12, color: "#64748b", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 2 }}>
+                  <div style={{ fontSize: 12, color:"#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 2 }}>
                     {c.last_message || "No messages yet"}
                   </div>
                 </div>
@@ -300,17 +300,17 @@ export default function Messages({ onNavigate }) {
         {!activeConv ? (
           <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
             <div style={{ fontSize: 64 }}>💬</div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: "#111827", margin: 0 }}>Select a conversation</h3>
-            <p style={{ fontSize: 14, color: "#64748b", margin: 0 }}>Choose from the sidebar to start messaging</p>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color:"#f8fafc", margin: 0 }}>Select a conversation</h3>
+            <p style={{ fontSize: 14, color:"#94a3b8", margin: 0 }}>Choose from the sidebar to start messaging</p>
           </div>
         ) : (
           <>
-            <div style={{ backgroundColor: "#fff", borderBottom: "1px solid #e2e8f0", padding: "16px 24px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
+            <div style={{ backgroundColor:"#1e293b", borderBottom:"1px solid #334155", padding: "16px 24px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
               <div style={{ width: 44, height: 44, borderRadius: "50%", background: getAvatarColor(activeConv.other_user_id), display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 700, fontSize: 18, boxShadow: "0 2px 8px rgba(0,0,0,0.15)" }}>
                 {getInitial(activeConv.other_name)}
               </div>
               <div>
-                <div style={{ fontWeight: 700, fontSize: 16, color: "#111827" }}>
+                <div style={{ fontWeight: 700, fontSize: 16, color:"#f8fafc" }}>
                   {activeConv.other_name || `User #${activeConv.other_user_id}`}
                 </div>
                 <div style={{ fontSize: 12, color: connected ? "#16a34a" : "#94a3b8", display: "flex", alignItems: "center", gap: 4 }}>
@@ -320,14 +320,14 @@ export default function Messages({ onNavigate }) {
               </div>
             </div>
 
-            <div style={{ flex: 1, overflowY: "auto", padding: "24px", display: "flex", flexDirection: "column", gap: 4, backgroundColor: "#f8fafc" }}>
+            <div style={{ flex: 1, overflowY: "auto", padding: "24px", display: "flex", flexDirection: "column", gap: 4, backgroundColor:"#0f172a" }}>
               {loadingMsgs && (
-                <div style={{ textAlign: "center", color: "#64748b", fontSize: 14, padding: 24 }}>Loading messages...</div>
+                <div style={{ textAlign: "center", color:"#94a3b8", fontSize: 14, padding: 24 }}>Loading messages...</div>
               )}
               {!loadingMsgs && messages.length === 0 && (
                 <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 8, marginTop: 80 }}>
                   <div style={{ fontSize: 48 }}>👋</div>
-                  <p style={{ fontSize: 14, color: "#64748b", margin: 0 }}>No messages yet. Say hello!</p>
+                  <p style={{ fontSize: 14, color:"#94a3b8", margin: 0 }}>No messages yet. Say hello!</p>
                 </div>
               )}
               {messages.map((m, i) => {
@@ -374,7 +374,7 @@ export default function Messages({ onNavigate }) {
               <div ref={bottomRef} />
             </div>
 
-            <div style={{ backgroundColor: "#fff", borderTop: "1px solid #e2e8f0", padding: "16px 24px", display: "flex", gap: 12, alignItems: "flex-end" }}>
+            <div style={{ backgroundColor:"#1e293b", borderTop:"1px solid #334155", padding: "16px 24px", display: "flex", gap: 12, alignItems: "flex-end" }}>
               <textarea
                 ref={inputRef}
                 value={text}

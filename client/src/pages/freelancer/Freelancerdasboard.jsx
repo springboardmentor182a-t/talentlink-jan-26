@@ -67,7 +67,7 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
     <div style={{ display:"flex", minHeight:"100vh", fontFamily:"'Segoe UI',sans-serif" }}>
 
       {/* Sidebar */}
-      <aside style={{ width:250, minHeight:"100vh", position:"fixed", left:0, top:0, backgroundColor:"#fff", borderRight:"1px solid #e5e7eb", display:"flex", flexDirection:"column" }}>
+      <aside style={{ width:250, minHeight:"100vh", position:"fixed", left:0, top:0, backgroundColor:"#1e293b", borderRight:"1px solid #e5e7eb", display:"flex", flexDirection:"column" }}>
         <div style={{ padding:"20px", borderBottom:"1px solid #e5e7eb", display:"flex", alignItems:"center", gap:10 }}>
           <div style={{ width:36, height:36, background:"linear-gradient(135deg,#7c3aed,#a855f7)", borderRadius:8, display:"flex", alignItems:"center", justifyContent:"center", color:"#fff", boxShadow:"0 4px 12px rgba(124,58,237,0.3)" }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
@@ -109,7 +109,7 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
             {user?.full_name?.[0]?.toUpperCase() || user?.name?.[0]?.toUpperCase() || "F"}
           </div>
           <div style={{ flex:1, minWidth:0 }}>
-            <div style={{ fontSize:13, fontWeight:600, color:"#111827", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+            <div style={{ fontSize:13, fontWeight:600, color:"#f8fafc", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
               {user?.full_name || user?.name}
             </div>
             <div style={{ fontSize:11, color:"#9ca3af" }}>Freelancer</div>
@@ -124,30 +124,30 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
       </aside>
 
       {/* Main */}
-      <main style={{ marginLeft:250, flex:1, backgroundColor:"#f8fafc", minHeight:"100vh" }}>
+      <main style={{ marginLeft:250, flex:1, backgroundColor:"#0f172a", minHeight:"100vh" }}>
 
         {/* Topbar */}
-        <div style={{ backgroundColor:"#fff", borderBottom:"1px solid #e5e7eb", padding:"0 32px", height:64, display:"flex", justifyContent:"space-between", alignItems:"center", position:"sticky", top:0, zIndex:100, boxShadow:"0 1px 3px rgba(0,0,0,0.05)" }}>
+        <div style={{ backgroundColor:"#1e293b", borderBottom:"1px solid #e5e7eb", padding:"0 32px", height:64, display:"flex", justifyContent:"space-between", alignItems:"center", position:"sticky", top:0, zIndex:100, boxShadow:"0 1px 3px rgba(0,0,0,0.05)" }}>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <div style={{ width:8, height:8, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)" }} />
-            <span style={{ fontWeight:700, fontSize:15, color:"#111827" }}>
+            <span style={{ fontWeight:700, fontSize:15, color:"#f8fafc" }}>
               {navItems.find(n => n.key === activePage)?.label}
             </span>
           </div>
 
           <div style={{ display:"flex", alignItems:"center", gap:12 }}>
             <NotificationBell theme="purple" />
-            <div style={{ display:"flex", alignItems:"center", gap:10, backgroundColor:"#f8fafc", padding:"6px 14px", borderRadius:20, border:"1px solid #e2e8f0" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10, backgroundColor:"#0f172a", padding:"6px 14px", borderRadius:20, border:"1px solid #334155" }}>
               <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:13 }}>
                 {user?.full_name?.[0]?.toUpperCase() || user?.name?.[0]?.toUpperCase() || "F"}
               </div>
               <div>
-                <div style={{ fontWeight:600, fontSize:13, color:"#111827" }}>{user?.full_name || user?.name}</div>
-                <div style={{ fontSize:11, color:"#64748b" }}>Freelancer</div>
+                <div style={{ fontWeight:600, fontSize:13, color:"#f8fafc" }}>{user?.full_name || user?.name}</div>
+                <div style={{ fontSize:11, color:"#94a3b8" }}>Freelancer</div>
               </div>
             </div>
             <button onClick={handleLogout}
-              style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid #e2e8f0", borderRadius:8, cursor:"pointer", fontSize:13, color:"#64748b", background:"white", fontFamily:"inherit", transition:"all 0.15s" }}
+              style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid #334155", borderRadius:8, cursor:"pointer", fontSize:13, color:"#94a3b8", background:"#1e293b", fontFamily:"inherit", transition:"all 0.15s" }}
               onMouseEnter={e => { e.currentTarget.style.borderColor="#7c3aed"; e.currentTarget.style.color="#7c3aed"; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor="#e2e8f0"; e.currentTarget.style.color="#64748b"; }}>
               <LogoutIcon /> Logout

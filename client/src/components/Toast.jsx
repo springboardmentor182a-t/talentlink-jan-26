@@ -11,7 +11,7 @@ const typeIcon = {
 };
 
 const typeColor = {
-  proposal:  { bg: "#eff6ff", border: "#2563eb", text: "#1e40af" },
+  proposal:  { bg: "#ecfdf5", border: "#10b981", text: "#1e40af" },
   message:   { bg: "#f5f3ff", border: "#7c3aed", text: "#5b21b6" },
   contract:  { bg: "#f0fdf4", border: "#16a34a", text: "#15803d" },
   milestone: { bg: "#fffbeb", border: "#d97706", text: "#b45309" },
@@ -61,7 +61,7 @@ export default function Toast() {
               <p style={{ fontSize: 13, fontWeight: 700, color: colors.text, margin: 0, lineHeight: 1.4 }}>
                 {toast.title}
               </p>
-              <p style={{ fontSize: 12, color: "#64748b", margin: "3px 0 0", lineHeight: 1.4 }}>
+              <p style={{ fontSize: 12, color:"#94a3b8", margin: "3px 0 0", lineHeight: 1.4 }}>
                 {toast.message}
               </p>
             </div>

@@ -1,21 +1,21 @@
 :root {
   --font-size: 16px;
-  --background: #e8eefb;
-  --foreground: #1a1a1a;
-  --card: #ffffff;
-  --card-foreground: #1a1a1a;
-  --primary: #1f63ff;
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+  --primary: #10b981;
   --primary-foreground: #ffffff;
-  --secondary: #030213;
+  --secondary: #064e3b;
   --secondary-foreground: #ffffff;
-  --accent: #7c3aed;
+  --accent: #06b6d4;
   --accent-foreground: #ffffff;
-  --muted: #f0f0f0;
-  --muted-foreground: #717182;
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
   --success: #10b981;
   --success-foreground: #ffffff;
-  --border: #d0d5e8;
-  --input-background: #f5f7fb;
+  --border: #334155;
+  --input-background: #0f172a;
   --radius: 12px;
 }
 
@@ -33,7 +33,7 @@ html {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   background-color: var(--background);
   color: var(--foreground);
   line-height: 1.6;

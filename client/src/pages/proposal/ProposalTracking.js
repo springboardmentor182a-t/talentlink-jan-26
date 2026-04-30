@@ -31,7 +31,7 @@ export default function ProposalTracking() {
       .finally(() => setLoading(false));
   }, [user]);
 
-  if (authLoading) return <div style={{ padding:32, color:"#64748b" }}>Loading...</div>;
+  if (authLoading) return <div style={{ padding:32, color:"#94a3b8" }}>Loading...</div>;
   if (!user) return <Navigate to="/freelancer/login" replace />;
 
   const counts = {
@@ -62,9 +62,9 @@ export default function ProposalTracking() {
             { label:"Accepted", val:counts.accepted, color:"#16a34a", bg:"#f0fdf4", icon:"✅" },
             { label:"Rejected", val:counts.rejected, color:"#dc2626", bg:"#fef2f2", icon:"❌" },
           ].map(s => (
-            <div key={s.label} style={{ backgroundColor:"#fff", borderRadius:16, padding:"22px 24px", display:"flex", justifyContent:"space-between", alignItems:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+            <div key={s.label} style={{ backgroundColor:"#1e293b", borderRadius:16, padding:"22px 24px", display:"flex", justifyContent:"space-between", alignItems:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #334155" }}>
               <div>
-                <div style={{ fontSize:12, color:"#64748b", marginBottom:6, textTransform:"uppercase", letterSpacing:"0.5px" }}>{s.label}</div>
+                <div style={{ fontSize:12, color:"#94a3b8", marginBottom:6, textTransform:"uppercase", letterSpacing:"0.5px" }}>{s.label}</div>
                 <div style={{ fontSize:32, fontWeight:800, color:s.color }}>{s.val}</div>
               </div>
               <div style={{ width:48, height:48, borderRadius:14, backgroundColor:s.bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24 }}>{s.icon}</div>
@@ -72,13 +72,13 @@ export default function ProposalTracking() {
           ))}
         </div>
 
-        {loading && <p style={{ color:"#64748b" }}>Loading proposals...</p>}
+        {loading && <p style={{ color:"#94a3b8" }}>Loading proposals...</p>}
 
         {!loading && proposals.length === 0 && (
-          <div style={{ backgroundColor:"#fff", borderRadius:16, padding:"60px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+          <div style={{ backgroundColor:"#1e293b", borderRadius:16, padding:"60px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #334155" }}>
             <div style={{ fontSize:56, marginBottom:16 }}>📄</div>
-            <h3 style={{ fontSize:18, fontWeight:700, color:"#111827", marginBottom:8 }}>No proposals yet</h3>
-            <p style={{ color:"#64748b", fontSize:14, marginBottom:20 }}>Browse projects and submit your first proposal!</p>
+            <h3 style={{ fontSize:18, fontWeight:700, color:"#f8fafc", marginBottom:8 }}>No proposals yet</h3>
+            <p style={{ color:"#94a3b8", fontSize:14, marginBottom:20 }}>Browse projects and submit your first proposal!</p>
             <button onClick={() => navigate("/freelancer/browse")}
               style={{ padding:"12px 28px", background:"linear-gradient(135deg,#7c3aed,#a855f7)", color:"white", border:"none", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14, boxShadow:"0 4px 12px rgba(124,58,237,0.3)" }}>
               Browse Projects →
@@ -90,7 +90,7 @@ export default function ProposalTracking() {
           const projectTitle = p.project_title || `Project #${p.project_id}`;
           const initials = projectTitle.charAt(0).toUpperCase();
           return (
-            <div key={p.id} style={{ backgroundColor:"#fff", borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}
+            <div key={p.id} style={{ backgroundColor:"#1e293b", borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #334155" }}
               onMouseEnter={e => e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.1)"}
               onMouseLeave={e => e.currentTarget.style.boxShadow="0 1px 3px rgba(0,0,0,0.06)"}>
 
@@ -100,8 +100,8 @@ export default function ProposalTracking() {
                     {initials}
                   </div>
                   <div>
-                    <div style={{ fontWeight:700, fontSize:15, color:"#111827" }}>{projectTitle}</div>
-                    <div style={{ fontSize:12, color:"#64748b", marginTop:2 }}>
+                    <div style={{ fontWeight:700, fontSize:15, color:"#f8fafc" }}>{projectTitle}</div>
+                    <div style={{ fontSize:12, color:"#94a3b8", marginTop:2 }}>
                       Submitted {p.created_at ? new Date(p.created_at).toLocaleDateString() : "—"}
                     </div>
                   </div>
@@ -110,7 +110,7 @@ export default function ProposalTracking() {
               </div>
 
               {p.cover_letter && (
-                <div style={{ fontSize:14, color:"#374151", lineHeight:1.8, backgroundColor:"#f8fafc", padding:"14px 16px", borderRadius:10, marginBottom:14, border:"1px solid #e2e8f0" }}>
+                <div style={{ fontSize:14, color:"#e2e8f0", lineHeight:1.8, backgroundColor:"#0f172a", padding:"14px 16px", borderRadius:10, marginBottom:14, border:"1px solid #334155" }}>
                   {p.cover_letter}
                 </div>
               )}
@@ -119,15 +119,15 @@ export default function ProposalTracking() {
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                   <div style={{ width:32, height:32, borderRadius:8, backgroundColor:"#f5f3ff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14 }}>💰</div>
                   <div>
-                    <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px" }}>Budget</div>
-                    <strong style={{ color:"#111827", fontSize:14 }}>${p.proposed_budget}</strong>
+                    <div style={{ fontSize:11, color:"#94a3b8", textTransform:"uppercase", letterSpacing:"0.5px" }}>Budget</div>
+                    <strong style={{ color:"#f8fafc", fontSize:14 }}>${p.proposed_budget}</strong>
                   </div>
                 </div>
                 <div style={{ display:"flex", alignItems:"center", gap:8 }}>
                   <div style={{ width:32, height:32, borderRadius:8, backgroundColor:"#f0fdf4", display:"flex", alignItems:"center", justifyContent:"center", fontSize:14 }}>🕐</div>
                   <div>
-                    <div style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.5px" }}>Delivery</div>
-                    <strong style={{ color:"#111827", fontSize:14 }}>{p.delivery_time}</strong>
+                    <div style={{ fontSize:11, color:"#94a3b8", textTransform:"uppercase", letterSpacing:"0.5px" }}>Delivery</div>
+                    <strong style={{ color:"#f8fafc", fontSize:14 }}>{p.delivery_time}</strong>
                   </div>
                 </div>
               </div>

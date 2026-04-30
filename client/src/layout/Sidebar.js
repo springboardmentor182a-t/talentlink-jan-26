@@ -22,14 +22,14 @@ const Sidebar = () => {
   const handleLogout = () => { logout(); navigate('/'); };
 
   return (
-    <aside style={{ width:250, height:"100vh", position:"fixed", left:0, top:0, display:"flex", flexDirection:"column", backgroundColor:"#fff", borderRight:"1px solid #e2e8f0" }}>
+    <aside style={{ width:250, height:"100vh", position:"fixed", left:0, top:0, display:"flex", flexDirection:"column", backgroundColor:"#0f172a", borderRight:"1px solid #1e293b" }}>
 
       {/* Logo */}
-      <div style={{ padding:"20px 24px", borderBottom:"1px solid #e2e8f0", display:"flex", alignItems:"center", gap:10 }}>
-        <div style={{ width:36, height:36, background:"linear-gradient(135deg,#1e3a5f,#2563eb)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", color:"white", boxShadow:"0 4px 12px rgba(37,99,235,0.3)", flexShrink:0 }}>
+      <div style={{ padding:"20px 24px", borderBottom:"1px solid #1e293b", display:"flex", alignItems:"center", gap:10 }}>
+        <div style={{ width:36, height:36, background:"linear-gradient(135deg,#064e3b,#10b981)", borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", color:"white", boxShadow:"0 4px 12px rgba(16,185,129,0.3)", flexShrink:0 }}>
           <BriefcaseIcon />
         </div>
-        <span style={{ fontWeight:800, fontSize:18, background:"linear-gradient(135deg,#1e3a5f,#2563eb)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", letterSpacing:"-0.5px" }}>
+        <span style={{ fontWeight:800, fontSize:18, background:"linear-gradient(135deg,#064e3b,#10b981)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", letterSpacing:"-0.5px" }}>
           TalentLink
         </span>
       </div>
@@ -45,11 +45,11 @@ const Sidebar = () => {
                   display:"flex", alignItems:"center", gap:12,
                   padding:"11px 14px", borderRadius:8,
                   textDecoration:"none",
-                  color: isActive ? "#2563eb" : "#64748b",
-                  backgroundColor: isActive ? "#eff6ff" : "transparent",
+                  color: isActive ? "#10b981" : "#94a3b8",
+                  backgroundColor: isActive ? "rgba(16, 185, 129, 0.1)" : "transparent",
                   fontWeight: isActive ? 600 : 400,
                   fontSize:14,
-                  borderLeft: isActive ? "3px solid #2563eb" : "3px solid transparent",
+                  borderLeft: isActive ? "3px solid #10b981" : "3px solid transparent",
                   transition:"all 0.15s"
                 })}>
                 <item.icon size={20} />
@@ -57,7 +57,7 @@ const Sidebar = () => {
 
                 {/* Badge — context keeps this accurate automatically */}
                 {item.path === "/messages" && msgUnreadCount > 0 && (
-                  <span style={{ background:"linear-gradient(135deg,#2563eb,#3b82f6)", color:"white", borderRadius:"50%", width:20, height:20, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700 }}>
+                  <span style={{ background:"linear-gradient(135deg,#10b981,#06b6d4)", color:"white", borderRadius:"50%", width:20, height:20, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700 }}>
                     {msgUnreadCount > 99 ? "99+" : msgUnreadCount}
                   </span>
                 )}
@@ -68,19 +68,19 @@ const Sidebar = () => {
       </nav>
 
       {/* User */}
-      <div style={{ padding:"16px 20px", borderTop:"1px solid #e2e8f0", display:"flex", alignItems:"center", gap:10 }}>
-        <div style={{ width:36, height:36, borderRadius:"50%", background:"linear-gradient(135deg,#1e3a5f,#2563eb)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:15, flexShrink:0, boxShadow:"0 2px 8px rgba(37,99,235,0.3)" }}>
+      <div style={{ padding:"16px 20px", borderTop:"1px solid #1e293b", display:"flex", alignItems:"center", gap:10 }}>
+        <div style={{ width:36, height:36, borderRadius:"50%", background:"linear-gradient(135deg,#064e3b,#10b981)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:15, flexShrink:0, boxShadow:"0 2px 8px rgba(16,185,129,0.3)" }}>
           {user?.full_name?.[0]?.toUpperCase() || user?.name?.[0]?.toUpperCase() || "C"}
         </div>
         <div style={{ flex:1, minWidth:0 }}>
-          <div style={{ fontSize:13, fontWeight:600, color:"#111827", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+          <div style={{ fontSize:13, fontWeight:600, color:"#f8fafc", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
             {user?.full_name || user?.name || "Client"}
           </div>
-          <div style={{ fontSize:11, color:"#9ca3af" }}>Client</div>
+          <div style={{ fontSize:11, color:"#94a3b8" }}>Client</div>
         </div>
         <button onClick={handleLogout} title="Logout"
           style={{ background:"none", border:"none", cursor:"pointer", color:"#9ca3af", padding:4, display:"flex", alignItems:"center" }}
-          onMouseEnter={e => e.currentTarget.style.color="#2563eb"}
+          onMouseEnter={e => e.currentTarget.style.color="#10b981"}
           onMouseLeave={e => e.currentTarget.style.color="#9ca3af"}>
           <LogOut size={18} />
         </button>

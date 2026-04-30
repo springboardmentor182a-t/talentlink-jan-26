@@ -11,7 +11,7 @@ const typeIcon = {
 };
 
 const typeColor = {
-  proposal:  "#2563eb",
+  proposal:  "#10b981",
   message:   "#7c3aed",
   contract:  "#16a34a",
   milestone: "#d97706",
@@ -24,7 +24,7 @@ export default function NotificationBell({ theme = "blue" }) {
   const [open, setOpen] = useState(false);
   const dropdownRef     = useRef(null);
 
-  const accentColor = theme === "purple" ? "#7c3aed" : "#2563eb";
+  const accentColor = theme === "purple" ? "#7c3aed" : "#10b981";
 
   // ✅ Filter out message notifications from bell
   const bellNotifications = notifications.filter(n => n.type !== "message");
@@ -72,13 +72,13 @@ export default function NotificationBell({ theme = "blue" }) {
 
       {/* Dropdown */}
       {open && (
-        <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, width: 360, backgroundColor: "white", borderRadius: 16, boxShadow: "0 8px 40px rgba(0,0,0,0.15)", border: "1px solid #e2e8f0", zIndex: 1000, overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, width: 360, backgroundColor:"#1e293b", borderRadius: 16, boxShadow: "0 8px 40px rgba(0,0,0,0.15)", border:"1px solid #334155", zIndex: 1000, overflow: "hidden" }}>
 
           {/* Header */}
           <div style={{ padding: "16px 20px", borderBottom: "1px solid #f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: "#111827", margin: 0 }}>Notifications</h3>
-              <p style={{ fontSize: 12, color: "#64748b", margin: "2px 0 0" }}>{bellUnreadCount} unread</p>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color:"#f8fafc", margin: 0 }}>Notifications</h3>
+              <p style={{ fontSize: 12, color:"#94a3b8", margin: "2px 0 0" }}>{bellUnreadCount} unread</p>
             </div>
             {bellUnreadCount > 0 && (
               <button
@@ -94,7 +94,7 @@ export default function NotificationBell({ theme = "blue" }) {
             {bellNotifications.length === 0 ? (
               <div style={{ padding: 40, textAlign: "center" }}>
                 <div style={{ fontSize: 40, marginBottom: 12 }}>🔔</div>
-                <p style={{ fontSize: 14, color: "#64748b", margin: 0 }}>No notifications yet</p>
+                <p style={{ fontSize: 14, color:"#94a3b8", margin: 0 }}>No notifications yet</p>
               </div>
             ) : (
               bellNotifications.map(n => (
@@ -111,12 +111,12 @@ export default function NotificationBell({ theme = "blue" }) {
 
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-                      <p style={{ fontSize: 13, fontWeight: n.is_read ? 500 : 700, color: "#111827", margin: 0, lineHeight: 1.4 }}>{n.title}</p>
+                      <p style={{ fontSize: 13, fontWeight: n.is_read ? 500 : 700, color:"#f8fafc", margin: 0, lineHeight: 1.4 }}>{n.title}</p>
                       {!n.is_read && (
                         <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: accentColor, flexShrink: 0, marginTop: 4 }} />
                       )}
                     </div>
-                    <p style={{ fontSize: 12, color: "#64748b", margin: "3px 0 0", lineHeight: 1.4 }}>{n.message}</p>
+                    <p style={{ fontSize: 12, color:"#94a3b8", margin: "3px 0 0", lineHeight: 1.4 }}>{n.message}</p>
                     <p style={{ fontSize: 11, color: "#94a3b8", margin: "4px 0 0" }}>{formatTime(n.created_at)}</p>
                   </div>
 

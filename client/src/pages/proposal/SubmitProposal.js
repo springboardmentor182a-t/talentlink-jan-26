@@ -112,13 +112,13 @@ export default function SubmitProposal() {
   const projectLabel = project?.title || `Project #${projectId}`;
 
   return (
-    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#f8fafc", minHeight:"100vh" }}>
+    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#0f172a", minHeight:"100vh" }}>
 
       {/* Topbar */}
-      <div style={{ backgroundColor:"#fff", padding:"0 32px", display:"flex", justifyContent:"space-between", alignItems:"center", borderBottom:"1px solid #e2e8f0", height:64, position:"sticky", top:0, zIndex:100, boxShadow:"0 1px 3px rgba(0,0,0,0.05)" }}>
+      <div style={{ backgroundColor:"#1e293b", padding:"0 32px", display:"flex", justifyContent:"space-between", alignItems:"center", borderBottom:"1px solid #334155", height:64, position:"sticky", top:0, zIndex:100, boxShadow:"0 1px 3px rgba(0,0,0,0.05)" }}>
         <div style={{ display:"flex", alignItems:"center", gap:12 }}>
           <button onClick={() => navigate("/proposal-tracking")}
-            style={{ background:"none", border:"none", fontSize:14, color:"#64748b", cursor:"pointer", display:"flex", alignItems:"center", gap:6, padding:"6px 12px", borderRadius:8 }}
+            style={{ background:"none", border:"none", fontSize:14, color:"#94a3b8", cursor:"pointer", display:"flex", alignItems:"center", gap:6, padding:"6px 12px", borderRadius:8 }}
             onMouseEnter={e => e.currentTarget.style.backgroundColor="#f1f5f9"}
             onMouseLeave={e => e.currentTarget.style.backgroundColor="transparent"}>
             ← Back
@@ -126,21 +126,21 @@ export default function SubmitProposal() {
           <div style={{ width:1, height:24, backgroundColor:"#e2e8f0" }} />
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <div style={{ width:8, height:8, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)" }} />
-            <span style={{ fontSize:15, fontWeight:700, color:"#111827" }}>Submit Proposal</span>
+            <span style={{ fontSize:15, fontWeight:700, color:"#f8fafc" }}>Submit Proposal</span>
           </div>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:10, backgroundColor:"#f8fafc", padding:"6px 14px", borderRadius:20, border:"1px solid #e2e8f0" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:10, backgroundColor:"#0f172a", padding:"6px 14px", borderRadius:20, border:"1px solid #334155" }}>
             <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#7c3aed,#a855f7)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:13 }}>
               {(user?.name || "F").charAt(0).toUpperCase()}
             </div>
             <div>
-              <div style={{ fontWeight:600, fontSize:13, color:"#111827" }}>{user.name}</div>
-              <div style={{ fontSize:11, color:"#64748b", textTransform:"capitalize" }}>{role}</div>
+              <div style={{ fontWeight:600, fontSize:13, color:"#f8fafc" }}>{user.name}</div>
+              <div style={{ fontSize:11, color:"#94a3b8", textTransform:"capitalize" }}>{role}</div>
             </div>
           </div>
           <button onClick={() => { logout(); navigate("/"); }}
-            style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid #e2e8f0", borderRadius:8, cursor:"pointer", fontSize:13, color:"#64748b", background:"white" }}>
+            style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid #334155", borderRadius:8, cursor:"pointer", fontSize:13, color:"#94a3b8", background:"#1e293b" }}>
             Logout
           </button>
         </div>
@@ -160,7 +160,7 @@ export default function SubmitProposal() {
         <div style={{ display:"grid", gridTemplateColumns:"1fr 300px", gap:24, alignItems:"start" }}>
 
           {/* Form */}
-          <div style={{ backgroundColor:"#fff", borderRadius:16, padding:32, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+          <div style={{ backgroundColor:"#1e293b", borderRadius:16, padding:32, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #334155" }}>
 
             <div style={{ marginBottom:24 }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:6 }}>
@@ -191,7 +191,7 @@ export default function SubmitProposal() {
                 <div style={{ marginTop:12, padding:14, backgroundColor:"#faf5ff", borderRadius:10, border:"1px solid #ddd6fe" }}>
                   <div style={{ fontSize:12, fontWeight:700, color:"#7c3aed", marginBottom:8 }}>✨ AI Key Points Used</div>
                   {keyPoints.map((point, i) => (
-                    <div key={i} style={{ fontSize:12, color:"#374151", marginBottom:4, display:"flex", gap:6 }}>
+                    <div key={i} style={{ fontSize:12, color:"#e2e8f0", marginBottom:4, display:"flex", gap:6 }}>
                       <span style={{ color:"#7c3aed" }}>•</span> {point}
                     </div>
                   ))}
@@ -212,7 +212,7 @@ export default function SubmitProposal() {
                   </button>
                 </div>
                 <div style={{ position:"relative" }}>
-                  <span style={{ position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", color:"#64748b", fontWeight:600 }}>$</span>
+                  <span style={{ position:"absolute", left:14, top:"50%", transform:"translateY(-50%)", color:"#94a3b8", fontWeight:600 }}>$</span>
                   <input style={{ ...inp, paddingLeft:26, borderColor: budget ? "#7c3aed" : "#e2e8f0" }} type="number" min="1" placeholder="5000" value={budget} onChange={e => setBudget(e.target.value)} />
                 </div>
                 {errors.budget && <p style={{ fontSize:12, color:"#ef4444", marginTop:4 }}>{errors.budget}</p>}
@@ -222,10 +222,10 @@ export default function SubmitProposal() {
                   <div style={{ marginTop:8, padding:10, backgroundColor:"#f0fdf4", borderRadius:8, border:"1px solid #86efac" }}>
                     <div style={{ fontSize:11, fontWeight:700, color:"#16a34a", marginBottom:4 }}>🤖 AI Budget Suggestion</div>
                     <div style={{ display:"flex", gap:10, marginBottom:4 }}>
-                      <span style={{ fontSize:11, color:"#374151" }}>Min: <strong style={{ color:"#16a34a" }}>${budgetEstimate.min}</strong></span>
-                      <span style={{ fontSize:11, color:"#374151" }}>Max: <strong style={{ color:"#dc2626" }}>${budgetEstimate.max}</strong></span>
+                      <span style={{ fontSize:11, color:"#e2e8f0" }}>Min: <strong style={{ color:"#16a34a" }}>${budgetEstimate.min}</strong></span>
+                      <span style={{ fontSize:11, color:"#e2e8f0" }}>Max: <strong style={{ color:"#dc2626" }}>${budgetEstimate.max}</strong></span>
                     </div>
-                    <div style={{ fontSize:11, color:"#64748b" }}>{budgetEstimate.reason}</div>
+                    <div style={{ fontSize:11, color:"#94a3b8" }}>{budgetEstimate.reason}</div>
                   </div>
                 )}
               </div>
@@ -248,10 +248,10 @@ export default function SubmitProposal() {
 
           {/* Tips Panel */}
           <div style={{ display:"flex", flexDirection:"column", gap:16, position:"sticky", top:80 }}>
-            <div style={{ backgroundColor:"#fff", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+            <div style={{ backgroundColor:"#1e293b", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #334155" }}>
               <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:16 }}>
                 <span style={{ fontSize:18 }}>💡</span>
-                <h3 style={{ fontSize:14, fontWeight:700, color:"#111827", margin:0 }}>Tips for Winning</h3>
+                <h3 style={{ fontSize:14, fontWeight:700, color:"#f8fafc", margin:0 }}>Tips for Winning</h3>
               </div>
               {[
                 { icon:"✍️", text:"Personalize your cover letter for each project" },
@@ -260,7 +260,7 @@ export default function SubmitProposal() {
                 { icon:"📋", text:"Mention specific skills relevant to the project" },
                 { icon:"🤝", text:"Show enthusiasm and professionalism" },
               ].map((t, i) => (
-                <div key={i} style={{ display:"flex", gap:10, marginBottom:12, fontSize:13, color:"#374151", lineHeight:1.5 }}>
+                <div key={i} style={{ display:"flex", gap:10, marginBottom:12, fontSize:13, color:"#e2e8f0", lineHeight:1.5 }}>
                   <span style={{ flexShrink:0 }}>{t.icon}</span>
                   {t.text}
                 </div>
@@ -295,7 +295,7 @@ export default function SubmitProposal() {
               </div>
             </div>
 
-            <div style={{ background:"linear-gradient(135deg,#1e3a5f,#2563eb)", borderRadius:16, padding:24, color:"white" }}>
+            <div style={{ background:"linear-gradient(135deg,#064e3b,#10b981)", borderRadius:16, padding:24, color:"white" }}>
               <h3 style={{ fontSize:14, fontWeight:700, margin:"0 0 12px" }}>📊 Proposal Stats</h3>
               {[
                 { label:"Avg Response Time", val:"24 hrs" },
@@ -315,5 +315,5 @@ export default function SubmitProposal() {
   );
 }
 
-const lbl = { display:"block", fontSize:13, fontWeight:600, color:"#374151", marginBottom:0 };
-const inp = { width:"100%", padding:"10px 14px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", backgroundColor:"#fff", boxSizing:"border-box", transition:"border-color 0.2s" };
+const lbl = { display:"block", fontSize:13, fontWeight:600, color:"#e2e8f0", marginBottom:0 };
+const inp = { width:"100%", padding:"10px 14px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", backgroundColor:"#1e293b", boxSizing:"border-box", transition:"border-color 0.2s" };

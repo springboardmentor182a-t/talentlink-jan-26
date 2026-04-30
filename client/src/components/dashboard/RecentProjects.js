@@ -6,11 +6,11 @@ const RecentProjects = ({ projects }) => {
             case 'open':
                 return { backgroundColor: '#dcfce7', color: '#166534' }; // Green
             case 'in progress':
-                return { backgroundColor: '#dbeafe', color: '#1e40af' }; // Blue
+                return { backgroundColor: '#d1fae5', color: '#1e40af' }; // Blue
             case 'completed':
-                return { backgroundColor: '#f3f4f6', color: '#374151' }; // Gray
+                return { backgroundColor: '#f3f4f6', color:"#e2e8f0" }; // Gray
             default:
-                return { backgroundColor: '#f3f4f6', color: '#374151' };
+                return { backgroundColor: '#f3f4f6', color:"#e2e8f0" };
         }
     };
 

@@ -8,14 +8,8 @@ import NotificationBell from "./components/NotificationBell";
 import AiChat from "./components/AiChat";
 
 // Auth
-import ChooseRole       from "./pages/auth/ChooseRole";
-import ClientLogin      from "./pages/auth/ClientLogin";
-import ClientSignup     from "./pages/auth/ClientSignup";
-import FreelancerLogin  from "./pages/auth/FreelancerLogin";
-import FreelancerSignup from "./pages/auth/FreelancerSignup";
-import ForgotPassword   from "./pages/auth/ForgotPassword";
-import OAuthCallback    from "./pages/auth/OAuthCallback";
-import ResetPassword    from "./pages/auth/ResetPassword";
+import Login  from "./pages/login";
+import Signup from "./pages/signup";
 
 // Proposals
 import SubmitProposal   from "./pages/proposal/SubmitProposal";
@@ -72,8 +66,8 @@ function ClientTopbar() {
 
   return (
     <div style={{
-      backgroundColor: "#fff",
-      borderBottom:    "1px solid #e2e8f0",
+      backgroundColor:"#1e293b",
+      borderBottom:"1px solid #334155",
       padding:         "0 32px",
       height:          64,
       display:         "flex",
@@ -85,25 +79,25 @@ function ClientTopbar() {
       boxShadow:       "0 1px 3px rgba(0,0,0,0.05)",
     }}>
       <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-        <div style={{ width:8, height:8, borderRadius:"50%", background:"linear-gradient(135deg,#1e3a5f,#2563eb)" }} />
-        <span style={{ fontWeight:700, fontSize:15, color:"#111827" }}>{label}</span>
+        <div style={{ width:8, height:8, borderRadius:"50%", background:"linear-gradient(135deg,#064e3b,#10b981)" }} />
+        <span style={{ fontWeight:700, fontSize:15, color:"#f8fafc" }}>{label}</span>
       </div>
 
       <div style={{ display:"flex", alignItems:"center", gap:12 }}>
         <NotificationBell theme="blue" />
-        <div style={{ display:"flex", alignItems:"center", gap:10, backgroundColor:"#f8fafc", padding:"6px 14px", borderRadius:20, border:"1px solid #e2e8f0" }}>
-          <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#1e3a5f,#2563eb)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:13, boxShadow:"0 2px 8px rgba(37,99,235,0.2)", flexShrink:0 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10, backgroundColor:"#0f172a", padding:"6px 14px", borderRadius:20, border:"1px solid #334155" }}>
+          <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#064e3b,#10b981)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:13, boxShadow:"0 2px 8px rgba(16,185,129,0.2)", flexShrink:0 }}>
             {(user?.name || "C").charAt(0).toUpperCase()}
           </div>
           <div style={{ lineHeight:1.3 }}>
-            <div style={{ fontWeight:600, fontSize:13, color:"#111827" }}>{user?.name || "Client"}</div>
-            <div style={{ fontSize:11, color:"#64748b" }}>Client</div>
+            <div style={{ fontWeight:600, fontSize:13, color:"#f8fafc" }}>{user?.name || "Client"}</div>
+            <div style={{ fontSize:11, color:"#94a3b8" }}>Client</div>
           </div>
         </div>
         <button
           onClick={() => { logout(); navigate("/"); }}
-          style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid #e2e8f0", borderRadius:8, cursor:"pointer", fontSize:13, color:"#64748b", background:"white", fontFamily:"inherit", fontWeight:500, transition:"all 0.15s" }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor="#2563eb"; e.currentTarget.style.color="#2563eb"; }}
+          style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid #334155", borderRadius:8, cursor:"pointer", fontSize:13, color:"#94a3b8", background:"#1e293b", fontFamily:"inherit", fontWeight:500, transition:"all 0.15s" }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor="#10b981"; e.currentTarget.style.color="#10b981"; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor="#e2e8f0"; e.currentTarget.style.color="#64748b"; }}>
           <LogOut size={15} />
           Logout
@@ -117,7 +111,7 @@ function DashboardLayout({ children }) {
   return (
     <div style={{ display:"flex" }}>
       <Sidebar />
-      <main style={{ flex:1, marginLeft:250, minHeight:"100vh", backgroundColor:"#f8fafc" }}>
+      <main style={{ flex:1, marginLeft:250, minHeight:"100vh", backgroundColor:"#0f172a" }}>
         <ClientTopbar />
         {children}
       </main>
@@ -137,14 +131,9 @@ function AppRoutes() {
     <>
       <Routes>
         {/* Auth */}
-        <Route path="/"                  element={<ChooseRole />} />
-        <Route path="/client/login"      element={<ClientLogin />} />
-        <Route path="/client/signup"     element={<ClientSignup />} />
-        <Route path="/freelancer/login"  element={<FreelancerLogin />} />
-        <Route path="/freelancer/signup" element={<FreelancerSignup />} />
-        <Route path="/forgot-password"   element={<ForgotPassword />} />
-        <Route path="/reset-password"    element={<ResetPassword />} />
-        <Route path="/oauth/callback"    element={<OAuthCallback />} />
+        <Route path="/"                  element={<Login />} />
+        <Route path="/login"             element={<Login />} />
+        <Route path="/signup"            element={<Signup />} />
 
         {/* Freelancer */}
         <Route path="/freelancer/dashboard" element={

@@ -218,7 +218,7 @@ const styles = {
     width: "360px",
     height: "500px",
     borderRadius: "16px",
-    background: "#fff",
+    background:"#1e293b",
     boxShadow: "0 8px 40px rgba(0,0,0,0.18)",
     display: "flex",
     flexDirection: "column",
@@ -285,7 +285,7 @@ const styles = {
     borderBottomRightRadius: "4px",
   },
   botBubble: {
-    background: "#fff",
+    background:"#1e293b",
     color: "#1e1e2e",
     border: "1px solid #e5e7eb",
     borderBottomLeftRadius: "4px",
@@ -310,7 +310,7 @@ const styles = {
     gap: "8px",
     padding: "12px",
     borderTop: "1px solid #e5e7eb",
-    background: "#fff",
+    background:"#1e293b",
     alignItems: "flex-end",
   },
   textarea: {

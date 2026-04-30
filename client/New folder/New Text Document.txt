@@ -1,0 +1,3 @@
+Client: testclient@talentlink.com / password123
+
+Freelancer: testfreelancer@talentlink.com / password123

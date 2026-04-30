@@ -8,7 +8,7 @@ export default function Profile({ onNavigate }) {
 
   const theme = isFreelancer
     ? { headerBg:"linear-gradient(135deg,#3b0764 0%,#7c3aed 40%,#a855f7 100%)", accent:"#7c3aed", accentLight:"#f5f3ff", btn:"linear-gradient(135deg,#7c3aed,#a855f7)", shadow:"rgba(124,58,237,0.3)" }
-    : { headerBg:"linear-gradient(135deg,#1e3a5f 0%,#2563eb 50%,#3b82f6 100%)", accent:"#2563eb", accentLight:"#eff6ff", btn:"linear-gradient(135deg,#2563eb,#3b82f6)", shadow:"rgba(37,99,235,0.3)" };
+    : { headerBg:"linear-gradient(135deg,#064e3b 0%,#10b981 50%,#06b6d4 100%)", accent:"#10b981", accentLight:"#ecfdf5", btn:"linear-gradient(135deg,#10b981,#06b6d4)", shadow:"rgba(16,185,129,0.3)" };
 
   const [profile,  setProfile]  = useState(null);
   const [editing,  setEditing]  = useState(false);
@@ -99,7 +99,7 @@ export default function Profile({ onNavigate }) {
 
   if (loading) return (
     <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"60vh" }}>
-      <p style={{ color:"#64748b" }}>Loading profile...</p>
+      <p style={{ color:"#94a3b8" }}>Loading profile...</p>
     </div>
   );
 
@@ -108,7 +108,7 @@ export default function Profile({ onNavigate }) {
   const editSkillList = (form.skills || "").split(",").map(s => s.trim()).filter(Boolean);
 
   return (
-    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#f8fafc", minHeight:"100vh" }}>
+    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#0f172a", minHeight:"100vh" }}>
 
       {/* Hero */}
       <div style={{ background:theme.headerBg, padding:"32px 32px", position:"relative", overflow:"hidden" }}>
@@ -141,7 +141,7 @@ export default function Profile({ onNavigate }) {
         )}
 
         {/* Profile Card */}
-        <div style={{ backgroundColor:"#fff", borderRadius:16, padding:32, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+        <div style={{ backgroundColor:"#1e293b", borderRadius:16, padding:32, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #334155" }}>
 
           {/* Avatar row */}
           <div style={{ display:"flex", alignItems:"center", gap:20, marginBottom:28, paddingBottom:24, borderBottom:"1px solid #f1f5f9" }}>
@@ -149,8 +149,8 @@ export default function Profile({ onNavigate }) {
               {initials}
             </div>
             <div style={{ flex:1 }}>
-              <div style={{ fontSize:22, fontWeight:800, color:"#111827" }}>{profile?.name}</div>
-              <div style={{ fontSize:13, color:"#64748b", marginTop:4 }}>{profile?.email}</div>
+              <div style={{ fontSize:22, fontWeight:800, color:"#f8fafc" }}>{profile?.name}</div>
+              <div style={{ fontSize:13, color:"#94a3b8", marginTop:4 }}>{profile?.email}</div>
               <span style={{ display:"inline-block", marginTop:6, padding:"3px 12px", borderRadius:20, fontSize:12, fontWeight:700, background:theme.accentLight, color:theme.accent }}>
                 {isFreelancer ? "Freelancer" : "Client"}
               </span>
@@ -264,7 +264,7 @@ export default function Profile({ onNavigate }) {
                 💾 {saving ? "Saving..." : "Save Changes"}
               </button>
               <button onClick={handleCancel}
-                style={{ padding:"12px 24px", backgroundColor:"white", color:"#374151", border:"1.5px solid #e2e8f0", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14 }}>
+                style={{ padding:"12px 24px", backgroundColor:"#1e293b", color:"#e2e8f0", border:"1.5px solid #e2e8f0", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14 }}>
                 Cancel
               </button>
             </div>
@@ -277,7 +277,7 @@ export default function Profile({ onNavigate }) {
 
 function FieldLabel({ icon, label }) {
   return (
-    <div style={{ display:"flex", alignItems:"center", gap:6, fontSize:13, fontWeight:600, color:"#374151", marginBottom:8 }}>
+    <div style={{ display:"flex", alignItems:"center", gap:6, fontSize:13, fontWeight:600, color:"#e2e8f0", marginBottom:8 }}>
       <span>{icon}</span>{label}
     </div>
   );
@@ -285,7 +285,7 @@ function FieldLabel({ icon, label }) {
 
 function ViewBox({ value }) {
   return (
-    <div style={{ fontSize:14, color:value ? "#111827" : "#94a3b8", padding:"10px 14px", backgroundColor:"#f8fafc", borderRadius:8, border:"1px solid #e2e8f0", lineHeight:1.6, minHeight:42 }}>
+    <div style={{ fontSize:14, color:value ? "#111827" : "#94a3b8", padding:"10px 14px", backgroundColor:"#0f172a", borderRadius:8, border:"1px solid #334155", lineHeight:1.6, minHeight:42 }}>
       {value || "—"}
     </div>
   );
@@ -326,5 +326,5 @@ function Tag({ label, theme }) {
 const inp = {
   width:"100%", padding:"10px 14px", border:"1.5px solid #e2e8f0",
   borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit",
-  backgroundColor:"#fff", boxSizing:"border-box", transition:"border-color 0.2s",
+  backgroundColor:"#1e293b", boxSizing:"border-box", transition:"border-color 0.2s",
 };
