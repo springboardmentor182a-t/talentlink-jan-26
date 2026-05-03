@@ -41,6 +41,10 @@ app.include_router(messages_router,          prefix="/messages",      tags=["Mes
 app.include_router(notifications_router,     prefix="/notifications", tags=["Notifications"])
 app.include_router(ai_router)
 
+@app.get("/health", tags=["Health"])
+def health():
+    return {"status": "ok"}
+
 static_dir = "/app/static"
 if os.path.exists(static_dir):
     app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")

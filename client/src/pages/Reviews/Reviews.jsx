@@ -1,14 +1,16 @@
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
 import api from "../../utils/api";
 
 export default function Reviews({ onNavigate }) {
   const { user, role } = useContext(AuthContext);
+  const { isDark }     = useTheme();
   const isFreelancer   = role === "freelancer";
 
   const theme = isFreelancer
-    ? { headerBg:"linear-gradient(135deg,#3b0764 0%,#7c3aed 40%,#a855f7 100%)", accent:"#7c3aed", accentLight:"#f5f3ff", btn:"linear-gradient(135deg,#7c3aed,#a855f7)", shadow:"rgba(124,58,237,0.3)" }
-    : { headerBg:"linear-gradient(135deg,#1e3a5f 0%,#2563eb 50%,#3b82f6 100%)", accent:"#2563eb", accentLight:"#eff6ff", btn:"linear-gradient(135deg,#2563eb,#3b82f6)", shadow:"rgba(37,99,235,0.3)" };
+    ? { headerBg:"linear-gradient(135deg,#3b0764 0%,#7c3aed 40%,#a855f7 100%)", accent:"#7c3aed", accentLight: isDark ? "rgba(124,58,237,0.15)" : "#f5f3ff", btn:"linear-gradient(135deg,#7c3aed,#a855f7)", shadow:"rgba(124,58,237,0.3)" }
+    : { headerBg:"linear-gradient(135deg,#1e3a5f 0%,#2563eb 50%,#3b82f6 100%)", accent:"#2563eb", accentLight: isDark ? "rgba(37,99,235,0.15)"  : "#eff6ff", btn:"linear-gradient(135deg,#2563eb,#3b82f6)", shadow:"rgba(37,99,235,0.3)" };
 
   const [received,   setReceived]   = useState([]);
   const [given,      setGiven]      = useState([]);
@@ -238,7 +240,7 @@ export default function Reviews({ onNavigate }) {
                 </label>
                 <select value={form.selectedContract}
                   onChange={e => setForm(f => ({ ...f, selectedContract:e.target.value }))}
-                  style={{ ...inp, cursor:"pointer", borderColor: form.selectedContract ? theme.accent : "#e2e8f0" }}>
+                  style={{ ...inp, cursor:"pointer", borderColor: form.selectedContract ? theme.accent : "var(--border)" }}>
                   <option value="">Choose a completed project...</option>
                   {dropdownOptions.map(o => (
                     <option key={o.value} value={o.value}>{o.label}</option>
@@ -270,7 +272,7 @@ export default function Reviews({ onNavigate }) {
                     ? "Share your experience working with this client. Were they clear with requirements? Did they communicate well?"
                     : "Share your experience. Did the freelancer deliver quality work on time? Would you hire them again?"}
                   rows={4}
-                  style={{ ...inp, resize:"vertical", lineHeight:1.7, borderColor: form.comment ? theme.accent : "#e2e8f0" }} />
+                  style={{ ...inp, resize:"vertical", lineHeight:1.7, borderColor: form.comment ? theme.accent : "var(--border)" }} />
                 <div style={{ fontSize:12, color: form.comment.length > 10 ? "#16a34a" : "#94a3b8", marginTop:4, textAlign:"right" }}>
                   {form.comment.length} characters
                 </div>
@@ -298,7 +300,7 @@ export default function Reviews({ onNavigate }) {
             { key:"given",    label: isFreelancer ? `Feedback Given (${given.length})` : `Given (${given.length})` },
           ].map(t => (
             <button key={t.key} onClick={() => setActiveTab(t.key)}
-              style={{ padding:"8px 20px", borderRadius:8, border:"none", cursor:"pointer", fontFamily:"inherit", fontSize:13, fontWeight: activeTab === t.key ? 700 : 500, backgroundColor: activeTab === t.key ? theme.accentLight : "transparent", color: activeTab === t.key ? theme.accent : "#64748b", transition:"all 0.15s" }}>
+              style={{ padding:"8px 20px", borderRadius:8, border:"none", cursor:"pointer", fontFamily:"inherit", fontSize:13, fontWeight: activeTab === t.key ? 700 : 500, backgroundColor: activeTab === t.key ? theme.accentLight : "transparent", color: activeTab === t.key ? theme.accent : "var(--text-muted)", transition:"all 0.15s" }}>
               {t.label}
             </button>
           ))}

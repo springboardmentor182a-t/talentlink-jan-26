@@ -70,10 +70,10 @@ export default function ClientDashboard() {
         {/* Stats Cards */}
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(140px, 1fr))", gap:16, marginBottom:32 }}>
           {[
-            { label:"Total Projects",    val:projects.length,  icon:"📁", color:"#2563eb", bg:"#eff6ff" },
+            { label:"Total Projects",    val:projects.length,  icon:"📁", color:"#2563eb", bg:"var(--tint-blue)" },
             { label:"Open Projects",     val:open.length,      icon:"🟢", color:"#16a34a", bg:"var(--tint-green)" },
             { label:"Total Proposals",   val:totalProposals,   icon:"📋", color:"#7c3aed", bg:"var(--tint-purple)" },
-            { label:"Pending Proposals", val:pendingProposals, icon:"⏳", color:"#d97706", bg:"#fffbeb" },
+            { label:"Pending Proposals", val:pendingProposals, icon:"⏳", color:"#d97706", bg:"var(--tint-orange)" },
           ].map(s => (
             <div key={s.label} style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div>
@@ -105,7 +105,7 @@ export default function ClientDashboard() {
 
         {/* Open Projects */}
         {open.length > 0 && (
-          <Section title="Open Projects" count={open.length} dotColor="#16a34a" badgeBg="#dcfce7" badgeColor="#16a34a">
+          <Section title="Open Projects" count={open.length} dotColor="#16a34a" badgeBg="var(--tint-green)" badgeColor="#16a34a">
             {open.map(p => (
               <ProjectCard key={p.id} p={p} proposals={proposals[p.id] || []} navigate={navigate}
                 recommendations={recommendations} setRecommendations={setRecommendations}
@@ -116,7 +116,7 @@ export default function ClientDashboard() {
 
         {/* In Progress */}
         {inProgress.length > 0 && (
-          <Section title="In Progress" count={inProgress.length} dotColor="#f59e0b" badgeBg="#fef3c7" badgeColor="#d97706">
+          <Section title="In Progress" count={inProgress.length} dotColor="#f59e0b" badgeBg="var(--tint-orange)" badgeColor="#d97706">
             {inProgress.map(p => (
               <ProjectCard key={p.id} p={p} proposals={proposals[p.id] || []} navigate={navigate}
                 recommendations={recommendations} setRecommendations={setRecommendations}
@@ -138,7 +138,7 @@ export default function ClientDashboard() {
 
         {/* Closed */}
         {closed.length > 0 && (
-          <Section title="Closed" count={closed.length} dotColor="#94a3b8" badgeBg="#f1f5f9" badgeColor="#64748b">
+          <Section title="Closed" count={closed.length} dotColor="#94a3b8" badgeBg="var(--muted)" badgeColor="var(--text-muted)">
             {closed.map(p => (
               <ProjectCard key={p.id} p={p} proposals={proposals[p.id] || []} navigate={navigate}
                 recommendations={recommendations} setRecommendations={setRecommendations}
@@ -243,19 +243,19 @@ function ProjectCard({ p, proposals, navigate, recommendations, setRecommendatio
         </div>
         <div>
           <div style={{ fontSize:11, color:"var(--text-muted)", textTransform:"uppercase", letterSpacing:"0.5px" }}>Proposals</div>
-          <div style={{ fontWeight:700, color: proposals.length > 0 ? "#7c3aed" : "#111827", fontSize:14 }}>{proposals.length}</div>
+          <div style={{ fontWeight:700, color: proposals.length > 0 ? "#7c3aed" : "var(--text-primary)", fontSize:14 }}>{proposals.length}</div>
         </div>
       </div>
 
       {proposals.length > 0 && (
         <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
           {pending > 0 && (
-            <span style={{ padding:"3px 10px", backgroundColor:"#fffbeb", color:"#d97706", borderRadius:20, fontSize:11, fontWeight:600, border:"1px solid #fde68a" }}>
+            <span style={{ padding:"3px 10px", backgroundColor:"var(--tint-orange)", color:"#d97706", borderRadius:20, fontSize:11, fontWeight:600, border:"1px solid var(--tint-orange-border)" }}>
               ⏳ {pending} pending
             </span>
           )}
           {accepted > 0 && (
-            <span style={{ padding:"3px 10px", backgroundColor:"var(--tint-green)", color:"#16a34a", borderRadius:20, fontSize:11, fontWeight:600, border:"1px solid #86efac" }}>
+            <span style={{ padding:"3px 10px", backgroundColor:"var(--tint-green)", color:"#16a34a", borderRadius:20, fontSize:11, fontWeight:600, border:"1px solid var(--tint-green-border)" }}>
               ✅ {accepted} accepted
             </span>
           )}

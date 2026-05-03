@@ -59,7 +59,7 @@ export default function FreelancerContracts({ onNavigate }) {
             { label:"Completed Contracts", val:completed.length,                     icon:"✅", color:"#16a34a", bg:"var(--tint-green)" },
             { label:"Total Earnings",      val:`$${totalEarnings.toLocaleString()}`, icon:"💰", color:"#2563eb", bg:"var(--tint-blue)" },
           ].map(s => (
-            <div key={s.label} style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <div key={s.label} style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div>
                 <div style={{ fontSize:12, color:"var(--text-muted)", marginBottom:6, textTransform:"uppercase", letterSpacing:"0.5px" }}>{s.label}</div>
                 <div style={{ fontSize:28, fontWeight:800, color:s.color }}>{s.val}</div>
@@ -70,7 +70,7 @@ export default function FreelancerContracts({ onNavigate }) {
         </div>
 
         {contracts.length === 0 && (
-          <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"60px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
+          <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"60px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
             <div style={{ fontSize:56, marginBottom:16 }}>📄</div>
             <h3 style={{ fontSize:18, fontWeight:700, color:"var(--text-primary)", marginBottom:8 }}>No contracts yet</h3>
             <p style={{ color:"var(--text-muted)", fontSize:14, marginBottom:20 }}>Contracts appear here when a client accepts your proposal.</p>
@@ -185,7 +185,7 @@ function ContractCard({ contract, onNavigate, user, completed }) {
   const rc = riskColor[risk?.risk_level] || riskColor["Medium"];
 
   return (
-    <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}
+    <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}
       onMouseEnter={e => e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.1)"}
       onMouseLeave={e => e.currentTarget.style.boxShadow="0 1px 3px rgba(0,0,0,0.06)"}>
 

@@ -162,7 +162,7 @@ export default function PostProject() {
             <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:32, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
 
               {error && (
-                <div style={{ background:"#fef2f2", border:"1px solid #fca5a5", color:"#b91c1c", borderRadius:10, padding:"12px 16px", marginBottom:20, fontSize:13 }}>
+                <div style={{ background:"var(--tint-red)", border:"1px solid var(--tint-red-border)", color:"var(--text-error)", borderRadius:10, padding:"12px 16px", marginBottom:20, fontSize:13 }}>
                   ⚠️ {error}
                 </div>
               )}

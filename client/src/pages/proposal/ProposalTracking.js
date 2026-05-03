@@ -62,7 +62,7 @@ export default function ProposalTracking() {
             { label:"Accepted", val:counts.accepted, color:"#16a34a", bg:"var(--tint-green)",  icon:"✅" },
             { label:"Rejected", val:counts.rejected, color:"#dc2626", bg:"var(--tint-red)",    icon:"❌" },
           ].map(s => (
-            <div key={s.label} style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"22px 24px", display:"flex", justifyContent:"space-between", alignItems:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
+            <div key={s.label} style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"22px 24px", display:"flex", justifyContent:"space-between", alignItems:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
               <div>
                 <div style={{ fontSize:12, color:"var(--text-muted)", marginBottom:6, textTransform:"uppercase", letterSpacing:"0.5px" }}>{s.label}</div>
                 <div style={{ fontSize:32, fontWeight:800, color:s.color }}>{s.val}</div>
@@ -75,7 +75,7 @@ export default function ProposalTracking() {
         {loading && <p style={{ color:"var(--text-muted)" }}>Loading proposals...</p>}
 
         {!loading && proposals.length === 0 && (
-          <div style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:"60px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
+          <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"60px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
             <div style={{ fontSize:56, marginBottom:16 }}>📄</div>
             <h3 style={{ fontSize:18, fontWeight:700, color:"var(--text-primary)", marginBottom:8 }}>No proposals yet</h3>
             <p style={{ color:"var(--text-muted)", fontSize:14, marginBottom:20 }}>Browse projects and submit your first proposal!</p>
@@ -90,7 +90,7 @@ export default function ProposalTracking() {
           const projectTitle = p.project_title || `Project #${p.project_id}`;
           const initials = projectTitle.charAt(0).toUpperCase();
           return (
-            <div key={p.id} style={{ backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}
+            <div key={p.id} style={{ backgroundColor:"var(--card)", borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}
               onMouseEnter={e => e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.1)"}
               onMouseLeave={e => e.currentTarget.style.boxShadow="0 1px 3px rgba(0,0,0,0.06)"}>
 

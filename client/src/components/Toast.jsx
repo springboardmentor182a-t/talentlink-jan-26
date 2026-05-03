@@ -11,12 +11,12 @@ const typeIcon = {
 };
 
 const typeColor = {
-  proposal:  { bg: "#eff6ff", border: "#2563eb", text: "#1e40af" },
-  message:   { bg: "#f5f3ff", border: "#7c3aed", text: "#5b21b6" },
-  contract:  { bg: "#f0fdf4", border: "#16a34a", text: "#15803d" },
-  milestone: { bg: "#fffbeb", border: "#d97706", text: "#b45309" },
-  review:    { bg: "#fff7ed", border: "#ea580c", text: "#c2410c" },
-  default:   { bg: "#f8fafc", border: "#64748b", text: "#475569" },
+  proposal:  { bg: "var(--tint-blue)",   border: "#2563eb",             text: "#1e40af" },
+  message:   { bg: "var(--tint-purple)", border: "#7c3aed",             text: "#5b21b6" },
+  contract:  { bg: "var(--tint-green)",  border: "#16a34a",             text: "#15803d" },
+  milestone: { bg: "var(--tint-orange)", border: "var(--tint-orange-border)", text: "#b45309" },
+  review:    { bg: "var(--tint-orange)", border: "var(--tint-orange-border)", text: "#c2410c" },
+  default:   { bg: "var(--card)",        border: "var(--border)",       text: "var(--text-secondary)" },
 };
 
 export default function Toast() {

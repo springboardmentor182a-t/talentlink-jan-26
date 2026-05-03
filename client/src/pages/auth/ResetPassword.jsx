@@ -51,7 +51,7 @@ export default function ResetPassword() {
       <div style={{ position:"fixed", top:50, right:-100, width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle, rgba(168,85,247,0.5) 0%, transparent 70%)", pointerEvents:"none", animation:"pulse 6s ease-in-out infinite 1s", filter:"blur(25px)" }} />
       <div style={{ position:"fixed", top:"40%", left:-80, width:350, height:350, borderRadius:"50%", background:"radial-gradient(circle, rgba(59,130,246,0.5) 0%, transparent 70%)", pointerEvents:"none", animation:"pulse 5s ease-in-out infinite 2s", filter:"blur(25px)" }} />
 
-      <div style={{ ...fadeUp, position:"relative", zIndex:10, backgroundColor:"var(--card)" /* TODO-DARK */, borderRadius:24, padding:"44px 40px", width:"100%", maxWidth:440, boxShadow:"0 20px 60px rgba(0,0,0,0.4)", border:"1px solid rgba(255,255,255,0.2)" }}>
+      <div style={{ ...fadeUp, position:"relative", zIndex:10, backgroundColor:"var(--card)", borderRadius:24, padding:"44px 40px", width:"100%", maxWidth:440, boxShadow:"0 20px 60px rgba(0,0,0,0.4)", border:"1px solid rgba(255,255,255,0.2)" }}>
 
         <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:10, marginBottom:28 }}>
           <div style={{ width:44, height:44, background:"linear-gradient(135deg,#2563eb,#7c3aed)", borderRadius:12, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontSize:22, boxShadow:"0 4px 15px rgba(37,99,235,0.4)" }}>💼</div>
@@ -64,7 +64,7 @@ export default function ResetPassword() {
           <p style={{ fontSize:14, color:"var(--text-faint)" }}>Enter your new password below.</p>
         </div>
 
-        {error && <div style={{ backgroundColor:"#fef2f2", border:"1.5px solid #fecaca", borderRadius:10, padding:"12px 16px", fontSize:13, color:"#dc2626", marginBottom:16 }}>⚠️ {error}</div>}
+        {error && <div style={{ backgroundColor:"var(--tint-red)", border:"1.5px solid var(--tint-red-border)", borderRadius:10, padding:"12px 16px", fontSize:13, color:"var(--text-error)", marginBottom:16 }}>⚠️ {error}</div>}
         {success && <div style={{ backgroundColor:"var(--tint-green)", border:"1.5px solid var(--tint-green-border)", borderRadius:10, padding:"12px 16px", fontSize:13, color:"#16a34a", marginBottom:16 }}>{success}</div>}
 
         <label style={{ display:"block", fontSize:13, fontWeight:600, color:"var(--text-secondary)", marginBottom:6 }}>New Password</label>

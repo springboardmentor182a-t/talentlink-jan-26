@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 load_dotenv(override=True)
 
 api_key = os.getenv("GROQ_API_KEY")
+if not api_key:
+    raise ValueError("GROQ_API_KEY is not set! Check your .env file.")
 client = Groq(api_key=api_key)
 
 def get_job_match_score(candidate_profile: dict, job: dict) -> dict:
