@@ -1,14 +1,16 @@
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
+import { useTheme } from "../../context/ThemeContext";
 import api from "../../utils/api";
 
 export default function Reviews({ onNavigate }) {
   const { user, role } = useContext(AuthContext);
+  const { isDark }     = useTheme();
   const isFreelancer   = role === "freelancer";
 
   const theme = isFreelancer
-    ? { headerBg:"linear-gradient(135deg,#3b0764 0%,#7c3aed 40%,#a855f7 100%)", accent:"#7c3aed", accentLight:"#f5f3ff", btn:"linear-gradient(135deg,#7c3aed,#a855f7)", shadow:"rgba(124,58,237,0.3)" }
-    : { headerBg:"linear-gradient(135deg,#1e3a5f 0%,#2563eb 50%,#3b82f6 100%)", accent:"#2563eb", accentLight:"#eff6ff", btn:"linear-gradient(135deg,#2563eb,#3b82f6)", shadow:"rgba(37,99,235,0.3)" };
+    ? { headerBg:"linear-gradient(135deg,#3b0764 0%,#7c3aed 40%,#a855f7 100%)", accent:"#7c3aed", accentLight: isDark ? "rgba(124,58,237,0.15)" : "#f5f3ff", btn:"linear-gradient(135deg,#7c3aed,#a855f7)", shadow:"rgba(124,58,237,0.3)" }
+    : { headerBg:"linear-gradient(135deg,#1e3a5f 0%,#2563eb 50%,#3b82f6 100%)", accent:"#2563eb", accentLight: isDark ? "rgba(37,99,235,0.15)"  : "#eff6ff", btn:"linear-gradient(135deg,#2563eb,#3b82f6)", shadow:"rgba(37,99,235,0.3)" };
 
   const [received,   setReceived]   = useState([]);
   const [given,      setGiven]      = useState([]);
@@ -124,7 +126,7 @@ export default function Reviews({ onNavigate }) {
     <div style={{ display:"flex", gap:2 }}>
       {[1,2,3,4,5].map(n => (
         <span key={n} onClick={() => interactive && onChange(n)}
-          style={{ fontSize:size, cursor:interactive ? "pointer" : "default", color: n <= rating ? "#f59e0b" : "#d1d5db", lineHeight:1 }}>
+          style={{ fontSize:size, cursor:interactive ? "pointer" : "default", color: n <= rating ? "#f59e0b" : "var(--border)", lineHeight:1 }}>
           ★
         </span>
       ))}
@@ -133,7 +135,7 @@ export default function Reviews({ onNavigate }) {
 
   if (loading) return (
     <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"60vh" }}>
-      <p style={{ color:"#64748b" }}>Loading reviews...</p>
+      <p style={{ color:"var(--text-muted)" }}>Loading reviews...</p>
     </div>
   );
 
@@ -151,10 +153,10 @@ export default function Reviews({ onNavigate }) {
   const listToShow = activeTab === "received" ? received : given;
 
   return (
-    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#f8fafc", minHeight:"100vh" }}>
+    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"var(--page-bg)", minHeight:"100vh" }}>
 
       {/* Hero */}
-      <div style={{ background:theme.headerBg, padding:"32px 32px", position:"relative", overflow:"hidden" }}>
+      <div style={{ background:theme.headerBg, padding:"24px 16px", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:-40, right:-40, width:200, height:200, borderRadius:"50%", background:"rgba(255,255,255,0.05)" }} />
         <div style={{ display:"inline-flex", alignItems:"center", gap:8, backgroundColor:"rgba(255,255,255,0.15)", borderRadius:20, padding:"4px 14px", fontSize:12, color:"white", fontWeight:600, marginBottom:10 }}>
           ⭐ Reviews
@@ -167,11 +169,11 @@ export default function Reviews({ onNavigate }) {
         </p>
       </div>
 
-      <div style={{ padding:32 }}>
+      <div style={{ padding:"20px 16px" }}>
 
         {/* Success */}
         {success && (
-          <div style={{ backgroundColor:"#f0fdf4", border:"1px solid #86efac", borderRadius:10, padding:"12px 16px", marginBottom:20, display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{ backgroundColor:"var(--tint-green)", border:"1px solid var(--tint-green-border)", borderRadius:10, padding:"12px 16px", marginBottom:20, display:"flex", alignItems:"center", gap:10 }}>
             <span>✅</span>
             <span style={{ fontSize:14, fontWeight:600, color:"#16a34a" }}>
               {isFreelancer ? "Feedback submitted successfully!" : "Review submitted successfully!"}
@@ -180,15 +182,15 @@ export default function Reviews({ onNavigate }) {
         )}
 
         {/* Stats */}
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:16, marginBottom:28 }}>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(160px, 1fr))", gap:16, marginBottom:28 }}>
           {[
             { label:"Reviews Received", val:received.length,                    icon:"📥", color:theme.accent, bg:theme.accentLight },
-            { label:isFreelancer ? "Feedback Given" : "Reviews Given", val:given.length, icon:"📤", color:"#16a34a", bg:"#f0fdf4" },
-            { label:"Average Rating",   val:avgRating ? `${avgRating} ★` : "—", icon:"⭐", color:"#d97706", bg:"#fffbeb" },
+            { label:isFreelancer ? "Feedback Given" : "Reviews Given", val:given.length, icon:"📤", color:"#16a34a", bg:"var(--tint-green)" },
+            { label:"Average Rating",   val:avgRating ? `${avgRating} ★` : "—", icon:"⭐", color:"#d97706", bg:"var(--tint-orange)" },
           ].map(s => (
-            <div key={s.label} style={{ backgroundColor:"#fff", borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+            <div key={s.label} style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"22px 24px", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div>
-                <div style={{ fontSize:12, color:"#64748b", marginBottom:6, textTransform:"uppercase", letterSpacing:"0.5px" }}>{s.label}</div>
+                <div style={{ fontSize:12, color:"var(--text-muted)", marginBottom:6, textTransform:"uppercase", letterSpacing:"0.5px" }}>{s.label}</div>
                 <div style={{ fontSize:28, fontWeight:800, color:s.color }}>{s.val}</div>
               </div>
               <div style={{ width:48, height:48, borderRadius:14, backgroundColor:s.bg, display:"flex", alignItems:"center", justifyContent:"center", fontSize:24 }}>{s.icon}</div>
@@ -198,12 +200,12 @@ export default function Reviews({ onNavigate }) {
 
         {/* Write Review / Give Feedback CTA */}
         {dropdownOptions.length > 0 && (
-          <div style={{ backgroundColor:"#fff", borderRadius:16, padding:"20px 24px", marginBottom:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"20px 24px", marginBottom:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
             <div>
-              <div style={{ fontWeight:700, fontSize:15, color:"#111827" }}>
+              <div style={{ fontWeight:700, fontSize:15, color:"var(--text-primary)" }}>
                 {isFreelancer ? "Give feedback to a client" : "Review a freelancer"}
               </div>
-              <div style={{ fontSize:13, color:"#64748b", marginTop:2 }}>
+              <div style={{ fontSize:13, color:"var(--text-muted)", marginTop:2 }}>
                 {isFreelancer
                   ? `You have ${dropdownOptions.length} completed project${dropdownOptions.length !== 1 ? "s" : ""} to give feedback on`
                   : `You have ${dropdownOptions.length} freelancer${dropdownOptions.length !== 1 ? "s" : ""} to review`}
@@ -218,13 +220,13 @@ export default function Reviews({ onNavigate }) {
 
         {/* Form */}
         {showForm && (
-          <div style={{ backgroundColor:"#fff", borderRadius:16, padding:28, marginBottom:24, boxShadow:"0 4px 16px rgba(0,0,0,0.08)", border:`1.5px solid ${theme.accent}44` }}>
-            <h3 style={{ fontSize:16, fontWeight:700, color:"#111827", margin:"0 0 20px" }}>
+          <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:28, marginBottom:24, boxShadow:"0 4px 16px rgba(0,0,0,0.08)", border:`1.5px solid ${theme.accent}44` }}>
+            <h3 style={{ fontSize:16, fontWeight:700, color:"var(--text-primary)", margin:"0 0 20px" }}>
               {isFreelancer ? "✍️ Give Feedback to Client" : "✍️ Write a Review"}
             </h3>
 
             {formError && (
-              <div style={{ backgroundColor:"#fef2f2", border:"1px solid #fca5a5", borderRadius:8, padding:"10px 14px", marginBottom:16, fontSize:13, color:"#dc2626" }}>
+              <div style={{ backgroundColor:"var(--tint-red)", border:"1px solid var(--tint-red-border)", borderRadius:8, padding:"10px 14px", marginBottom:16, fontSize:13, color:"var(--text-error)" }}>
                 ⚠️ {formError}
               </div>
             )}
@@ -238,7 +240,7 @@ export default function Reviews({ onNavigate }) {
                 </label>
                 <select value={form.selectedContract}
                   onChange={e => setForm(f => ({ ...f, selectedContract:e.target.value }))}
-                  style={{ ...inp, cursor:"pointer", borderColor: form.selectedContract ? theme.accent : "#e2e8f0" }}>
+                  style={{ ...inp, cursor:"pointer", borderColor: form.selectedContract ? theme.accent : "var(--border)" }}>
                   <option value="">Choose a completed project...</option>
                   {dropdownOptions.map(o => (
                     <option key={o.value} value={o.value}>{o.label}</option>
@@ -262,7 +264,7 @@ export default function Reviews({ onNavigate }) {
               <div>
                 <label style={lbl}>
                   {isFreelancer ? "Feedback" : "Review"} <span style={{ color:"#ef4444" }}>*</span>
-                  <span style={{ fontSize:11, color:"#94a3b8", fontWeight:400, marginLeft:6 }}>Required</span>
+                  <span style={{ fontSize:11, color:"var(--text-faint)", fontWeight:400, marginLeft:6 }}>Required</span>
                 </label>
                 <textarea value={form.comment}
                   onChange={e => setForm(f => ({ ...f, comment:e.target.value }))}
@@ -270,7 +272,7 @@ export default function Reviews({ onNavigate }) {
                     ? "Share your experience working with this client. Were they clear with requirements? Did they communicate well?"
                     : "Share your experience. Did the freelancer deliver quality work on time? Would you hire them again?"}
                   rows={4}
-                  style={{ ...inp, resize:"vertical", lineHeight:1.7, borderColor: form.comment ? theme.accent : "#e2e8f0" }} />
+                  style={{ ...inp, resize:"vertical", lineHeight:1.7, borderColor: form.comment ? theme.accent : "var(--border)" }} />
                 <div style={{ fontSize:12, color: form.comment.length > 10 ? "#16a34a" : "#94a3b8", marginTop:4, textAlign:"right" }}>
                   {form.comment.length} characters
                 </div>
@@ -279,11 +281,11 @@ export default function Reviews({ onNavigate }) {
               <div style={{ display:"flex", gap:12 }}>
                 <button onClick={handleSubmit}
                   disabled={submitting || !form.selectedContract || !form.comment.trim()}
-                  style={{ padding:"12px 28px", background:(submitting || !form.selectedContract || !form.comment.trim()) ? "#cbd5e1" : theme.btn, color:"white", border:"none", borderRadius:10, cursor:(submitting || !form.selectedContract || !form.comment.trim()) ? "not-allowed" : "pointer", fontWeight:700, fontSize:14, boxShadow:(submitting || !form.selectedContract || !form.comment.trim()) ? "none" : `0 4px 12px ${theme.shadow}` }}>
+                  style={{ padding:"12px 28px", background:(submitting || !form.selectedContract || !form.comment.trim()) ? "var(--muted)" : theme.btn, color:(submitting || !form.selectedContract || !form.comment.trim()) ? "var(--text-faint)" : "white", border:"none", borderRadius:10, cursor:(submitting || !form.selectedContract || !form.comment.trim()) ? "not-allowed" : "pointer", fontWeight:700, fontSize:14, boxShadow:(submitting || !form.selectedContract || !form.comment.trim()) ? "none" : `0 4px 12px ${theme.shadow}` }}>
                   {submitting ? "Submitting..." : isFreelancer ? "Submit Feedback →" : "Submit Review →"}
                 </button>
                 <button onClick={() => { setShowForm(false); setFormError(""); }}
-                  style={{ padding:"12px 20px", backgroundColor:"white", color:"#374151", border:"1.5px solid #e2e8f0", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14 }}>
+                  style={{ padding:"12px 20px", backgroundColor:"var(--card)", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14 }}>
                   Cancel
                 </button>
               </div>
@@ -292,13 +294,13 @@ export default function Reviews({ onNavigate }) {
         )}
 
         {/* Tabs */}
-        <div style={{ display:"flex", gap:4, marginBottom:20, backgroundColor:"#fff", padding:4, borderRadius:12, border:"1px solid #e2e8f0", width:"fit-content" }}>
+        <div style={{ display:"flex", gap:4, marginBottom:20, backgroundColor:"var(--card)", padding:4, borderRadius:12, border:"1px solid var(--border)", width:"fit-content" }}>
           {[
             { key:"received", label:`Received (${received.length})` },
             { key:"given",    label: isFreelancer ? `Feedback Given (${given.length})` : `Given (${given.length})` },
           ].map(t => (
             <button key={t.key} onClick={() => setActiveTab(t.key)}
-              style={{ padding:"8px 20px", borderRadius:8, border:"none", cursor:"pointer", fontFamily:"inherit", fontSize:13, fontWeight: activeTab === t.key ? 700 : 500, backgroundColor: activeTab === t.key ? theme.accentLight : "transparent", color: activeTab === t.key ? theme.accent : "#64748b", transition:"all 0.15s" }}>
+              style={{ padding:"8px 20px", borderRadius:8, border:"none", cursor:"pointer", fontFamily:"inherit", fontSize:13, fontWeight: activeTab === t.key ? 700 : 500, backgroundColor: activeTab === t.key ? theme.accentLight : "transparent", color: activeTab === t.key ? theme.accent : "var(--text-muted)", transition:"all 0.15s" }}>
               {t.label}
             </button>
           ))}
@@ -306,12 +308,12 @@ export default function Reviews({ onNavigate }) {
 
         {/* Review cards */}
         {listToShow.length === 0 ? (
-          <div style={{ backgroundColor:"#fff", borderRadius:16, padding:"48px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+          <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:"48px 32px", textAlign:"center", boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
             <div style={{ fontSize:48, marginBottom:12 }}>⭐</div>
-            <h3 style={{ fontSize:16, fontWeight:700, color:"#111827", marginBottom:8 }}>
+            <h3 style={{ fontSize:16, fontWeight:700, color:"var(--text-primary)", marginBottom:8 }}>
               {activeTab === "received" ? "No reviews received yet" : isFreelancer ? "No feedback given yet" : "No reviews given yet"}
             </h3>
-            <p style={{ color:"#64748b", fontSize:14 }}>
+            <p style={{ color:"var(--text-muted)", fontSize:14 }}>
               {activeTab === "received"
                 ? "Complete projects to start receiving reviews"
                 : dropdownOptions.length > 0
@@ -321,7 +323,7 @@ export default function Reviews({ onNavigate }) {
           </div>
         ) : (
           listToShow.map(r => (
-            <div key={r.id} style={{ backgroundColor:"#fff", borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}
+            <div key={r.id} style={{ backgroundColor:"var(--card)", borderRadius:16, padding:24, marginBottom:16, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}
               onMouseEnter={e => e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.1)"}
               onMouseLeave={e => e.currentTarget.style.boxShadow="0 1px 3px rgba(0,0,0,0.06)"}>
 
@@ -331,10 +333,10 @@ export default function Reviews({ onNavigate }) {
                     {(r.reviewer_name || "?").charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <div style={{ fontWeight:700, fontSize:15, color:"#111827" }}>
+                    <div style={{ fontWeight:700, fontSize:15, color:"var(--text-primary)" }}>
                       {r.reviewer_name || "Anonymous"}
                     </div>
-                    <div style={{ fontSize:12, color:"#94a3b8", marginTop:2, display:"flex", alignItems:"center", gap:8 }}>
+                    <div style={{ fontSize:12, color:"var(--text-faint)", marginTop:2, display:"flex", alignItems:"center", gap:8 }}>
                       {r.created_at ? new Date(r.created_at).toLocaleDateString([], { year:"numeric", month:"long", day:"numeric" }) : ""}
                       {r.project_name && (
                         <span style={{ padding:"2px 10px", backgroundColor:theme.accentLight, color:theme.accent, borderRadius:20, fontSize:11, fontWeight:600 }}>
@@ -346,12 +348,12 @@ export default function Reviews({ onNavigate }) {
                 </div>
                 <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:4 }}>
                   <Stars rating={r.rating} size={20} />
-                  <span style={{ fontSize:12, color:"#64748b", fontWeight:600 }}>{ratingLabel(r.rating)}</span>
+                  <span style={{ fontSize:12, color:"var(--text-muted)", fontWeight:600 }}>{ratingLabel(r.rating)}</span>
                 </div>
               </div>
 
               {r.comment && (
-                <div style={{ fontSize:14, color:"#374151", lineHeight:1.8, backgroundColor:"#f8fafc", padding:"14px 18px", borderRadius:10, border:"1px solid #e2e8f0", fontStyle:"italic" }}>
+                <div style={{ fontSize:14, color:"var(--text-secondary)", lineHeight:1.8, backgroundColor:"var(--page-bg)", padding:"14px 18px", borderRadius:10, border:"1px solid var(--border)", fontStyle:"italic" }}>
                   "{r.comment}"
                 </div>
               )}
@@ -363,5 +365,5 @@ export default function Reviews({ onNavigate }) {
   );
 }
 
-const lbl = { display:"flex", alignItems:"center", gap:6, fontSize:13, fontWeight:600, color:"#374151", marginBottom:6 };
-const inp = { width:"100%", padding:"10px 14px", border:"1.5px solid #e2e8f0", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", backgroundColor:"#fff", boxSizing:"border-box", transition:"border-color 0.2s" };
+const lbl = { display:"flex", alignItems:"center", gap:6, fontSize:13, fontWeight:600, color:"var(--text-secondary)", marginBottom:6 };
+const inp = { width:"100%", padding:"10px 14px", border:"1.5px solid var(--border)", borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit", backgroundColor:"var(--input-background)", boxSizing:"border-box", transition:"border-color 0.2s" };

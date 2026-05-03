@@ -3,7 +3,8 @@ from sqlalchemy.sql import func
 from src.database.core import Base
 
 class Proposal(Base):
-    __tablename__ = "proposals"  # ✅ double underscores on both sides
+    __tablename__ = "proposals"
+    __table_args__ = {"extend_existing": True}
 
     id = Column(Integer, primary_key=True, index=True)
     project_id = Column(Integer, nullable=False)

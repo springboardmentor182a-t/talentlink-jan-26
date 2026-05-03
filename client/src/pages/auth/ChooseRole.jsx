@@ -1,8 +1,10 @@
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContext";
 import { useEffect, useState } from "react";
 
 export default function ChooseRole() {
   const navigate = useNavigate();
+  const { isDark } = useTheme();
   const [visible, setVisible] = useState(false);
   const [hoverClient, setHoverClient] = useState(false);
   const [hoverFreelancer, setHoverFreelancer] = useState(false);
@@ -29,27 +31,27 @@ export default function ChooseRole() {
   const fadeInDelay3 = { opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(40px)", transition: "opacity 0.7s ease 0.6s, transform 0.7s ease 0.6s" };
 
   const cardStyle = (hovered) => ({
-    backgroundColor: "rgba(255,255,255,0.95)",
+    backgroundColor: isDark ? "rgba(30,27,50,0.92)" : "rgba(255,255,255,0.95)",
     backdropFilter: "blur(20px)",
     borderRadius: 20,
     padding: "36px 32px",
     width: 340,
-    boxShadow: hovered ? "0 24px 64px rgba(0,0,0,0.25)" : "0 8px 32px rgba(0,0,0,0.12)",
+    boxShadow: hovered ? "0 24px 64px rgba(0,0,0,0.35)" : "0 8px 32px rgba(0,0,0,0.18)",
     position: "relative",
     cursor: "pointer",
     transform: hovered ? "translateY(-10px)" : "translateY(0)",
     transition: "all 0.3s ease",
-    border: "1px solid rgba(255,255,255,0.6)",
+    border: isDark ? "1px solid rgba(255,255,255,0.12)" : "1px solid rgba(255,255,255,0.6)",
   });
 
   const list        = { listStyle: "none", padding: 0, margin: "0 0 28px", display: "flex", flexDirection: "column", gap: 10 };
-  const item        = { display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: "#374151" };
+  const item        = { display: "flex", alignItems: "center", gap: 10, fontSize: 14, color: isDark ? "rgba(255,255,255,0.75)" : "#374151" };
   const btnBlue     = { width: "100%", padding: 14, background: "linear-gradient(135deg,#1e3a5f,#2563eb,#3b82f6)", color: "white", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 15, cursor: "pointer", transition: "all 0.2s ease", boxShadow: "0 4px 15px rgba(37,99,235,0.5)" };
   const btnPurple   = { width: "100%", padding: 14, background: "linear-gradient(135deg,#4c1d95,#7c3aed,#a855f7)", color: "white", border: "none", borderRadius: 10, fontWeight: 700, fontSize: 15, cursor: "pointer", transition: "all 0.2s ease", boxShadow: "0 4px 15px rgba(124,58,237,0.5)" };
-  const badgeBlue   = { position: "absolute", top: 20, right: 20, backgroundColor: "#eff6ff", color: "#2563eb", fontSize: 12, fontWeight: 600, padding: "4px 12px", borderRadius: 20 };
-  const badgePurple = { position: "absolute", top: 20, right: 20, backgroundColor: "#f5f3ff", color: "#7c3aed", fontSize: 12, fontWeight: 600, padding: "4px 12px", borderRadius: 20 };
-  const iconBlue    = { width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#eff6ff,#dbeafe)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, marginBottom: 20 };
-  const iconPurple  = { width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#f5f3ff,#ede9fe)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, marginBottom: 20 };
+  const badgeBlue   = { position: "absolute", top: 20, right: 20, backgroundColor: isDark ? "rgba(37,99,235,0.2)" : "#eff6ff", color: "#2563eb", fontSize: 12, fontWeight: 600, padding: "4px 12px", borderRadius: 20 };
+  const badgePurple = { position: "absolute", top: 20, right: 20, backgroundColor: isDark ? "rgba(124,58,237,0.2)" : "#f5f3ff", color: "#7c3aed", fontSize: 12, fontWeight: 600, padding: "4px 12px", borderRadius: 20 };
+  const iconBlue    = { width: 52, height: 52, borderRadius: "50%", background: isDark ? "linear-gradient(135deg,rgba(37,99,235,0.3),rgba(59,130,246,0.2))" : "linear-gradient(135deg,#eff6ff,#dbeafe)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, marginBottom: 20 };
+  const iconPurple  = { width: 52, height: 52, borderRadius: "50%", background: isDark ? "linear-gradient(135deg,rgba(124,58,237,0.3),rgba(168,85,247,0.2))" : "linear-gradient(135deg,#f5f3ff,#ede9fe)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, marginBottom: 20 };
 
   const navLinkStyle = {
     display: "flex", alignItems: "center", gap: 6, padding: "7px 16px",
@@ -79,19 +81,18 @@ export default function ChooseRole() {
       <div style={{ position: "fixed", bottom: "20%", left: "20%", width: 280, height: 280, borderRadius: "50%", background: "radial-gradient(circle, rgba(139,92,246,0.4) 0%, transparent 70%)", pointerEvents: "none", animation: "pulse 8s ease-in-out infinite 1.5s", filter: "blur(20px)", zIndex: 0 }} />
 
       {/* Navbar */}
-      <div style={{ position: "relative", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "18px 40px", backgroundColor: "rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(20px)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 38, height: 38, background: "linear-gradient(135deg,#2563eb,#7c3aed)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 18, boxShadow: "0 4px 15px rgba(37,99,235,0.4)" }}>💼</div>
-          <span style={{ fontWeight: 800, fontSize: 20, background: "linear-gradient(135deg,#60a5fa,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>TalentLink</span>
+      <div style={{ position: "relative", zIndex: 10, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px 16px", padding: "14px clamp(12px, 4vw, 40px)", backgroundColor: "rgba(255,255,255,0.05)", borderBottom: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(20px)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+          <div style={{ width: 38, height: 38, background: "linear-gradient(135deg,#2563eb,#7c3aed)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 18, boxShadow: "0 4px 15px rgba(37,99,235,0.4)", flexShrink: 0 }}>💼</div>
+          <span style={{ fontWeight: 800, fontSize: 20, background: "linear-gradient(135deg,#60a5fa,#a78bfa)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", whiteSpace: "nowrap" }}>TalentLink</span>
         </div>
 
         {/* Direct sign in links */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginRight: 4 }}>Sign in as</span>
-          <button className="nav-link-blue" style={navLinkStyle} onClick={() => navigate("/client/login")}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+          <button className="nav-link-blue" style={{ ...navLinkStyle, fontSize: "clamp(11px, 2.5vw, 13px)", padding: "6px clamp(10px, 2vw, 16px)" }} onClick={() => navigate("/client/login")}>
             💼 Client
           </button>
-          <button className="nav-link-purple" style={navLinkStyle} onClick={() => navigate("/freelancer/login")}>
+          <button className="nav-link-purple" style={{ ...navLinkStyle, fontSize: "clamp(11px, 2.5vw, 13px)", padding: "6px clamp(10px, 2vw, 16px)" }} onClick={() => navigate("/freelancer/login")}>
             👤 Freelancer
           </button>
         </div>
@@ -127,15 +128,15 @@ export default function ChooseRole() {
         <div style={cardStyle(hoverClient)} onMouseEnter={() => setHoverClient(true)} onMouseLeave={() => setHoverClient(false)}>
           <span style={badgeBlue}>For Businesses</span>
           <div style={{ ...iconBlue, animation: "float 3s ease-in-out infinite" }}>💼</div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "#111827", marginBottom: 8 }}>I'm a Client</h2>
-          <p style={{ fontSize: 14, color: "#6b7280", marginBottom: 20, lineHeight: 1.6 }}>Post projects and hire talented freelancers to bring your vision to life.</p>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text-primary)", marginBottom: 8 }}>I'm a Client</h2>
+          <p style={{ fontSize: 14, color: "var(--text-faint)", marginBottom: 20, lineHeight: 1.6 }}>Post projects and hire talented freelancers to bring your vision to life.</p>
           <ul style={list}>
             {["Post unlimited projects", "Review freelancer proposals", "Manage contracts & progress", "Secure payment tracking"].map(f => (
               <li key={f} style={item}><span>✅</span>{f}</li>
             ))}
           </ul>
           <button className="btn-blue" style={btnBlue} onClick={() => navigate("/client/login")}>Continue as Client →</button>
-          <p style={{ textAlign: "center", fontSize: 12, color: "#9ca3af", marginTop: 12 }}>
+          <p style={{ textAlign: "center", fontSize: 12, color: "var(--text-faint)", marginTop: 12 }}>
             New here?{" "}
             <span onClick={() => navigate("/client/signup")} style={{ color: "#2563eb", fontWeight: 600, cursor: "pointer" }}>Create account</span>
           </p>
@@ -145,15 +146,15 @@ export default function ChooseRole() {
         <div style={cardStyle(hoverFreelancer)} onMouseEnter={() => setHoverFreelancer(true)} onMouseLeave={() => setHoverFreelancer(false)}>
           <span style={badgePurple}>For Professionals</span>
           <div style={{ ...iconPurple, animation: "float 3s ease-in-out infinite 1s" }}>👤</div>
-          <h2 style={{ fontSize: 22, fontWeight: 800, color: "#111827", marginBottom: 8 }}>I'm a Freelancer</h2>
-          <p style={{ fontSize: 14, color: "#6b7280", marginBottom: 20, lineHeight: 1.6 }}>Find exciting projects and work with clients from around the world.</p>
+          <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text-primary)", marginBottom: 8 }}>I'm a Freelancer</h2>
+          <p style={{ fontSize: 14, color: "var(--text-faint)", marginBottom: 20, lineHeight: 1.6 }}>Find exciting projects and work with clients from around the world.</p>
           <ul style={list}>
             {["Browse thousands of projects", "Submit competitive proposals", "Build your portfolio", "Get paid for your expertise"].map(f => (
               <li key={f} style={item}><span>✅</span>{f}</li>
             ))}
           </ul>
           <button className="btn-purple" style={btnPurple} onClick={() => navigate("/freelancer/login")}>Continue as Freelancer →</button>
-          <p style={{ textAlign: "center", fontSize: 12, color: "#9ca3af", marginTop: 12 }}>
+          <p style={{ textAlign: "center", fontSize: 12, color: "var(--text-faint)", marginTop: 12 }}>
             New here?{" "}
             <span onClick={() => navigate("/freelancer/signup")} style={{ color: "#7c3aed", fontWeight: 600, cursor: "pointer" }}>Create account</span>
           </p>

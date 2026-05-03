@@ -57,9 +57,9 @@ export default function NotificationBell({ theme = "blue" }) {
       {/* Bell Button */}
       <button
         onClick={() => setOpen(v => !v)}
-        style={{ position: "relative", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 10, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 18, transition: "all 0.2s" }}
-        onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.2)"}
-        onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
+        style={{ position: "relative", background: "var(--input-bg)", border: "1px solid var(--border)", borderRadius: 10, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 18, transition: "all 0.2s" }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = accentColor; }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; }}
       >
         🔔
         {/* ✅ Use bellUnreadCount — excludes messages */}
@@ -72,13 +72,13 @@ export default function NotificationBell({ theme = "blue" }) {
 
       {/* Dropdown */}
       {open && (
-        <div style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, width: 360, backgroundColor: "white", borderRadius: 16, boxShadow: "0 8px 40px rgba(0,0,0,0.15)", border: "1px solid #e2e8f0", zIndex: 1000, overflow: "hidden" }}>
+        <div className="notif-panel" style={{ position: "absolute", top: "calc(100% + 8px)", right: 0, width: "min(360px, calc(100vw - 16px))", backgroundColor: "var(--card)", borderRadius: 16, boxShadow: "0 8px 40px rgba(0,0,0,0.15)", border: "1px solid var(--border)", zIndex: 1000, overflow: "hidden" }}>
 
           {/* Header */}
-          <div style={{ padding: "16px 20px", borderBottom: "1px solid #f1f5f9", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ padding: "16px 20px", borderBottom: "1px solid var(--border-light)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, color: "#111827", margin: 0 }}>Notifications</h3>
-              <p style={{ fontSize: 12, color: "#64748b", margin: "2px 0 0" }}>{bellUnreadCount} unread</p>
+              <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)", margin: 0 }}>Notifications</h3>
+              <p style={{ fontSize: 12, color: "var(--text-muted)", margin: "2px 0 0" }}>{bellUnreadCount} unread</p>
             </div>
             {bellUnreadCount > 0 && (
               <button
@@ -94,16 +94,16 @@ export default function NotificationBell({ theme = "blue" }) {
             {bellNotifications.length === 0 ? (
               <div style={{ padding: 40, textAlign: "center" }}>
                 <div style={{ fontSize: 40, marginBottom: 12 }}>🔔</div>
-                <p style={{ fontSize: 14, color: "#64748b", margin: 0 }}>No notifications yet</p>
+                <p style={{ fontSize: 14, color: "var(--text-muted)", margin: 0 }}>No notifications yet</p>
               </div>
             ) : (
               bellNotifications.map(n => (
                 <div
                   key={n.id}
                   onClick={() => !n.is_read && markAsRead(n.id)}
-                  style={{ padding: "14px 20px", borderBottom: "1px solid #f8fafc", display: "flex", gap: 12, alignItems: "flex-start", backgroundColor: n.is_read ? "white" : "#f8faff", cursor: n.is_read ? "default" : "pointer", transition: "background 0.15s" }}
-                  onMouseEnter={e => e.currentTarget.style.backgroundColor = "#f8fafc"}
-                  onMouseLeave={e => e.currentTarget.style.backgroundColor = n.is_read ? "white" : "#f8faff"}
+                  style={{ padding: "14px 20px", borderBottom: "1px solid var(--border-light)", display: "flex", gap: 12, alignItems: "flex-start", backgroundColor: n.is_read ? "var(--card)" : "var(--nav-active-bg)", cursor: n.is_read ? "default" : "pointer", transition: "background 0.15s" }}
+                  onMouseEnter={e => e.currentTarget.style.backgroundColor = "var(--page-bg)"}
+                  onMouseLeave={e => e.currentTarget.style.backgroundColor = n.is_read ? "var(--card)" : "var(--nav-active-bg)"}
                 >
                   <div style={{ width: 38, height: 38, borderRadius: "50%", backgroundColor: `${typeColor[n.type] || typeColor.default}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
                     {typeIcon[n.type] || typeIcon.default}
@@ -111,20 +111,20 @@ export default function NotificationBell({ theme = "blue" }) {
 
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-                      <p style={{ fontSize: 13, fontWeight: n.is_read ? 500 : 700, color: "#111827", margin: 0, lineHeight: 1.4 }}>{n.title}</p>
+                      <p style={{ fontSize: 13, fontWeight: n.is_read ? 500 : 700, color: "var(--text-primary)", margin: 0, lineHeight: 1.4 }}>{n.title}</p>
                       {!n.is_read && (
                         <span style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: accentColor, flexShrink: 0, marginTop: 4 }} />
                       )}
                     </div>
-                    <p style={{ fontSize: 12, color: "#64748b", margin: "3px 0 0", lineHeight: 1.4 }}>{n.message}</p>
-                    <p style={{ fontSize: 11, color: "#94a3b8", margin: "4px 0 0" }}>{formatTime(n.created_at)}</p>
+                    <p style={{ fontSize: 12, color: "var(--text-muted)", margin: "3px 0 0", lineHeight: 1.4 }}>{n.message}</p>
+                    <p style={{ fontSize: 11, color: "var(--text-faint)", margin: "4px 0 0" }}>{formatTime(n.created_at)}</p>
                   </div>
 
                   <button
                     onClick={(e) => { e.stopPropagation(); deleteNotification(n.id); }}
-                    style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: 16, padding: "0 4px", flexShrink: 0 }}
+                    style={{ background: "none", border: "none", color: "var(--text-faint)", cursor: "pointer", fontSize: 16, padding: "0 4px", flexShrink: 0 }}
                     onMouseEnter={e => e.currentTarget.style.color = "#ef4444"}
-                    onMouseLeave={e => e.currentTarget.style.color = "#94a3b8"}
+                    onMouseLeave={e => e.currentTarget.style.color = "var(--text-faint)"}
                   >
                     ×
                   </button>

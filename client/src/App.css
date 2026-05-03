@@ -1,27 +1,132 @@
 :root {
   --font-size: 16px;
-  --background: #e8eefb;
-  --foreground: #1a1a1a;
-  --card: #ffffff;
-  --card-foreground: #1a1a1a;
+
+  /* Brand / accent — never change with theme */
   --primary: #1f63ff;
   --primary-foreground: #ffffff;
   --secondary: #030213;
   --secondary-foreground: #ffffff;
   --accent: #7c3aed;
   --accent-foreground: #ffffff;
-  --muted: #f0f0f0;
-  --muted-foreground: #717182;
   --success: #10b981;
   --success-foreground: #ffffff;
-  --border: #d0d5e8;
-  --input-background: #f5f7fb;
   --radius: 12px;
+
+  /* ── LIGHT THEME (default) ── */
+  --background:       #e8eefb;   /* outer page bg */
+  --foreground:       #1a1a1a;   /* primary text */
+
+  /* Surfaces */
+  --card:             #ffffff;   /* card / panel bg */
+  --card-foreground:  #1a1a1a;
+
+  /* Named semantic surfaces used throughout the app */
+  --page-bg:          #f8fafc;   /* main content area bg  (#f8fafc) */
+  --sidebar-bg:       #ffffff;   /* sidebar bg            (#fff) */
+  --topbar-bg:        #ffffff;   /* topbar bg             (#fff) */
+  --input-bg:         #f8fafc;   /* topbar user pill bg   (#f8fafc) */
+
+  /* Text shades */
+  --text-primary:     #111827;   /* headings / names      (#111827) */
+  --text-secondary:   #374151;   /* body text             (#374151) */
+  --text-muted:       #64748b;   /* muted / secondary     (#64748b) */
+  --text-faint:       #9ca3af;   /* faint labels          (#9ca3af) */
+
+  /* Borders */
+  --border:           #e2e8f0;   /* dominant border       (#e2e8f0, #d0d5e8) */
+  --border-light:     #f1f5f9;   /* subtle separator      (#f1f5f9) */
+
+  /* Inputs */
+  --input-background: #f5f7fb;
+  --muted:            #f0f0f0;
+  --muted-foreground: #717182;
+
+  /* Nav active state */
+  --nav-active-bg:    #eff6ff;
+  --nav-active-color: #2563eb;
+  --nav-idle-color:   #64748b;
+
+  /* Focus ring */
+  --ring:             rgba(31,99,255,0.18);
+
+  /* Semantic tint panels */
+  --tint-green:         #f0fdf4;
+  --tint-green-border:  #86efac;
+  --tint-purple:        #faf5ff;
+  --tint-purple-border: #ddd6fe;
+  --tint-blue:          #eff6ff;
+  --tint-red:           #fef2f2;
+  --tint-red-border:    #fca5a5;
+  --tint-orange:        #fff7ed;
+  --tint-orange-border: #fed7aa;
+  --text-info:          #0369a1;
+  --text-error:         #b91c1c;
+  --text-warning:       #c2410c;
 }
 
-/* =========================
-   RESET & BASE
-========================= */
+/* ═══════════════════════════════════════
+   DARK THEME — toggled by JS setting
+   data-theme="dark" on <html>
+═══════════════════════════════════════ */
+[data-theme="dark"] {
+  --background:       #0f1117;
+  --foreground:       #e2e8f0;
+
+  --card:             #1e2330;
+  --card-foreground:  #e2e8f0;
+
+  --page-bg:          #151922;
+  --sidebar-bg:       #1a1f2e;
+  --topbar-bg:        #1a1f2e;
+  --input-bg:         #252d3d;
+
+  --text-primary:     #f1f5f9;
+  --text-secondary:   #cbd5e1;
+  --text-muted:       #94a3b8;
+  --text-faint:       #64748b;
+
+  --border:           #2d3748;
+  --border-light:     #252d3d;
+
+  --input-background: #252d3d;
+  --muted:            #252d3d;
+  --muted-foreground: #94a3b8;
+
+  --nav-active-bg:    rgba(37,99,235,0.15);
+  --nav-active-color: #60a5fa;
+  --nav-idle-color:   #94a3b8;
+
+  /* Focus ring — stronger opacity needed on dark surfaces */
+  --ring:             rgba(96,165,250,0.35);
+
+  /* Semantic tint panels — darkened so they don't blind in dark mode */
+  --tint-green:         rgba(22,163,74,0.12);
+  --tint-green-border:  rgba(22,163,74,0.3);
+  --tint-purple:        rgba(124,58,237,0.12);
+  --tint-purple-border: rgba(124,58,237,0.3);
+  --tint-blue:          rgba(37,99,235,0.12);
+  --tint-red:           rgba(220,38,38,0.12);
+  --tint-red-border:    rgba(220,38,38,0.3);
+  --tint-orange:        rgba(234,88,12,0.12);
+  --tint-orange-border: rgba(234,88,12,0.3);
+  --text-info:          #60a5fa;
+  --text-error:         #f87171;
+  --text-warning:       #fb923c;
+}
+
+/* Hide floating AI chat button on messages page to avoid overlapping Send button */
+body.messages-active .ai-chat-fab { display: none !important; }
+
+/* Notification panel — keep inside viewport on narrow screens */
+@media (max-width: 480px) {
+  .notif-panel {
+    position: fixed !important;
+    top: 60px !important;
+    right: 8px !important;
+    left: 8px !important;
+    width: auto !important;
+  }
+}
 * {
   margin: 0;
   padding: 0;
@@ -240,7 +345,7 @@ input, textarea, select {
 input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(31, 99, 255, 0.1);
+  box-shadow: 0 0 0 3px var(--ring);
 }
 
 input::placeholder {
@@ -476,4 +581,84 @@ input::placeholder {
   .btn-social {
     width: 100%;
   }
+}
+
+/* ═══════════════════════════════════════
+   SEMANTIC SURFACE UTILITY CLASSES
+   Drop these onto elements to theme them
+   automatically via CSS var overrides.
+═══════════════════════════════════════ */
+
+/* Page-level background */
+.th-page-bg  { background-color: var(--page-bg) !important; }
+
+/* Card/panel */
+.th-card     { background-color: var(--card) !important; color: var(--card-foreground) !important; }
+
+/* Sidebar */
+.th-sidebar  { background-color: var(--sidebar-bg) !important; border-right-color: var(--border) !important; }
+
+/* Topbar */
+.th-topbar   { background-color: var(--topbar-bg) !important; border-bottom-color: var(--border) !important; }
+
+/* Borders */
+.th-border   { border-color: var(--border) !important; }
+
+/* Text helpers */
+.th-text-primary   { color: var(--text-primary) !important; }
+.th-text-secondary { color: var(--text-secondary) !important; }
+.th-text-muted     { color: var(--text-muted) !important; }
+.th-text-faint     { color: var(--text-faint) !important; }
+
+/* Input pill (topbar user chip) */
+.th-input-bg { background-color: var(--input-bg) !important; border-color: var(--border) !important; }
+
+/* Nav items */
+.th-nav-idle   { color: var(--nav-idle-color) !important; }
+.th-nav-active { color: var(--nav-active-color) !important; background-color: var(--nav-active-bg) !important; }
+
+/* Dark-mode transition */
+*,
+*::before,
+*::after {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Dark mode: inputs */
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background-color: var(--input-background);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+/* Dark mode: scrollbar */
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: var(--page-bg);
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Dark mode override for inline #f8fafc bg (DashboardLayout main content) */
+[data-theme="dark"] .cl-main-content {
+  background-color: var(--page-bg) !important;
+}
+
+/* Dark mode: sidebar overlay */
+[data-theme="dark"] .cl-sidebar-overlay {
+  background-color: rgba(0,0,0,0.6);
 }

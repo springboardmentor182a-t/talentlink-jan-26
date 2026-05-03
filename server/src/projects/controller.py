@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from src.database.core import get_db
 from .model import Project
 from .schema import ProjectCreate, ProjectResponse
-from src.entities.proposal import Proposal
+from src.proposals.model import Proposal
 from src.entities.user import User
 from src.notifications.controller import create_and_send_notification
 

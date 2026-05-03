@@ -8,9 +8,9 @@ const RecentProjects = ({ projects }) => {
             case 'in progress':
                 return { backgroundColor: '#dbeafe', color: '#1e40af' }; // Blue
             case 'completed':
-                return { backgroundColor: '#f3f4f6', color: '#374151' }; // Gray
+                return { backgroundColor: 'var(--muted)', color: 'var(--text-secondary)' };
             default:
-                return { backgroundColor: '#f3f4f6', color: '#374151' };
+                return { backgroundColor: 'var(--muted)', color: 'var(--text-secondary)' };
         }
     };
 

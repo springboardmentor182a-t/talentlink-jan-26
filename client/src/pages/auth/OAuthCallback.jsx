@@ -27,7 +27,7 @@ export default function OAuthCallback() {
     <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", fontFamily:"'Segoe UI',sans-serif" }}>
       <div style={{ textAlign:"center" }}>
         <div style={{ fontSize:48, marginBottom:16 }}>⏳</div>
-        <p style={{ color:"#6b7280", fontSize:16 }}>Logging you in...</p>
+        <p style={{ color:"var(--text-faint)", fontSize:16 }}>Logging you in...</p>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 from .schemas import DashboardStats, ProjectSummary, ChartData, UnreadMessages, ContractStats, ContractSummary, MilestoneSchema
-from src.entities.project import Project
+from src.projects.model import Project
+from src.messages.model import Message
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
@@ -57,7 +58,8 @@ class ClientDashboardService:
 
     @staticmethod
     def get_unread_messages_count(db: Session):
-        return UnreadMessages(count=3)
+        count = db.query(Message).filter(Message.is_read == False).count()
+        return UnreadMessages(count=count)
 
     @staticmethod
     def get_contract_stats(db: Session):
@@ -113,30 +115,37 @@ class ClientDashboardService:
 
     @staticmethod
     def get_proposals(db: Session, project_id: int):
-        from src.entities.proposal import Proposal
+        from src.proposals.model import Proposal
         return db.query(Proposal).filter(Proposal.project_id == project_id).all()
 
     @staticmethod
     def accept_proposal(db: Session, proposal_id: int):
-        from src.entities.proposal import Proposal
+        from src.proposals.model import Proposal
         from src.entities.contract import Contract, Milestone
-        from src.entities.project import Project
+        from src.projects.model import Project
+        from src.entities.user import User
 
         proposal = db.query(Proposal).filter(Proposal.id == proposal_id).first()
         if not proposal:
             return None
-        
+
         proposal.status = 'accepted'
-        
+
         project = db.query(Project).filter(Project.id == proposal.project_id).first()
         if project:
-            project.status = 'in progress'
-        
+            project.status = 'in-progress'
+
+        freelancer = db.query(User).filter(User.id == proposal.freelancer_id).first()
+        freelancer_name = freelancer.name if freelancer else f"Freelancer #{proposal.freelancer_id}"
+
         contract = Contract(
+            project_id=proposal.project_id,
+            client_id=project.client_id if project else None,
+            freelancer_id=proposal.freelancer_id,
             title=f"Contract for {project.title if project else 'Project'}",
-            freelancer_name=proposal.freelancer_name,
+            freelancer_name=freelancer_name,
             status='active',
-            contract_value=proposal.amount,
+            contract_value=str(proposal.proposed_budget),
             milestones_total=1,
             start_date=datetime.utcnow()
         )
@@ -146,11 +155,11 @@ class ClientDashboardService:
         milestone = Milestone(
             contract_id=contract.id,
             title="Initial Deliverable",
-            amount=proposal.amount,
+            amount=str(proposal.proposed_budget),
             status='pending'
         )
         db.add(milestone)
-        
+
         db.commit()
         db.refresh(contract)
         return contract

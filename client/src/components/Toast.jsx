@@ -11,12 +11,12 @@ const typeIcon = {
 };
 
 const typeColor = {
-  proposal:  { bg: "#eff6ff", border: "#2563eb", text: "#1e40af" },
-  message:   { bg: "#f5f3ff", border: "#7c3aed", text: "#5b21b6" },
-  contract:  { bg: "#f0fdf4", border: "#16a34a", text: "#15803d" },
-  milestone: { bg: "#fffbeb", border: "#d97706", text: "#b45309" },
-  review:    { bg: "#fff7ed", border: "#ea580c", text: "#c2410c" },
-  default:   { bg: "#f8fafc", border: "#64748b", text: "#475569" },
+  proposal:  { bg: "var(--tint-blue)",   border: "#2563eb",             text: "#1e40af" },
+  message:   { bg: "var(--tint-purple)", border: "#7c3aed",             text: "#5b21b6" },
+  contract:  { bg: "var(--tint-green)",  border: "#16a34a",             text: "#15803d" },
+  milestone: { bg: "var(--tint-orange)", border: "var(--tint-orange-border)", text: "#b45309" },
+  review:    { bg: "var(--tint-orange)", border: "var(--tint-orange-border)", text: "#c2410c" },
+  default:   { bg: "var(--card)",        border: "var(--border)",       text: "var(--text-secondary)" },
 };
 
 export default function Toast() {
@@ -61,7 +61,7 @@ export default function Toast() {
               <p style={{ fontSize: 13, fontWeight: 700, color: colors.text, margin: 0, lineHeight: 1.4 }}>
                 {toast.title}
               </p>
-              <p style={{ fontSize: 12, color: "#64748b", margin: "3px 0 0", lineHeight: 1.4 }}>
+              <p style={{ fontSize: 12, color: "var(--text-muted)", margin: "3px 0 0", lineHeight: 1.4 }}>
                 {toast.message}
               </p>
             </div>
@@ -69,9 +69,9 @@ export default function Toast() {
             {/* Close button */}
             <button
               onClick={() => removeToast(toast.toastId)}
-              style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", fontSize: 18, padding: 0, flexShrink: 0, lineHeight: 1 }}
-              onMouseEnter={e => e.currentTarget.style.color = "#374151"}
-              onMouseLeave={e => e.currentTarget.style.color = "#94a3b8"}
+              style={{ background: "none", border: "none", color: "var(--text-faint)", cursor: "pointer", fontSize: 18, padding: 0, flexShrink: 0, lineHeight: 1 }}
+              onMouseEnter={e => e.currentTarget.style.color = "var(--text-primary)"}
+              onMouseLeave={e => e.currentTarget.style.color = "var(--text-faint)"}
             >
               ×
             </button>

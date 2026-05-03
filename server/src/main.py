@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from src.database.core import Base, engine
 from src.users.router import router as users_router
@@ -39,6 +41,14 @@ app.include_router(messages_router,          prefix="/messages",      tags=["Mes
 app.include_router(notifications_router,     prefix="/notifications", tags=["Notifications"])
 app.include_router(ai_router)
 
-@app.get("/")
-def root():
-    return {"message": "TalentLink API is running ✅"}
+@app.get("/health", tags=["Health"])
+def health():
+    return {"status": "ok"}
+
+static_dir = "/app/static"
+if os.path.exists(static_dir):
+    app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+else:
+    @app.get("/")
+    def root():
+        return {"message": "TalentLink API is running ✅"}

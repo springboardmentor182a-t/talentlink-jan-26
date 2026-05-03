@@ -1,8 +1,10 @@
+import React from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
 import { NotificationProvider } from "./context/NotificationContext";
-import { LogOut } from "lucide-react";
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
+import { LogOut, Sun, Moon } from "lucide-react";
 import Toast from "./components/Toast";
 import NotificationBell from "./components/NotificationBell";
 import AiChat from "./components/AiChat";
@@ -42,11 +44,11 @@ const routeLabels = {
   "/dashboard":      "Dashboard",
   "/profile":        "Profile",
   "/post-project":   "Post Project",
-  "/projects":       "Project Management",
-  "/contracts":      "Contract Management",
+  "/projects":       "Projects",
+  "/contracts":      "Contracts",
   "/messages":       "Messages",
   "/reviews":        "Reviews",
-  "/view-proposals": "View Proposals",
+  "/view-proposals": "Proposals",
 };
 
 function ProtectedRoute({ children, allowedRole }) {
@@ -61,52 +63,80 @@ function ProtectedRoute({ children, allowedRole }) {
   return children;
 }
 
-function ClientTopbar() {
-  const { user, logout } = useContext(AuthContext);
-  const location         = useLocation();
-  const navigate         = useNavigate();
+function ClientTopbar({ onMenuClick }) {
+  const { user, logout }        = useContext(AuthContext);
+  const { isDark, toggleTheme } = useTheme();
+  const location                = useLocation();
+  const navigate                = useNavigate();
 
   const label = Object.entries(routeLabels).find(([path]) =>
     location.pathname === path || location.pathname.startsWith(path + "/")
   )?.[1] || "Dashboard";
 
   return (
-    <div style={{
-      backgroundColor: "#fff",
-      borderBottom:    "1px solid #e2e8f0",
-      padding:         "0 32px",
-      height:          64,
-      display:         "flex",
-      justifyContent:  "space-between",
-      alignItems:      "center",
-      position:        "sticky",
-      top:             0,
-      zIndex:          100,
-      boxShadow:       "0 1px 3px rgba(0,0,0,0.05)",
+    <div className="th-topbar" style={{
+      borderBottom:   "1px solid var(--border)",
+      padding:        "0 16px",
+      height:         56,
+      display:        "flex",
+      justifyContent: "space-between",
+      alignItems:     "center",
+      position:       "sticky",
+      top:            0,
+      zIndex:         100,
+      boxShadow:      "0 1px 3px rgba(0,0,0,0.05)",
     }}>
-      <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-        <div style={{ width:8, height:8, borderRadius:"50%", background:"linear-gradient(135deg,#1e3a5f,#2563eb)" }} />
-        <span style={{ fontWeight:700, fontSize:15, color:"#111827" }}>{label}</span>
+      <div style={{ display:"flex", alignItems:"center", gap:8, minWidth:0, flex:1 }}>
+        <button onClick={onMenuClick} className="cl-hamburger"
+          style={{ display:"none", background:"none", border:"none", cursor:"pointer", padding:4, flexShrink:0 }}
+          aria-label="Open menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <div style={{ width:8, height:8, borderRadius:"50%", background:"linear-gradient(135deg,#1e3a5f,#2563eb)", flexShrink:0 }} />
+        <span style={{ fontWeight:700, fontSize:15, color:"var(--text-primary)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{label}</span>
       </div>
 
-      <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+      <div className="cl-topbar-right" style={{ display:"flex", alignItems:"center", gap:10, flexShrink:0 }}>
+        {/* ── Dark / Light toggle ── */}
+        <button
+          onClick={toggleTheme}
+          title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          style={{
+            display:"flex", alignItems:"center", justifyContent:"center",
+            width:34, height:34, borderRadius:8,
+            border:"1px solid var(--border)",
+            backgroundColor:"var(--input-bg)",
+            cursor:"pointer",
+            color:"var(--text-muted)",
+            flexShrink:0,
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor="#2563eb"; e.currentTarget.style.color="#2563eb"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.color="var(--text-muted)"; }}>
+          {isDark ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
+
         <NotificationBell theme="blue" />
-        <div style={{ display:"flex", alignItems:"center", gap:10, backgroundColor:"#f8fafc", padding:"6px 14px", borderRadius:20, border:"1px solid #e2e8f0" }}>
+
+        {/* User pill */}
+        <div className="th-input-bg cl-user-pill" style={{ display:"flex", alignItems:"center", gap:8, padding:"6px 10px", borderRadius:20, border:"1px solid var(--border)", flexShrink:0 }}>
           <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#1e3a5f,#2563eb)", display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:700, fontSize:13, boxShadow:"0 2px 8px rgba(37,99,235,0.2)", flexShrink:0 }}>
             {(user?.name || "C").charAt(0).toUpperCase()}
           </div>
-          <div style={{ lineHeight:1.3 }}>
-            <div style={{ fontWeight:600, fontSize:13, color:"#111827" }}>{user?.name || "Client"}</div>
-            <div style={{ fontSize:11, color:"#64748b" }}>Client</div>
+          <div className="cl-name-hide" style={{ lineHeight:1.3 }}>
+            <div style={{ fontWeight:600, fontSize:13, color:"var(--text-primary)" }}>{user?.name || "Client"}</div>
+            <div style={{ fontSize:11, color:"var(--text-muted)" }}>Client</div>
           </div>
         </div>
+
         <button
           onClick={() => { logout(); navigate("/"); }}
-          style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid #e2e8f0", borderRadius:8, cursor:"pointer", fontSize:13, color:"#64748b", background:"white", fontFamily:"inherit", fontWeight:500, transition:"all 0.15s" }}
+          style={{ display:"flex", alignItems:"center", gap:6, padding:"8px 16px", border:"1px solid var(--border)", borderRadius:8, cursor:"pointer", fontSize:13, color:"var(--text-muted)", backgroundColor:"var(--topbar-bg)", fontFamily:"inherit", fontWeight:500, flexShrink:0 }}
           onMouseEnter={e => { e.currentTarget.style.borderColor="#2563eb"; e.currentTarget.style.color="#2563eb"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor="#e2e8f0"; e.currentTarget.style.color="#64748b"; }}>
+          onMouseLeave={e => { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.color="var(--text-muted)"; }}>
           <LogOut size={15} />
-          Logout
+          <span className="cl-logout-text">Logout</span>
         </button>
       </div>
     </div>
@@ -114,22 +144,57 @@ function ClientTopbar() {
 }
 
 function DashboardLayout({ children }) {
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
   return (
     <div style={{ display:"flex" }}>
-      <Sidebar />
-      <main style={{ flex:1, marginLeft:250, minHeight:"100vh", backgroundColor:"#f8fafc" }}>
-        <ClientTopbar />
+      {sidebarOpen && (
+        <div onClick={() => setSidebarOpen(false)}
+          className="cl-sidebar-overlay"
+          style={{ position:"fixed", inset:0, backgroundColor:"rgba(0,0,0,0.4)", zIndex:199 }} />
+      )}
+      <div className={`client-sidebar-wrap${sidebarOpen ? " sidebar-open" : ""}`}>
+        <Sidebar />
+      </div>
+      <main
+        className="cl-main-content"
+        style={{ flex:1, marginLeft:"var(--cl-sidebar-margin,250px)", minHeight:"100vh", backgroundColor:"var(--page-bg)", minWidth:0, overflowX:"hidden" }}>
+        <ClientTopbar onMenuClick={() => setSidebarOpen(v => !v)} />
         {children}
+        <style>{`
+          @media (max-width: 767px) {
+            :root { --cl-sidebar-margin: 0px; }
+            .client-sidebar-wrap { position:fixed; left:0; top:0; z-index:200; transform:translateX(-100%); transition:transform 0.25s ease; height:100vh; }
+            .client-sidebar-wrap.sidebar-open { transform:translateX(0); }
+            .cl-hamburger { display:flex !important; }
+            .cl-name-hide { display:none !important; }
+            .cl-logout-text { display:none !important; }
+          }
+          @media (max-width: 480px) {
+            .cl-topbar-right { gap: 6px !important; }
+            .cl-user-pill { padding: 5px 8px !important; }
+          }
+          @media (min-width: 768px) {
+            :root { --cl-sidebar-margin: 250px; }
+            .client-sidebar-wrap { position:fixed; left:0; top:0; z-index:200; transform:none; height:100vh; }
+          }
+        `}</style>
       </main>
     </div>
   );
 }
 
-// Only show AiChat when user is logged in
 function AiChatWrapper() {
   const { user } = useContext(AuthContext);
+  const location = useLocation();
   if (!user) return null;
+  // Hide the floating AI chat button on the messages page — it overlaps the Send button
+  if (location.pathname.startsWith("/messages")) return null;
   return <AiChat />;
+}
+
+function ClientMessagesWrapper() {
+  const navigate = useNavigate();
+  return <Messages onNavigate={(page) => navigate(`/${page}`)} />;
 }
 
 function AppRoutes() {
@@ -192,7 +257,7 @@ function AppRoutes() {
         } />
         <Route path="/messages" element={
           <ProtectedRoute allowedRole="client">
-            <DashboardLayout><Messages /></DashboardLayout>
+            <DashboardLayout><ClientMessagesWrapper /></DashboardLayout>
           </ProtectedRoute>
         } />
         <Route path="/reviews" element={
@@ -209,7 +274,6 @@ function AppRoutes() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      {/* AiChat floats over every page, only when logged in */}
       <AiChatWrapper />
     </>
   );
@@ -217,14 +281,15 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        {/* NotificationProvider is now INSIDE BrowserRouter so useLocation() works */}
-        <NotificationProvider>
-          <AppRoutes />
-          <Toast />
-        </NotificationProvider>
-      </BrowserRouter>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <NotificationProvider>
+            <AppRoutes />
+            <Toast />
+          </NotificationProvider>
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

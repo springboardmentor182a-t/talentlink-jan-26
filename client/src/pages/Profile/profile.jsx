@@ -106,20 +106,20 @@ export default function Profile({ onNavigate }) {
 
   if (loading) return (
     <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"60vh" }}>
-      <p style={{ color:"#64748b" }}>Loading profile...</p>
+      <p style={{ color:"var(--text-muted)" }}>Loading profile...</p>
     </div>
   );
 
-  const initials       = (profile?.name || "U").charAt(0).toUpperCase();
-  const skillList      = (profile?.skills || "").split(",").map(s => s.trim()).filter(Boolean);
-  const certList       = (profile?.certifications || "").split(",").map(s => s.trim()).filter(Boolean);
-  const editSkillList  = (form.skills || "").split(",").map(s => s.trim()).filter(Boolean);
+  const initials      = (profile?.name || "U").charAt(0).toUpperCase();
+  const skillList     = (profile?.skills || "").split(",").map(s => s.trim()).filter(Boolean);
+  const certList      = (profile?.certifications || "").split(",").map(s => s.trim()).filter(Boolean);
+  const editSkillList = (form.skills || "").split(",").map(s => s.trim()).filter(Boolean);
 
   return (
-    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"#f8fafc", minHeight:"100vh" }}>
+    <div style={{ fontFamily:"'Segoe UI',sans-serif", backgroundColor:"var(--page-bg)", minHeight:"100vh" }}>
 
       {/* Hero */}
-      <div style={{ background:theme.headerBg, padding:"32px 32px", position:"relative", overflow:"hidden" }}>
+      <div style={{ background:theme.headerBg, padding:"24px 16px", position:"relative", overflow:"hidden" }}>
         <div style={{ position:"absolute", top:-40, right:-40, width:200, height:200, borderRadius:"50%", background:"rgba(255,255,255,0.05)" }} />
         <div style={{ display:"inline-flex", alignItems:"center", gap:8, backgroundColor:"rgba(255,255,255,0.15)", borderRadius:20, padding:"4px 14px", fontSize:12, color:"white", fontWeight:600, marginBottom:10 }}>
           👤 {isFreelancer ? "Freelancer Profile" : "Company Profile"}
@@ -132,17 +132,18 @@ export default function Profile({ onNavigate }) {
         </p>
       </div>
 
-      <div style={{ padding:32, maxWidth:960, margin:"0 auto" }}>
+      <div style={{ padding:"20px 16px", maxWidth:900, margin:"0 auto" }}>
 
         {/* Banners */}
         {success && (
-          <div style={{ backgroundColor:"#f0fdf4", border:"1px solid #86efac", borderRadius:10, padding:"12px 16px", marginBottom:20, display:"flex", alignItems:"center", gap:10 }}>
-            <span>✅</span><span style={{ fontSize:14, fontWeight:600, color:"#16a34a" }}>Profile updated successfully!</span>
+          <div style={{ backgroundColor:"var(--tint-green)", border:"1px solid var(--tint-green-border)", borderRadius:10, padding:"12px 16px", marginBottom:20, display:"flex", alignItems:"center", gap:10 }}>
+            <span>✅</span>
+            <span style={{ fontSize:14, fontWeight:600, color:"#16a34a" }}>Profile updated successfully!</span>
           </div>
         )}
         {error && (
-          <div style={{ backgroundColor:"#fef2f2", border:"1px solid #fca5a5", borderRadius:10, padding:"12px 16px", marginBottom:20, display:"flex", alignItems:"center", gap:10 }}>
-            <span>⚠️</span><span style={{ fontSize:14, color:"#dc2626" }}>{error}</span>
+          <div style={{ backgroundColor:"var(--tint-red)", border:"1px solid var(--tint-red-border)", borderRadius:10, padding:"12px 16px", marginBottom:20, display:"flex", alignItems:"center", gap:10 }}>
+            <span>⚠️</span><span style={{ fontSize:14, color:"var(--text-error)" }}>{error}</span>
           </div>
         )}
 
@@ -150,7 +151,7 @@ export default function Profile({ onNavigate }) {
         {isFreelancer && (
           <>
             {/* Header card */}
-            <div style={{ backgroundColor:"#fff", borderRadius:16, padding:28, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0", marginBottom:20 }}>
+            <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:28, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", marginBottom:20 }}>
               <div style={{ display:"flex", alignItems:"center", gap:20, marginBottom: editing ? 24 : 0 }}>
                 <div style={{ width:80, height:80, borderRadius:"50%", background:theme.btn, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:800, fontSize:32, boxShadow:`0 4px 16px ${theme.shadow}`, flexShrink:0 }}>
                   {initials}
@@ -158,20 +159,20 @@ export default function Profile({ onNavigate }) {
                 <div style={{ flex:1 }}>
                   {!editing ? (
                     <>
-                      <div style={{ fontSize:22, fontWeight:800, color:"#111827" }}>{profile?.name}</div>
+                      <div style={{ fontSize:22, fontWeight:800, color:"var(--text-primary)" }}>{profile?.name}</div>
                       {profile?.title && <div style={{ fontSize:15, color:theme.accent, fontWeight:600, marginTop:2 }}>{profile.title}</div>}
-                      <div style={{ fontSize:13, color:"#64748b", marginTop:4 }}>{profile?.email}</div>
+                      <div style={{ fontSize:13, color:"var(--text-faint)", marginTop:4 }}>{profile?.email}</div>
                       <div style={{ display:"flex", gap:12, flexWrap:"wrap", marginTop:8 }}>
-                        {profile?.location   && <Chip icon="📍" label={profile.location} />}
-                        {profile?.experience && <Chip icon="💼" label={profile.experience} />}
+                        {profile?.location     && <Chip icon="📍" label={profile.location} />}
+                        {profile?.experience   && <Chip icon="💼" label={profile.experience} />}
                         {profile?.availability && <Chip icon="🟢" label={profile.availability} />}
                         {profile?.expected_salary && <Chip icon="💰" label={profile.expected_salary} />}
                       </div>
                     </>
                   ) : (
                     <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-                      <EF label="Full Name"   icon="👤" value={form.name}     onChange={v => set("name", v)}     placeholder="Your full name" theme={theme} />
-                      <EF label="Job Title"   icon="🎯" value={form.title}    onChange={v => set("title", v)}    placeholder="e.g. Full Stack Developer" theme={theme} />
+                      <EF label="Full Name" icon="👤" value={form.name}  onChange={v => set("name", v)}  placeholder="Your full name" theme={theme} />
+                      <EF label="Job Title" icon="🎯" value={form.title} onChange={v => set("title", v)} placeholder="e.g. Full Stack Developer" theme={theme} />
                     </div>
                   )}
                 </div>
@@ -185,9 +186,9 @@ export default function Profile({ onNavigate }) {
 
               {/* Social links - view */}
               {!editing && (profile?.linkedin || profile?.github || profile?.portfolio) && (
-                <div style={{ display:"flex", gap:12, flexWrap:"wrap", marginTop:16, paddingTop:16, borderTop:"1px solid #f1f5f9" }}>
+                <div style={{ display:"flex", gap:12, flexWrap:"wrap", marginTop:16, paddingTop:16, borderTop:"1px solid var(--border-light)" }}>
                   {profile.linkedin  && <a href={profile.linkedin}  target="_blank" rel="noreferrer" style={{ display:"flex", alignItems:"center", gap:6, fontSize:13, color:"#0077b5", fontWeight:600, textDecoration:"none" }}>🔗 LinkedIn</a>}
-                  {profile.github    && <a href={profile.github}    target="_blank" rel="noreferrer" style={{ display:"flex", alignItems:"center", gap:6, fontSize:13, color:"#24292e", fontWeight:600, textDecoration:"none" }}>⚡ GitHub</a>}
+                  {profile.github    && <a href={profile.github}    target="_blank" rel="noreferrer" style={{ display:"flex", alignItems:"center", gap:6, fontSize:13, color:"var(--text-primary)", fontWeight:600, textDecoration:"none" }}>⚡ GitHub</a>}
                   {profile.portfolio && <a href={profile.portfolio} target="_blank" rel="noreferrer" style={{ display:"flex", alignItems:"center", gap:6, fontSize:13, color:theme.accent, fontWeight:600, textDecoration:"none" }}>🌐 Portfolio</a>}
                 </div>
               )}
@@ -227,8 +228,8 @@ export default function Profile({ onNavigate }) {
 
                 <Section title="Education & Certifications">
                   <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16 }}>
-                    <EF label="Education"       icon="🎓" value={form.education}      onChange={v => set("education", v)}      placeholder="e.g. B.Tech CSE, Anna University, 2020" theme={theme} />
-                    <EF label="Certifications"  icon="📜" value={form.certifications} onChange={v => set("certifications", v)} placeholder="e.g. AWS Certified, Google Cloud" theme={theme} />
+                    <EF label="Education"      icon="🎓" value={form.education}      onChange={v => set("education", v)}      placeholder="e.g. B.Tech CSE, Anna University, 2020" theme={theme} />
+                    <EF label="Certifications" icon="📜" value={form.certifications} onChange={v => set("certifications", v)} placeholder="e.g. AWS Certified, Google Cloud" theme={theme} />
                   </div>
                 </Section>
 
@@ -246,14 +247,14 @@ export default function Profile({ onNavigate }) {
             {!editing && (
               <>
                 {profile?.bio && (
-                  <div style={{ backgroundColor:"#fff", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0", marginBottom:16 }}>
+                  <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", marginBottom:16 }}>
                     <SectionHead icon="📝" title="Professional Summary" />
-                    <p style={{ fontSize:14, color:"#374151", lineHeight:1.8, margin:0 }}>{profile.bio}</p>
+                    <p style={{ fontSize:14, color:"var(--text-secondary)", lineHeight:1.8, margin:0 }}>{profile.bio}</p>
                   </div>
                 )}
 
                 {skillList.length > 0 && (
-                  <div style={{ backgroundColor:"#fff", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0", marginBottom:16 }}>
+                  <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", marginBottom:16 }}>
                     <SectionHead icon="🛠️" title="Skills" />
                     <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
                       {skillList.map(s => <Tag key={s} label={s} theme={theme} />)}
@@ -263,12 +264,12 @@ export default function Profile({ onNavigate }) {
 
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16, marginBottom:16 }}>
                   {(profile?.education || profile?.certifications) && (
-                    <div style={{ backgroundColor:"#fff", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+                    <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
                       <SectionHead icon="🎓" title="Education & Certifications" />
-                      {profile.education     && <InfoRow icon="🎓" label="Education"      value={profile.education} />}
+                      {profile.education && <InfoRow icon="🎓" label="Education" value={profile.education} />}
                       {profile.certifications && (
                         <div style={{ marginTop:10 }}>
-                          <div style={{ fontSize:12, color:"#64748b", marginBottom:6 }}>📜 Certifications</div>
+                          <div style={{ fontSize:12, color:"var(--text-faint)", marginBottom:6 }}>📜 Certifications</div>
                           <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                             {certList.map(c => <Tag key={c} label={c} theme={theme} />)}
                           </div>
@@ -277,10 +278,10 @@ export default function Profile({ onNavigate }) {
                     </div>
                   )}
                   {(profile?.languages || profile?.phone) && (
-                    <div style={{ backgroundColor:"#fff", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
+                    <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
                       <SectionHead icon="ℹ️" title="Additional Information" />
-                      {profile.languages && <InfoRow icon="🗣️" label="Languages"   value={profile.languages} />}
-                      {profile.phone     && <InfoRow icon="📞" label="Phone"       value={profile.phone} />}
+                      {profile.languages && <InfoRow icon="🗣️" label="Languages" value={profile.languages} />}
+                      {profile.phone     && <InfoRow icon="📞" label="Phone"     value={profile.phone} />}
                     </div>
                   )}
                 </div>
@@ -291,15 +292,15 @@ export default function Profile({ onNavigate }) {
 
         {/* ── CLIENT PROFILE ── */}
         {!isFreelancer && (
-          <div style={{ backgroundColor:"#fff", borderRadius:16, padding:32, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:20, marginBottom:28, paddingBottom:24, borderBottom:"1px solid #f1f5f9" }}>
+          <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:32, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:20, marginBottom:28, paddingBottom:24, borderBottom:"1px solid var(--border-light)" }}>
               <div style={{ width:80, height:80, borderRadius:"50%", background:theme.btn, display:"flex", alignItems:"center", justifyContent:"center", color:"white", fontWeight:800, fontSize:32, boxShadow:`0 4px 16px ${theme.shadow}`, flexShrink:0 }}>
                 {initials}
               </div>
               <div style={{ flex:1 }}>
-                <div style={{ fontSize:22, fontWeight:800, color:"#111827" }}>{profile?.name}</div>
+                <div style={{ fontSize:22, fontWeight:800, color:"var(--text-primary)" }}>{profile?.name}</div>
                 {profile?.industry && <div style={{ fontSize:14, color:theme.accent, fontWeight:600, marginTop:2 }}>{profile.industry}</div>}
-                <div style={{ fontSize:13, color:"#64748b", marginTop:4 }}>{profile?.email}</div>
+                <div style={{ fontSize:13, color:"var(--text-faint)", marginTop:4 }}>{profile?.email}</div>
               </div>
               {!editing && (
                 <button onClick={() => setEditing(true)}
@@ -312,18 +313,18 @@ export default function Profile({ onNavigate }) {
             {!editing ? (
               <div style={{ display:"grid", gap:20 }}>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
-                  <VF label="Company Name"  icon="🏢" value={profile?.name} />
-                  <VF label="Industry"      icon="🏭" value={profile?.industry} />
+                  <VF label="Company Name" icon="🏢" value={profile?.name} />
+                  <VF label="Industry"     icon="🏭" value={profile?.industry} />
                 </div>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
-                  <VF label="Company Size"  icon="👥" value={profile?.company_size} />
-                  <VF label="Website"       icon="🌐" value={profile?.website} />
+                  <VF label="Company Size" icon="👥" value={profile?.company_size} />
+                  <VF label="Website"      icon="🌐" value={profile?.website} />
                 </div>
                 <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:20 }}>
-                  <VF label="Location"      icon="📍" value={profile?.location} />
-                  <VF label="Phone"         icon="📞" value={profile?.phone} />
+                  <VF label="Location"     icon="📍" value={profile?.location} />
+                  <VF label="Phone"        icon="📞" value={profile?.phone} />
                 </div>
-                <VF label="About Company"   icon="📝" value={profile?.bio} />
+                <VF label="About Company"  icon="📝" value={profile?.bio} />
               </div>
             ) : (
               <div style={{ display:"grid", gap:20 }}>
@@ -350,15 +351,16 @@ export default function Profile({ onNavigate }) {
         {editing && (
           <div style={{ display:"flex", gap:12, marginTop:24 }}>
             <button onClick={handleSave} disabled={saving}
-              style={{ display:"flex", alignItems:"center", gap:8, padding:"12px 32px", background:saving ? "#cbd5e1" : theme.btn, color:"white", border:"none", borderRadius:10, cursor:saving ? "not-allowed" : "pointer", fontWeight:700, fontSize:14, boxShadow:saving ? "none" : `0 4px 12px ${theme.shadow}` }}>
+              style={{ display:"flex", alignItems:"center", gap:8, padding:"12px 32px", background:saving ? "var(--muted)" : theme.btn, color:"white", border:"none", borderRadius:10, cursor:saving ? "not-allowed" : "pointer", fontWeight:700, fontSize:14, boxShadow:saving ? "none" : `0 4px 12px ${theme.shadow}` }}>
               💾 {saving ? "Saving..." : "Save Changes"}
             </button>
             <button onClick={handleCancel}
-              style={{ padding:"12px 24px", backgroundColor:"white", color:"#374151", border:"1.5px solid #e2e8f0", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14 }}>
+              style={{ padding:"12px 24px", backgroundColor:"var(--card)", color:"var(--text-secondary)", border:"1.5px solid var(--border)", borderRadius:10, cursor:"pointer", fontWeight:600, fontSize:14 }}>
               Cancel
             </button>
           </div>
         )}
+
       </div>
     </div>
   );
@@ -368,15 +370,15 @@ export default function Profile({ onNavigate }) {
 
 function Section({ title, children }) {
   return (
-    <div style={{ backgroundColor:"#fff", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid #e2e8f0", marginBottom:16 }}>
-      <h3 style={{ fontSize:14, fontWeight:700, color:"#111827", margin:"0 0 16px", display:"flex", alignItems:"center", gap:8 }}>{title}</h3>
+    <div style={{ backgroundColor:"var(--card)", borderRadius:16, padding:24, boxShadow:"0 1px 3px rgba(0,0,0,0.06)", border:"1px solid var(--border)", marginBottom:16 }}>
+      <h3 style={{ fontSize:14, fontWeight:700, color:"var(--text-primary)", margin:"0 0 16px", display:"flex", alignItems:"center", gap:8 }}>{title}</h3>
       {children}
     </div>
   );
 }
 
 function SectionHead({ icon, title }) {
-  return <h3 style={{ fontSize:14, fontWeight:700, color:"#111827", margin:"0 0 14px", display:"flex", alignItems:"center", gap:8 }}><span>{icon}</span>{title}</h3>;
+  return <h3 style={{ fontSize:14, fontWeight:700, color:"var(--text-primary)", margin:"0 0 14px", display:"flex", alignItems:"center", gap:8 }}><span>{icon}</span>{title}</h3>;
 }
 
 function InfoRow({ icon, label, value }) {
@@ -384,15 +386,15 @@ function InfoRow({ icon, label, value }) {
   return (
     <div style={{ display:"flex", gap:8, marginBottom:8, fontSize:13 }}>
       <span>{icon}</span>
-      <span style={{ color:"#64748b" }}>{label}:</span>
-      <span style={{ color:"#111827", fontWeight:500 }}>{value}</span>
+      <span style={{ color:"var(--text-faint)" }}>{label}:</span>
+      <span style={{ color:"var(--text-primary)", fontWeight:500 }}>{value}</span>
     </div>
   );
 }
 
 function Chip({ icon, label }) {
   return (
-    <span style={{ display:"inline-flex", alignItems:"center", gap:4, fontSize:12, color:"#374151", backgroundColor:"#f8fafc", padding:"4px 10px", borderRadius:20, border:"1px solid #e2e8f0" }}>
+    <span style={{ display:"inline-flex", alignItems:"center", gap:4, fontSize:12, color:"var(--text-secondary)", backgroundColor:"var(--input-background)", padding:"4px 10px", borderRadius:20, border:"1px solid var(--border)" }}>
       {icon} {label}
     </span>
   );
@@ -400,7 +402,7 @@ function Chip({ icon, label }) {
 
 function FieldLabel({ icon, label }) {
   return (
-    <div style={{ display:"flex", alignItems:"center", gap:6, fontSize:13, fontWeight:600, color:"#374151", marginBottom:8 }}>
+    <div style={{ display:"flex", alignItems:"center", gap:6, fontSize:13, fontWeight:600, color:"var(--text-secondary)", marginBottom:8 }}>
       <span>{icon}</span>{label}
     </div>
   );
@@ -410,7 +412,7 @@ function VF({ label, icon, value }) {
   return (
     <div>
       <FieldLabel icon={icon} label={label} />
-      <div style={{ fontSize:14, color:value ? "#111827" : "#94a3b8", padding:"10px 14px", backgroundColor:"#f8fafc", borderRadius:8, border:"1px solid #e2e8f0", minHeight:42 }}>
+      <div style={{ fontSize:14, color:value ? "var(--text-primary)" : "var(--text-faint)", padding:"10px 14px", backgroundColor:"var(--page-bg)", borderRadius:8, border:"1px solid var(--border)", minHeight:42 }}>
         {value || "—"}
       </div>
     </div>
@@ -442,7 +444,7 @@ function Tag({ label, theme }) {
 }
 
 const inp = {
-  width:"100%", padding:"10px 14px", border:"1.5px solid #e2e8f0",
+  width:"100%", padding:"10px 14px", border:"1.5px solid var(--border)",
   borderRadius:10, fontSize:14, outline:"none", fontFamily:"inherit",
-  backgroundColor:"#fff", boxSizing:"border-box", transition:"border-color 0.2s",
+  backgroundColor:"var(--input-background)", boxSizing:"border-box", transition:"border-color 0.2s",
 };
