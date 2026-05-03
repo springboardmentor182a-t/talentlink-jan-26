@@ -192,6 +192,11 @@ function AiChatWrapper() {
   return <AiChat />;
 }
 
+function ClientMessagesWrapper() {
+  const navigate = useNavigate();
+  return <Messages onNavigate={(page) => navigate(`/${page}`)} />;
+}
+
 function AppRoutes() {
   return (
     <>
@@ -252,7 +257,7 @@ function AppRoutes() {
         } />
         <Route path="/messages" element={
           <ProtectedRoute allowedRole="client">
-            <DashboardLayout><Messages /></DashboardLayout>
+            <DashboardLayout><ClientMessagesWrapper /></DashboardLayout>
           </ProtectedRoute>
         } />
         <Route path="/reviews" element={

@@ -89,7 +89,8 @@ export default function FreelancerDashboard({ defaultPage = "dashboard" }) {
 
       {/* Sidebar */}
       <aside style={{ width:250, height:"100vh", position:"fixed", left:0, top:0, backgroundColor:"var(--sidebar-bg)", borderRight:"1px solid var(--border)", display:"flex", flexDirection:"column",
-        transform: sidebarOpen ? "translateX(0)" : undefined,
+        transform: sidebarOpen ? "translateX(0)" : "translateX(-100%)",
+        transition: "transform 0.25s ease",
         zIndex:200,
       }} className={`freelancer-sidebar${sidebarOpen ? " sidebar-open" : ""}`}>
         <div style={{ padding:"20px", borderBottom:"1px solid var(--border)", display:"flex", alignItems:"center", gap:10 }}>

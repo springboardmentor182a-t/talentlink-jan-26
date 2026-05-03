@@ -57,9 +57,9 @@ export default function NotificationBell({ theme = "blue" }) {
       {/* Bell Button */}
       <button
         onClick={() => setOpen(v => !v)}
-        style={{ position: "relative", background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", borderRadius: 10, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 18, transition: "all 0.2s" }}
-        onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.2)"}
-        onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
+        style={{ position: "relative", background: "var(--input-bg)", border: "1px solid var(--border)", borderRadius: 10, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: 18, transition: "all 0.2s" }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = accentColor; }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; }}
       >
         🔔
         {/* ✅ Use bellUnreadCount — excludes messages */}

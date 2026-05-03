@@ -159,7 +159,7 @@ export default function ViewProposals() {
                 {project.skills ? (
                   <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                     {project.skills.split(",").map(s => (
-                      <span key={s} style={{ padding:"4px 12px", background:"linear-gradient(135deg,#eff6ff,#dbeafe)", color:"#2563eb", borderRadius:20, fontSize:12, fontWeight:600, border:"1px solid #bfdbfe" }}>{s.trim()}</span>
+                      <span key={s} style={{ padding:"4px 12px", background:"var(--tint-blue)", color:"var(--text-info)", borderRadius:20, fontSize:12, fontWeight:600, border:"1px solid var(--border)" }}>{s.trim()}</span>
                     ))}
                   </div>
                 ) : <span style={{ fontSize:14, color:"var(--text-muted)" }}>No skills specified</span>}
@@ -356,7 +356,7 @@ export default function ViewProposals() {
                           <div style={profileSectionLabel}>Skills</div>
                           <div style={{ display:"flex", gap:6, flexWrap:"wrap" }}>
                             {skillList.map(s => (
-                              <span key={s} style={{ padding:"3px 12px", background:"var(--tint-blue)", color:"#2563eb", borderRadius:20, fontSize:12, fontWeight:600, border:"1px solid #bfdbfe" }}>{s}</span>
+                              <span key={s} style={{ padding:"3px 12px", background:"var(--tint-blue)", color:"var(--text-info)", borderRadius:20, fontSize:12, fontWeight:600, border:"1px solid var(--border)" }}>{s}</span>
                             ))}
                           </div>
                         </div>

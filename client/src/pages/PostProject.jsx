@@ -234,10 +234,10 @@ export default function PostProject() {
                   <div onClick={() => document.getElementById("skill-inp").focus()}
                     style={{ ...inp, display:"flex", flexWrap:"wrap", gap:8, height:"auto", minHeight:48, padding:"10px 14px", cursor:"text", borderColor: skillTags.length > 0 ? "#2563eb" : "var(--border)" }}>
                     {skillTags.map(s => (
-                      <span key={s} style={{ padding:"4px 12px", background:"linear-gradient(135deg,#eff6ff,#dbeafe)", color:"#1d4ed8", borderRadius:20, fontSize:12, fontWeight:600, display:"flex", alignItems:"center", gap:6, border:"1px solid #bfdbfe" }}>
+                      <span key={s} style={{ padding:"4px 12px", background:"var(--tint-blue)", color:"var(--text-info)", borderRadius:20, fontSize:12, fontWeight:600, display:"flex", alignItems:"center", gap:6, border:"1px solid var(--border)" }}>
                         {s}
                         <button type="button" onClick={() => removeSkill(s)}
-                          style={{ background:"none", border:"none", color:"#1d4ed8", cursor:"pointer", fontSize:14, lineHeight:1, padding:0 }}>×</button>
+                          style={{ background:"none", border:"none", color:"var(--text-info)", cursor:"pointer", fontSize:14, lineHeight:1, padding:0 }}>×</button>
                       </span>
                     ))}
                     <input id="skill-inp" type="text"
@@ -266,8 +266,8 @@ export default function PostProject() {
                     </button>
 
                     {budgetEstimate && (
-                      <div style={{ marginTop:10, padding:12, backgroundColor:"var(--tint-blue)", borderRadius:10, border:"1px solid #bfdbfe" }}>
-                        <div style={{ fontSize:12, fontWeight:700, color:"#1d4ed8", marginBottom:6 }}>🤖 AI Budget Suggestion</div>
+                      <div style={{ marginTop:10, padding:12, backgroundColor:"var(--tint-blue)", borderRadius:10, border:"1px solid var(--border)" }}>
+                        <div style={{ fontSize:12, fontWeight:700, color:"var(--text-info)", marginBottom:6 }}>🤖 AI Budget Suggestion</div>
                         <div style={{ display:"flex", gap:12, marginBottom:6 }}>
                           <div style={{ fontSize:12, color:"var(--text-secondary)" }}><span style={{ color:"var(--text-muted)" }}>Min: </span><strong style={{ color:"#16a34a" }}>${budgetEstimate.min}</strong></div>
                           <div style={{ fontSize:12, color:"var(--text-secondary)" }}><span style={{ color:"var(--text-muted)" }}>Max: </span><strong style={{ color:"#dc2626" }}>${budgetEstimate.max}</strong></div>

@@ -63,7 +63,7 @@ export default function Contracts() {
       <div style={{ padding:"20px 16px" }}>
         <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(160px, 1fr))", gap:16, marginBottom:32 }}>
           {[
-            { label:"Active Contracts",    val:active.length,                     icon:"⚡", color:"#2563eb", bg:"#eff6ff" },
+            { label:"Active Contracts",    val:active.length,                     icon:"⚡", color:"#2563eb", bg:"var(--tint-blue)" },
             { label:"Completed Contracts", val:completed.length,                  icon:"✅", color:"#16a34a", bg:"var(--tint-green)" },
             { label:"Total Investment",    val:`$${totalBudget.toLocaleString()}`, icon:"💰", color:"#7c3aed", bg:"var(--tint-purple)" },
           ].map(s => (
@@ -94,7 +94,7 @@ export default function Contracts() {
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
               <div style={{ width:10, height:10, borderRadius:"50%", backgroundColor:"#f59e0b" }} />
               <h2 style={{ fontSize:18, fontWeight:700, color:"var(--text-primary)", margin:0 }}>Active Contracts</h2>
-              <span style={{ backgroundColor:"#fef3c7", color:"#d97706", borderRadius:20, padding:"2px 10px", fontSize:12, fontWeight:600 }}>{active.length}</span>
+              <span style={{ backgroundColor:"var(--tint-orange)", color:"#d97706", borderRadius:20, padding:"2px 10px", fontSize:12, fontWeight:600 }}>{active.length}</span>
             </div>
             {active.map(p => (
               <ContractCard key={p.id} p={p} proposals={proposals[p.id] || []} navigate={navigate} onComplete={() => markCompleted(p.id)} />
@@ -107,7 +107,7 @@ export default function Contracts() {
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
               <div style={{ width:10, height:10, borderRadius:"50%", backgroundColor:"#16a34a" }} />
               <h2 style={{ fontSize:18, fontWeight:700, color:"var(--text-primary)", margin:0 }}>Completed Contracts</h2>
-              <span style={{ backgroundColor:"#dcfce7", color:"#16a34a", borderRadius:20, padding:"2px 10px", fontSize:12, fontWeight:600 }}>{completed.length}</span>
+              <span style={{ backgroundColor:"var(--tint-green)", color:"#16a34a", borderRadius:20, padding:"2px 10px", fontSize:12, fontWeight:600 }}>{completed.length}</span>
             </div>
             {completed.map(p => (
               <ContractCard key={p.id} p={p} proposals={proposals[p.id] || []} navigate={navigate} onComplete={null} />
@@ -240,7 +240,7 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
       {p.skills && (
         <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:16 }}>
           {p.skills.split(",").map(sk => (
-            <span key={sk} style={{ padding:"3px 10px", background:"linear-gradient(135deg,#eff6ff,#dbeafe)", color:"#1d4ed8", borderRadius:20, fontSize:11, fontWeight:600, border:"1px solid #bfdbfe" }}>
+            <span key={sk} style={{ padding:"3px 10px", background:"var(--tint-blue)", color:"var(--text-info)", borderRadius:20, fontSize:11, fontWeight:600, border:"1px solid var(--border)" }}>
               {sk.trim()}
             </span>
           ))}
@@ -392,11 +392,11 @@ function ContractCard({ p, proposals, navigate, onComplete }) {
           </button>
         )}
         <button onClick={fetchRisk}
-          style={{ padding:"10px 20px", background: showRisk ? "#fef3c7" : "linear-gradient(135deg,#f59e0b,#f97316)", color: showRisk ? "#d97706" : "white", border: showRisk ? "1.5px solid #fcd34d" : "none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13, display:"flex", alignItems:"center", gap:6 }}>
+          style={{ padding:"10px 20px", background: showRisk ? "var(--tint-orange)" : "linear-gradient(135deg,#f59e0b,#f97316)", color: showRisk ? "#d97706" : "white", border: showRisk ? "1.5px solid var(--tint-orange-border)" : "none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13, display:"flex", alignItems:"center", gap:6 }}>
           🔮 {showRisk ? "Hide Risk" : "Contract Risk"}
         </button>
         <button onClick={fetchSummary}
-          style={{ padding:"10px 20px", background: showSummary ? "#e0f2fe" : "linear-gradient(135deg,#0369a1,#0ea5e9)", color: showSummary ? "#0369a1" : "white", border: showSummary ? "1.5px solid #bae6fd" : "none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13, display:"flex", alignItems:"center", gap:6 }}>
+          style={{ padding:"10px 20px", background: showSummary ? "var(--tint-blue)" : "linear-gradient(135deg,#0369a1,#0ea5e9)", color: showSummary ? "var(--text-info)" : "white", border: showSummary ? "1.5px solid var(--border)" : "none", borderRadius:8, cursor:"pointer", fontWeight:600, fontSize:13, display:"flex", alignItems:"center", gap:6 }}>
           🤖 {showSummary ? "Hide Summary" : "AI Summary"}
         </button>
         <button onClick={() => navigate("/projects")}
