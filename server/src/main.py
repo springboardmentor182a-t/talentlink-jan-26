@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
 from src.database.core import Base, engine
@@ -47,8 +46,6 @@ def health():
 
 static_dir = "/app/static"
 if os.path.exists(static_dir):
-    app.mount("/static", StaticFiles(directory=static_dir), name="static")
-
     @app.get("/")
     def serve_root():
         return FileResponse(os.path.join(static_dir, "index.html"))
